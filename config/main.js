@@ -1,19 +1,27 @@
 // these change the name of the site (at the top
-
 var sitename = "fanter beta."; // Change this to change the name of your website.
 var subtext = "v0.2, games not added, styling incomplete. :3"; // set the subtext
-
 // more settings in main.css
-
-
-
 // END CONFIG
 // DO NOT MODIFY IF YOU DO NOT KNOW WHAT YOUR DOING!
-
 var serverUrl1 = "https://gms.parcoil.com";
 var currentPageTitle = document.title;
 document.title = `${currentPageTitle} | ${sitename}`;
-let gamesData = []; 
+let gamesData = [];
+
+function getFavourites() {
+  return JSON.parse(localStorage.getItem("favourites") || "[]");
+}
+
+function toggleFavourite(gameName) {
+  let favs = getFavourites();
+  if (favs.includes(gameName)) {
+    favs = favs.filter(f => f !== gameName);
+  } else {
+    favs.push(gameName);
+  }
+  localStorage.setItem("favourites", JSON.stringify(favs));
+}
 
 function displayFilteredGames(filteredGames) {
   const gamesContainer = document.getElementById("gamesContainer");
@@ -39,9 +47,8 @@ function displayFilteredGames(filteredGames) {
         window.location.href = `play.html?gameurl=${game.url}/`;
       }
     };
-   const gameName = document.createElement("p");
+    const gameName = document.createElement("p");
     gameName.textContent = game.name;
-
     const favBtn = document.createElement("button");
     favBtn.classList.add("fav-btn");
     favBtn.textContent = getFavourites().includes(game.name) ? "★" : "☆";
@@ -51,7 +58,6 @@ function displayFilteredGames(filteredGames) {
       toggleFavourite(game.name);
       favBtn.textContent = getFavourites().includes(game.name) ? "★" : "☆";
     };
-
     gameDiv.appendChild(gameImage);
     gameDiv.appendChild(gameName);
     gameDiv.appendChild(favBtn);
@@ -59,13 +65,12 @@ function displayFilteredGames(filteredGames) {
   });
 }
 
-
 function handleSearchInput() {
   const searchInputValue = document
     .getElementById("searchInput")
     .value.toLowerCase();
   let filteredGames;
- const favFilterOn = localStorage.getItem("favFilter") === "true";
+  const favFilterOn = localStorage.getItem("favFilter") === "true";
   if (favFilterOn) {
     const favs = getFavourites();
     filteredGames = gamesData.filter((game) =>
@@ -80,20 +85,19 @@ function handleSearchInput() {
   displayFilteredGames(filteredGames);
 }
 
-
-fetch("./config/games.json") 
+fetch("./config/games.json")
   .then((response) => response.json())
   .then((data) => {
     gamesData = data;
-    displayFilteredGames(data); 
+    displayFilteredGames(data);
+    if (localStorage.getItem("favFilter") === "true") {
+      handleSearchInput();
+    }
   })
   .catch((error) => console.error("Error fetching games:", error));
-
 
 document
   .getElementById("searchInput")
   .addEventListener("input", handleSearchInput);
-
 document.getElementById("title").innerHTML = `${sitename}`;
-
-document.getElementById("subtitle").innerHTML = `${subtext}`
+document.getElementById("subtitle").innerHTML = `${subtext}`;
