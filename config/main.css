@@ -150,7 +150,10 @@ body::after {
 .game:hover {
   transform: scale(1.08) translateY(-15px);
   border: 2px solid var(--accent-color);
+  outline: 4px solid rgba(45, 90, 227, 0.6);
+  outline-offset: 4px;
   filter: drop-shadow(0 15px 30px rgba(45, 90, 227, 0.5));
+
 }
 
 /* Game images (BRIGHT MODE BOOSTED) */
