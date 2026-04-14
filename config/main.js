@@ -92,6 +92,67 @@ function toggleFavSidebar() {
   btn.textContent = !favFilterOn ? "✕" : "★";
 
   if (!favFilterOn) {
+    const favs = getFavourites();
+    const allCards = document.querySelectorAll(".game");
+    const searchBar = document.getElementById("searchInput");
+    const searchRect = searchBar.getBoundingClientRect();
+
+    let delay = 0;
+    const promises = [];
+
+    allCards.forEach((card) => {
+      const isFaved = favs.includes(card.querySelector("p").textContent);
+      if (!isFaved) {
+        const cardRect = card.getBoundingClientRect();
+
+        // create a flying clone
+        const clone = card.cloneNode(true);
+        clone.style.position = "fixed";
+        clone.style.left = cardRect.left + "px";
+        clone.style.top = cardRect.top + "px";
+        clone.style.width = cardRect.width + "px";
+        clone.style.height = cardRect.height + "px";
+        clone.style.margin = "0";
+        clone.style.zIndex = "999";
+        clone.style.transition = `transform 0.3s ease ${delay}s, opacity 0.25s ease ${delay + 0.05}s`;
+        clone.style.pointerEvents = "none";
+        document.body.appendChild(clone);
+
+        // hide original immediately
+        card.style.visibility = "hidden";
+
+        // fly clone to searchbar
+        const targetX = searchRect.left + searchRect.width / 2 - cardRect.left - cardRect.width / 2;
+        const targetY = searchRect.top - cardRect.top;
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            clone.style.transform = `translate(${targetX}px, ${targetY}px) scale(0.2)`;
+            clone.style.opacity = "0";
+          });
+        });
+
+        // remove clone after animation
+        setTimeout(() => {
+          clone.remove();
+        }, delay * 1000 + 400);
+
+        delay += 0.04;
+      }
+    });
+
+    setTimeout(() => {
+      localStorage.setItem("favFilter", "true");
+      handleSearchInput();
+    }, delay * 1000 + 300);
+
+  } else {
+    localStorage.setItem("favFilter", "false");
+    handleSearchInput();
+  }
+}
+
+  if (!favFilterOn) {
     // turning ON - animate non-favourites away
     const favs = getFavourites();
     const allCards = document.querySelectorAll(".game");
