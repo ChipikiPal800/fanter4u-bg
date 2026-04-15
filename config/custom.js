@@ -43,12 +43,17 @@ function setupSearch() {
   });
 }
 
-// ===== LOADING SCREEN WITH BROKEN WALL BREAKTHROUGHS =====
+// ===== LOADING SCREEN WITH SMOOTH TRANSITION =====
 (function() {
+  // Add loading class to body
+  document.body.classList.add('loading');
+  
   const loadingScreen = document.getElementById('loadingScreen');
   const progressBar = document.querySelector('.loading-progress-bar');
   const statusText = document.querySelector('.loading-status');
   const brokenWallContainer = document.getElementById('brokenWallContainer');
+  const whiteFlash = document.getElementById('whiteFlash');
+  const revealOverlay = document.getElementById('revealOverlay');
   
   // Matrix Rain Effect
   const canvas = document.getElementById('matrixCanvas');
@@ -60,7 +65,6 @@ function setupSearch() {
   let fontSize = 16;
   let columns;
   
-  // Matrix characters
   const matrixChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#%&@!?<>{}[]()*+-=~`";
   
   function resizeCanvas() {
@@ -68,7 +72,6 @@ function setupSearch() {
     height = window.innerHeight;
     canvas.width = width;
     canvas.height = height;
-    
     columns = Math.floor(width / fontSize);
     drops = [];
     for (let i = 0; i < columns; i++) {
@@ -85,8 +88,7 @@ function setupSearch() {
       const x = i * fontSize;
       const y = drops[i] * fontSize;
       
-      // Gradient green shades
-      const greenShades = ['#00ff88', '#00cc66', '#33ff99', '#00ffaa', '#66ffcc'];
+      const greenShades = ['#00ff88', '#00cc66', '#33ff99'];
       ctx.fillStyle = greenShades[Math.floor(Math.random() * greenShades.length)];
       ctx.font = fontSize + 'px monospace';
       
@@ -101,61 +103,76 @@ function setupSearch() {
   
   resizeCanvas();
   let matrixInterval = setInterval(drawMatrix, 50);
-  
   window.addEventListener('resize', resizeCanvas);
   
-  // ===== BROKEN WALL BREAKTHROUGHS =====
+  // Random matrix code falling breakthroughs
+  function createRandomMatrixFall() {
+    const fall = document.createElement('div');
+    fall.style.cssText = `
+      position: absolute;
+      left: ${Math.random() * 100}%;
+      top: -100px;
+      width: ${Math.random() * 100 + 50}px;
+      color: #00ff88;
+      font-family: 'Courier New', monospace;
+      font-size: ${Math.random() * 10 + 8}px;
+      opacity: ${Math.random() * 0.5 + 0.3};
+      pointer-events: none;
+      z-index: 4;
+      white-space: nowrap;
+      animation: matrixFall ${Math.random() * 2 + 1}s linear forwards;
+    `;
+    
+    const chars = "010011101001011010";
+    let text = "";
+    for (let i = 0; i < Math.random() * 20 + 10; i++) {
+      text += chars[Math.floor(Math.random() * chars.length)];
+    }
+    fall.textContent = text;
+    
+    document.body.appendChild(fall);
+    setTimeout(() => fall.remove(), 3000);
+  }
+  
+  // Broken wall breakthroughs
   function createBrokenWall() {
     const wall = document.createElement('div');
     wall.className = 'broken-wall';
     
-    // Random position
     const posX = Math.random() * 100;
     const posY = Math.random() * 100;
-    
-    // Random size (like broken wall pieces)
-    const sizeW = Math.random() * 250 + 100;
-    const sizeH = Math.random() * 150 + 80;
+    const sizeW = Math.random() * 200 + 80;
+    const sizeH = Math.random() * 120 + 60;
     
     wall.style.left = posX + '%';
     wall.style.top = posY + '%';
     wall.style.width = sizeW + 'px';
     wall.style.height = sizeH + 'px';
     
-    // 30% chance to be a "cracked" red wall
-    if (Math.random() > 0.7) {
+    if (Math.random() > 0.8) {
       wall.classList.add('cracked');
     }
     
     brokenWallContainer.appendChild(wall);
-    
-    // Remove after animation
-    setTimeout(() => {
-      if (wall && wall.remove) wall.remove();
-    }, 800);
+    setTimeout(() => wall.remove(), 800);
   }
   
-  // Create multiple breakthroughs at once (like a wall shattering)
   function createBreakthroughCluster() {
-    const clusterSize = Math.floor(Math.random() * 5) + 2; // 2-6 breakthroughs
+    const clusterSize = Math.floor(Math.random() * 4) + 2;
     for (let i = 0; i < clusterSize; i++) {
-      setTimeout(() => {
-        createBrokenWall();
-      }, i * 50);
+      setTimeout(() => createBrokenWall(), i * 50);
     }
   }
   
-  // Random screen shake
-  function screenShake() {
-    if (Math.random() > 0.92) {
-      loadingScreen.style.transform = `translate(${Math.random() * 6 - 3}px, ${Math.random() * 6 - 3}px)`;
-      setTimeout(() => {
-        loadingScreen.style.transform = 'translate(0, 0)';
-      }, 100);
+  // Random effects during loading
+  const effectsInterval = setInterval(() => {
+    if (progress < 100) {
+      if (Math.random() > 0.7) createBreakthroughCluster();
+      if (Math.random() > 0.85) createRandomMatrixFall();
     }
-  }
+  }, 600);
   
-  // Simulate loading progress
+  // Loading progress simulation
   let progress = 0;
   const statusMessages = [
     "Initializing fanter.OS...",
@@ -166,99 +183,219 @@ function setupSearch() {
     "Applying custom themes...",
     "Hacking mainframe...",
     "Checking for updates...",
-    "Loading user preferences...",
     "Almost there...",
     "Starting fanter.OS..."
   ];
   
   let messageIndex = 0;
   
-  // Create breakthroughs at intervals
-  const breakthroughInterval = setInterval(() => {
-    if (progress < 100) {
-      createBreakthroughCluster();
-      screenShake();
-    }
-  }, 800);
-  
-  // Extra random single breakthroughs
-  const randomBreakthroughInterval = setInterval(() => {
-    if (progress < 100 && Math.random() > 0.6) {
-      createBrokenWall();
-    }
-  }, 300);
-  
   const loadInterval = setInterval(() => {
-    progress += Math.random() * 12 + 3;
+    progress += Math.random() * 10 + 2;
     
     if (progress >= 100) {
       progress = 100;
       clearInterval(loadInterval);
       clearInterval(matrixInterval);
-      clearInterval(breakthroughInterval);
-      clearInterval(randomBreakthroughInterval);
+      clearInterval(effectsInterval);
       
       statusText.textContent = "Complete! Starting fanter.OS...";
       progressBar.style.width = '100%';
       
-      // Hide loading screen after delay
-      setTimeout(() => {
-        loadingScreen.classList.add('hide');
-        
-        // Remove loading screen from DOM after animation
-        setTimeout(() => {
-          if (loadingScreen && loadingScreen.remove) loadingScreen.remove();
-        }, 800);
-      }, 500);
+      // Start the transition effect
+      setTimeout(() => startTransition(), 300);
     }
     
     progressBar.style.width = progress + '%';
     
-    // Update status message
-    const messageIndexCalc = Math.floor(progress / 10);
-    if (messageIndexCalc > messageIndex && messageIndexCalc < statusMessages.length) {
-      messageIndex = messageIndexCalc;
+    const newIndex = Math.floor(progress / 11);
+    if (newIndex > messageIndex && newIndex < statusMessages.length) {
+      messageIndex = newIndex;
       statusText.textContent = statusMessages[messageIndex];
     }
-    
   }, 250);
   
-  // Extra glitch effects on the title
-  const title = document.querySelector('.loading-title');
-  if (title) {
-    setInterval(() => {
-      if (Math.random() > 0.92 && progress < 100) {
-        const originalText = title.textContent;
-        const glitchChars = "!@#$%^&*()_+{}[]|\\:;\"'<>,.?/";
-        const glitched = originalText.split('').map(char => {
-          if (Math.random() > 0.85) {
-            return glitchChars[Math.floor(Math.random() * glitchChars.length)];
-          }
-          return char;
-        }).join('');
-        title.textContent = glitched;
+  // ===== SMOOTH TRANSITION EFFECT =====
+  function startTransition() {
+    // Step 1: White flash
+    whiteFlash.style.opacity = '1';
+    
+    setTimeout(() => {
+      // Step 2: Hide loading screen
+      loadingScreen.style.opacity = '0';
+      loadingScreen.style.visibility = 'hidden';
+      
+      // Step 3: Show reveal overlay (thick line)
+      revealOverlay.style.transform = 'scaleX(1)';
+      
+      setTimeout(() => {
+        // Step 4: Fade out white flash
+        whiteFlash.style.opacity = '0';
+        
+        // Step 5: Show background content
+        document.body.classList.remove('loading');
+        
+        // Step 6: Animate games appearing randomly
+        animateGamesRandomly();
+        
+        // Step 7: Slide in search bar and settings button
+        animateSearchAndSettings();
         
         setTimeout(() => {
-          title.textContent = originalText;
-        }, 100);
-      }
-    }, 150);
+          // Step 8: Remove reveal overlay
+          revealOverlay.style.transform = 'scaleX(0)';
+          setTimeout(() => {
+            revealOverlay.remove();
+            whiteFlash.remove();
+          }, 1200);
+        }, 500);
+        
+      }, 800);
+    }, 300);
   }
   
-  // Block all interaction with the background
+  // Random game appearance animation
+  function animateGamesRandomly() {
+    const games = document.querySelectorAll('.game');
+    const gamesContainer = document.getElementById('gamesContainer');
+    
+    // Make all games invisible initially
+    games.forEach(game => {
+      game.style.opacity = '0';
+      game.style.transform = 'scale(0)';
+      game.style.transition = 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+    });
+    
+    // Reveal games randomly
+    const revealOrder = Array.from(games).map((_, i) => i);
+    for (let i = revealOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [revealOrder[i], revealOrder[j]] = [revealOrder[j], revealOrder[i]];
+    }
+    
+    revealOrder.forEach((index, i) => {
+      setTimeout(() => {
+        const game = games[index];
+        if (game) {
+          game.style.opacity = '1';
+          game.style.transform = 'scale(1)';
+          
+          // Add bounce effect
+          game.style.animation = 'gamePop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+          setTimeout(() => {
+            if (game) game.style.animation = '';
+          }, 400);
+        }
+      }, i * 50);
+    });
+  }
+  
+  // Slide in search bar and settings button
+  function animateSearchAndSettings() {
+    const searchBar = document.getElementById('searchInput');
+    const settingsBtn = document.querySelector('.center .settings-btn');
+    const favSidebar = document.querySelector('.fav-sidebar-btn');
+    const title = document.querySelector('.center h1');
+    const subtitle = document.querySelector('.center p');
+    
+    // Search bar slides from left
+    if (searchBar) {
+      searchBar.style.opacity = '0';
+      searchBar.style.transform = 'translateX(-100px)';
+      searchBar.style.transition = 'all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+      setTimeout(() => {
+        searchBar.style.opacity = '1';
+        searchBar.style.transform = 'translateX(0)';
+      }, 100);
+    }
+    
+    // Settings button slides from right
+    if (settingsBtn) {
+      settingsBtn.style.opacity = '0';
+      settingsBtn.style.transform = 'translateX(100px)';
+      settingsBtn.style.transition = 'all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+      setTimeout(() => {
+        settingsBtn.style.opacity = '1';
+        settingsBtn.style.transform = 'translateX(0)';
+      }, 200);
+    }
+    
+    // Title fades in
+    if (title) {
+      title.style.opacity = '0';
+      title.style.transform = 'translateY(-20px)';
+      title.style.transition = 'all 0.5s ease';
+      setTimeout(() => {
+        title.style.opacity = '1';
+        title.style.transform = 'translateY(0)';
+      }, 150);
+    }
+    
+    // Subtitle fades in
+    if (subtitle) {
+      subtitle.style.opacity = '0';
+      subtitle.style.transform = 'translateY(-20px)';
+      subtitle.style.transition = 'all 0.5s ease';
+      setTimeout(() => {
+        subtitle.style.opacity = '1';
+        subtitle.style.transform = 'translateY(0)';
+      }, 250);
+    }
+    
+    // Favorite sidebar slides from left
+    if (favSidebar) {
+      favSidebar.style.opacity = '0';
+      favSidebar.style.transform = 'translateX(-100px)';
+      favSidebar.style.transition = 'all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+      setTimeout(() => {
+        favSidebar.style.opacity = '1';
+        favSidebar.style.transform = 'translateX(0)';
+      }, 300);
+    }
+  }
+  
+  // Add game pop animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes gamePop {
+      0% {
+        transform: scale(0);
+        opacity: 0;
+      }
+      60% {
+        transform: scale(1.1);
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes matrixFall {
+      0% {
+        transform: translateY(-100px);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh);
+        opacity: 0;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+  
+  // Block intractions
   loadingScreen.addEventListener('click', (e) => {
     e.stopPropagation();
     e.preventDefault();
   });
   
-  loadingScreen.addEventListener('mousemove', (e) => {
-    e.stopPropagation();
-  });
+  window.addEventListener('resize', () => resizeCanvas());
   
-  // Ensure canvas updates on resize
-  window.addEventListener('resize', () => {
-    resizeCanvas();
-  });
-  
-  console.log('Loading screen initialized with matrix breakthroughs!');
+  console.log('Loading screen ready with transition effects!');
 })();
