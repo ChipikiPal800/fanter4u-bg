@@ -1416,3 +1416,77 @@ body.no-animations * {
   background: var(--accent-color);
   border-radius: 4px;
 }
+
+/* Add to your main.css */
+
+/* Featured settings card (larger) */
+.settings-card.featured {
+  width: 540px;
+  max-width: calc(100% - 40px);
+  background: linear-gradient(135deg, rgba(45,90,227,0.2), rgba(255,204,0,0.1));
+  border: 2px solid rgba(255,204,0,0.6);
+}
+
+.settings-card.featured .settings-card-icon {
+  font-size: 48px;
+  animation: iconPulse 2s ease-in-out infinite;
+}
+
+@keyframes iconPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); text-shadow: 0 0 20px gold; }
+}
+
+/* Mini card (for less important settings) */
+.settings-card.mini {
+  width: 180px;
+  padding: 15px;
+}
+
+.settings-card.mini .settings-card-icon {
+  font-size: 28px;
+}
+
+.settings-card.mini h2 {
+  font-size: 16px;
+}
+
+.settings-card.mini p {
+  font-size: 11px;
+  display: none; /* Hide description on mini cards */
+}
+
+/* Horizontal card */
+.settings-card.horizontal {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  align-items: center;
+  text-align: left;
+  gap: 20px;
+  padding: 20px 30px;
+}
+
+.settings-card.horizontal .settings-card-icon {
+  font-size: 40px;
+  margin-bottom: 0;
+}
+
+.settings-card.horizontal .card-content {
+  flex: 1;
+}
+
+.settings-card.horizontal h2 {
+  margin-bottom: 5px;
+}
+
+.settings-card.horizontal p {
+  margin-bottom: 0;
+}
+
+/* Glowing border on hover */
+.settings-card.glow:hover {
+  border-color: #ffcc00;
+  box-shadow: 0 0 30px rgba(255,204,0,0.4);
+  transform: translateY(-5px) scale(1.02);
+}
