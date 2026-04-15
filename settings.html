@@ -331,19 +331,28 @@
       }
     }
 
-    function saveTheme() {
-      const solidColor = document.getElementById("solidColorPicker").value;
-      const fontSize = document.getElementById("fontSizeSlider").value;
-      const fontColor = document.getElementById("fontColorPicker").value;
-      
-      themeSettings = {
-        bg: selectedBg,
-        solidColor: solidColor,
-        font: selectedFontFamily,
-        fontSize: parseInt(fontSize),
-        fontColor: fontColor,
-        theme: selectedTheme
-      };
+   function saveTheme() {
+  const solidColor = document.getElementById("solidColorPicker").value;
+  const fontSize = document.getElementById("fontSizeSlider").value;
+  const fontColor = document.getElementById("fontColorPicker").value;
+  
+  const themeToSave = {
+    bg: selectedBg,
+    solidColor: solidColor,
+    font: selectedFontFamily,
+    fontSize: parseInt(fontSize),
+    fontColor: fontColor,
+    theme: selectedTheme
+  };
+  
+  localStorage.setItem("themeSettings", JSON.stringify(themeToSave));
+  
+  // Apply to settings page immediately
+  applyThemeToPage();
+  
+  closeThemeMenu();
+  alert("Theme saved! ✅");
+}
       
       localStorage.setItem("themeSettings", JSON.stringify(themeSettings));
       
