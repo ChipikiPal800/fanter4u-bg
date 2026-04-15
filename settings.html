@@ -254,6 +254,118 @@
     window.closeSafetyKeyMenu = closeSafetyKeyMenu;
     window.saveSafetyKey = saveSafetyKey;
 
+      // Theme menu
+    let themeSettings = JSON.parse(localStorage.getItem("themeSettings") || "{}");
+    let selectedBg = themeSettings.bg || "chill";
+    let selectedFontFamily = themeSettings.font || "ubuntu";
+    let selectedFontSize = themeSettings.fontSize || 16;
+    let selectedFontColor = themeSettings.fontColor || "#ffffff";
+    let selectedTheme = themeSettings.theme || "chill";
+
+    function openThemeMenu() {
+      const overlay = document.getElementById("themeOverlay");
+      overlay.style.display = "flex";
+      requestAnimationFrame(() => requestAnimationFrame(() => overlay.classList.add("visible")));
+      showThemeTabSelector();
+      syncSelections();
+    }
+
+    function closeThemeMenu() {
+      const overlay = document.getElementById("themeOverlay");
+      overlay.classList.remove("visible");
+      setTimeout(() => overlay.style.display = "none", 400);
+    }
+
+    function showThemeTabSelector() {
+      document.getElementById("themeTabSelector").style.display = "block";
+      document.querySelectorAll(".theme-tab-content").forEach(t => t.style.display = "none");
+    }
+
+    function showThemeTab(tab) {
+      document.getElementById("themeTabSelector").style.display = "none";
+      document.querySelectorAll(".theme-tab-content").forEach(t => t.style.display = "none");
+      document.getElementById("themeTab-" + tab).style.display = "block";
+    }
+
+    function selectBg(type) {
+      selectedBg = type;
+      document.querySelectorAll("[id^='bg-']").forEach(b => b.classList.remove("selected"));
+      document.getElementById("bg-" + type).classList.add("selected");
+      document.getElementById("colorPickerWrap").style.display = type === "solid" ? "block" : "none";
+    }
+
+    function selectFont(font) {
+      selectedFontFamily = font;
+      document.querySelectorAll("[id^='font-']").forEach(b => b.classList.remove("selected"));
+      document.getElementById("font-" + font).classList.add("selected");
+      updateFontPreview();
+    }
+
+    function updateFontPreview() {
+      const preview = document.getElementById("fontPreview");
+      const size = document.getElementById("fontSizeSlider").value;
+      const color = document.getElementById("fontColorPicker").value;
+      selectedFontSize = size;
+      selectedFontColor = color;
+      preview.style.fontSize = size + "px";
+      preview.style.color = color;
+      preview.style.fontFamily = selectedFontFamily;
+    }
+
+    function selectTheme(theme) {
+      selectedTheme = theme;
+      document.querySelectorAll("[id^='theme-']").forEach(b => b.classList.remove("selected"));
+      document.getElementById("theme-" + theme).classList.add("selected");
+    }
+
+    function syncSelections() {
+      document.getElementById("fontSizeSlider").value = selectedFontSize;
+      document.getElementById("fontColorPicker").value = selectedFontColor;
+      selectBg(selectedBg);
+      selectFont(selectedFontFamily);
+      selectTheme(selectedTheme);
+      updateFontPreview();
+    }
+
+    function saveTheme() {
+      const solidColor = document.getElementById("solidColorPicker").value;
+      themeSettings = {
+        bg: selectedBg,
+        solidColor: solidColor,
+        font: selectedFontFamily,
+        fontSize: selectedFontSize,
+        fontColor: selectedFontColor,
+        theme: selectedTheme
+      };
+      localStorage.setItem("themeSettings", JSON.stringify(themeSettings));
+      applyTheme(themeSettings);
+      closeThemeMenu();
+      alert("theme saved! ✅ refresh the main page to see changes.");
+    }
+
+    function applyTheme(s) {
+      document.documentElement.style.setProperty("--text-color", s.fontColor || "#ffffff");
+      document.body.style.fontSize = (s.fontSize || 16) + "px";
+      document.body.style.fontFamily = s.font || "ubuntu";
+    }
+
+    // apply on load
+    applyTheme(themeSettings);
+
+    document.getElementById("themeOverlay").addEventListener("click", (e) => {
+      if (e.target.id === "themeOverlay") closeThemeMenu();
+    });
+
+    window.openThemeMenu = openThemeMenu;
+    window.closeThemeMenu = closeThemeMenu;
+    window.showThemeTab = showThemeTab;
+    window.showThemeTabSelector = showThemeTabSelector;
+    window.selectBg = selectBg;
+    window.selectFont = selectFont;
+    window.selectTheme = selectTheme;
+    window.updateFontPreview = updateFontPreview;
+    window.saveTheme = saveTheme;
+
   </script>
 
     <script>
