@@ -971,3 +971,224 @@ html {
     opacity: 0;
   }
 }
+
+/* ===== LOADING SCREEN ===== */
+#loadingScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, 
+    rgba(30, 20, 20, 0.95), 
+    rgba(20, 30, 20, 0.95), 
+    rgba(20, 20, 40, 0.95),
+    rgba(40, 20, 30, 0.95));
+  background-size: 400% 400%;
+  animation: loadingBgShift 8s ease infinite;
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+
+/* Animated background with brighter colors */
+@keyframes loadingBgShift {
+  0% { background-position: 0% 50%; filter: brightness(1.2) saturate(1.3); }
+  25% { background-position: 50% 50%; filter: brightness(1.4) saturate(1.5); }
+  50% { background-position: 100% 50%; filter: brightness(1.3) saturate(1.4); }
+  75% { background-position: 50% 50%; filter: brightness(1.5) saturate(1.6); }
+  100% { background-position: 0% 50%; filter: brightness(1.2) saturate(1.3); }
+}
+
+/* Matrix rain canvas */
+#matrixCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.6;
+}
+
+/* Glitch overlay */
+.glitch-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255, 0, 0, 0.05) 0px,
+    rgba(0, 255, 0, 0.05) 2px,
+    rgba(0, 0, 255, 0.05) 4px,
+    transparent 6px
+  );
+  animation: glitchFlicker 0.3s infinite;
+}
+
+@keyframes glitchFlicker {
+  0% { opacity: 0.3; }
+  10% { opacity: 0.5; transform: translateX(2px); }
+  20% { opacity: 0.2; transform: translateX(-2px); }
+  30% { opacity: 0.6; transform: translateX(1px); }
+  40% { opacity: 0.3; transform: translateX(-1px); }
+  50% { opacity: 0.5; transform: translateX(0px); }
+  60% { opacity: 0.2; transform: translateX(3px); }
+  70% { opacity: 0.4; transform: translateX(-3px); }
+  80% { opacity: 0.6; transform: translateX(1px); }
+  90% { opacity: 0.3; transform: translateX(-1px); }
+  100% { opacity: 0.4; transform: translateX(0px); }
+}
+
+/* Scanlines effect */
+.scanlines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 3;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.1) 0px,
+    rgba(0, 0, 0, 0.1) 2px,
+    transparent 2px,
+    transparent 4px
+  );
+  animation: scanlinesMove 8s linear infinite;
+}
+
+@keyframes scanlinesMove {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(4px); }
+}
+
+/* Loading content container */
+.loading-content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading icon */
+.loading-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+  border: 4px solid rgba(45, 90, 227, 0.3);
+  border-top: 4px solid #2d5ae3;
+  border-right: 4px solid #ffcc00;
+  border-bottom: 4px solid #00ff88;
+  border-radius: 50%;
+  animation: spin 1s linear infinite, iconGlow 2s ease-in-out infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes iconGlow {
+  0% { box-shadow: 0 0 10px rgba(45, 90, 227, 0.5); }
+  50% { box-shadow: 0 0 30px rgba(45, 90, 227, 0.8), 0 0 20px rgba(255, 204, 0, 0.5); }
+  100% { box-shadow: 0 0 10px rgba(45, 90, 227, 0.5); }
+}
+
+/* Loding title */
+.loading-title {
+  font-size: 32px;
+  font-family: 'Orbitron', monospace;
+  color: #fff;
+  text-shadow: 
+    0 0 10px #2d5ae3,
+    0 0 20px #2d5ae3,
+    0 0 30px #ffcc00;
+  margin-bottom: 30px;
+  letter-spacing: 4px;
+  animation: titlePulse 2s ease-in-out infinite;
+}
+
+@keyframes titlePulse {
+  0%, 100% { opacity: 1; text-shadow: 0 0 10px #2d5ae3; }
+  50% { opacity: 0.9; text-shadow: 0 0 20px #ffcc00, 0 0 30px #2d5ae3; }
+}
+
+/* Loading progress bar */
+.loading-progress {
+  width: 300px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  margin: 0 auto 15px;
+  overflow: hidden;
+  position: relative;
+}
+
+.loading-progress-bar {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #2d5ae3, #ffcc00, #00ff88, #2d5ae3);
+  background-size: 300% 100%;
+  border-radius: 4px;
+  animation: progressMove 2s linear infinite;
+  transition: width 0.3s ease;
+}
+
+@keyframes progressMove {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+
+/* Loading status text */
+.loading-status {
+  font-family: 'Courier New', monospace;
+  color: #00ff88;
+  font-size: 14px;
+  letter-spacing: 2px;
+  animation: blink 1.5s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* random gitch blocks */
+.glitch-block {
+  position: absolute;
+  background: rgba(255, 0, 0, 0.3);
+  pointer-events: none;
+  z-index: 5;
+  animation: glitchBlockFade 0.5s ease-out forwards;
+}
+
+@keyframes glitchBlockFade {
+  0% { opacity: 0.8; transform: scaleX(1); }
+  100% { opacity: 0; transform: scaleX(0); }
+}
+
+/* Hide loading screen when done */
+#loadingScreen.hide {
+  opacity: 0;
+  visibility: hidden;
+}
