@@ -885,17 +885,22 @@ html {
   margin-top: 0px !important;
 }
 
-/* modern SVG cc */
-body {
-  cursor: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 27"%3E%3Cpolygon points="2,2 20,13 13,13 18,25 13,23 9,15 2,20" fill="%232d5ae3" stroke="%23ffffff" stroke-width="1.5"/%3E%3C/svg%3E') 4 4, auto;
+/* Hide default cursor */
+body, a, button, .game, .settings-btn, .input, .fav-btn {
+    cursor: none;
 }
 
-/* pointer cursor for cliking elements */
-.game, button, a, .settings-btn, .fav-btn, .theme-option-btn, .game img, #searchInput, .fav-sidebar-btn, .link {
-  cursor: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 27"%3E%3Cpolygon points="2,2 20,13 13,13 18,25 13,23 9,15 2,20" fill="%23ffcc00" stroke="%23ffffff" stroke-width="1.5"/%3E%3C/svg%3E') 8 4, pointer !important;
-}
-
-/* Text cursor for inputs */
-input, textarea, #searchInput {
-  cursor: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"%3E%3Crect x="4" y="2" width="2" height="20" fill="%234a9eff"/%3E%3C/svg%3E') 3 12, text;
+/* the glowing orb element */
+.custom-cursor {
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--accent-color, #2d5ae3);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease, width 0.2s, height 0.2s, background 0.2s;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 15px rgba(45, 90, 227, 0.5);
+    backdrop-filter: blur(2px);
 }
