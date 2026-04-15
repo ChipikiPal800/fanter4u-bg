@@ -181,7 +181,8 @@
     </script>
     
 <script>
-    // ===== LOADING SCREEN SYSTEM =====
+  
+// ===== LOADING SCREEN SYSTEM ====
 (function() {
   // Add loading class to body
   document.body.classList.add('loading');
@@ -263,7 +264,7 @@
     setTimeout(() => wall.remove(), 800);
   }
   
-  // ===== PROGRESS SIMULATION =====
+  // ===== PROGRESS SIMULATION (SLOWER) =====
   let progress = 0;
   const messages = [
     "Initializing fanter.OS...",
@@ -273,6 +274,8 @@
     "Loading games library...",
     "Applying themes...",
     "Hacking mainframe...",
+    "Optimizing performance...",
+    "Loading user preferences...",
     "Almost there...",
     "Starting fanter.OS..."
   ];
@@ -286,9 +289,9 @@
     }
   }, 500);
   
-  // Progress update
+  // SLOWER PROGRESS UPDATE
   const progressInterval = setInterval(() => {
-    progress += Math.random() * 8 + 2;
+    progress += Math.random() * 3 + 1;  // Slower: 1-4% per update
     if (progress >= 100) {
       progress = 100;
       clearInterval(progressInterval);
@@ -297,34 +300,41 @@
       progressBar.style.width = '100%';
       statusEl.textContent = "Complete! Starting fanter.OS...";
       
-      // Wait for games to actually load
-      waitForGamesToLoad();
+      // Wait for games to actually load AND render
+      waitForGamesToLoadAndRender();
     } else {
       progressBar.style.width = progress + '%';
-      const newIndex = Math.floor(progress / 12);
+      const newIndex = Math.floor(progress / 9);
       if (newIndex > msgIndex && newIndex < messages.length) {
         msgIndex = newIndex;
         statusEl.textContent = messages[msgIndex];
       }
     }
-  }, 200);
+  }, 300);  // Update every 300ms
   
-  // ===== WAIT FOR ACTUAL GAMES TO LOAD =====
-  function waitForGamesToLoad() {
-    // Check if gamesData exists and has content
+  // ===== WAIT FOR GAMES TO ACTUALLY LOAD AND RENDER =====
+  function waitForGamesToLoadAndRender() {
+    let attempts = 0;
+    const maxAttempts = 50;
+    
     const checkInterval = setInterval(() => {
-      if (typeof gamesData !== 'undefined' && gamesData && gamesData.length > 0) {
+      attempts++;
+      
+      // Check if games are in the DOM
+      const gamesContainer = document.getElementById('gamesContainer');
+      const hasGames = gamesContainer && gamesContainer.children.length > 0;
+      
+      if (hasGames) {
         clearInterval(checkInterval);
-        // Games are loaded, start transition
+        // Extra delay to ensure everything is ready
+        setTimeout(() => {
+          startTransition();
+        }, 500);
+      } else if (attempts >= maxAttempts) {
+        clearInterval(checkInterval);
         startTransition();
       }
     }, 100);
-    
-    // Timeout after 5 seconds just in case
-    setTimeout(() => {
-      clearInterval(checkInterval);
-      startTransition();
-    }, 5000);
   }
   
   // ===== TRANSITION EFFECT =====
@@ -350,10 +360,10 @@
           document.body.classList.remove('loading');
           
           // Animate games
-          animateGamesRandomly();
-          
-          // Animate UI elements
-          animateUIElements();
+          setTimeout(() => {
+            animateGamesRandomly();
+            animateUIElements();
+          }, 100);
           
           setTimeout(() => {
             revealOverlay.style.transform = 'scaleX(0)';
@@ -373,16 +383,20 @@
     const games = document.querySelectorAll('.game');
     const gameArray = Array.from(games);
     
-    // Shuffle array
+    // First, make sure all games are visible but hidden
+    gameArray.forEach(game => {
+      game.style.opacity = '0';
+      game.style.transform = 'scale(0)';
+      game.style.display = 'inline-block';
+    });
+    
+    // Shuffle array for random appearance
     for (let i = gameArray.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [gameArray[i], gameArray[j]] = [gameArray[j], gameArray[i]];
     }
     
     gameArray.forEach((game, index) => {
-      game.style.opacity = '0';
-      game.style.transform = 'scale(0)';
-      
       setTimeout(() => {
         game.style.opacity = '1';
         game.style.transform = 'scale(1)';
@@ -390,7 +404,7 @@
         setTimeout(() => {
           game.style.animation = '';
         }, 400);
-      }, index * 40);
+      }, index * 50);
     });
   }
   
@@ -419,13 +433,26 @@
     });
   }
   
+  // Also ensure search bar and settings button are hidden intially
+  const searchInput = document.getElementById('searchInput');
+  const settingsBtn = document.querySelector('.center .settings-btn');
+  if (searchInput) {
+    searchInput.style.opacity = '0';
+    searchInput.style.transform = 'translateX(-100px)';
+  }
+  if (settingsBtn) {
+    settingsBtn.style.opacity = '0';
+    settingsBtn.style.transform = 'translateX(100px)';
+  }
+  
   // Block clicks on loading screen
   loadingScreen.addEventListener('click', (e) => {
     e.stopPropagation();
   });
   
-  console.log('Loading screen active - waiting for games to load...');
+  console.log('Loading screen active - waiting for games to render...');
 })();
+
       </script> 
   </body>
 </html>
