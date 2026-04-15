@@ -1,14 +1,6 @@
 // these change the name of the site (at the top
 var sitename = "fanter beta."; // Change this to change the name of your website.
 
-// aply saved theme on load
-(function() {
-  const s = JSON.parse(localStorage.getItem("themeSettings") || "{}");
-  if (s.fontColor) document.documentElement.style.setProperty("--text-color", s.fontColor);
-  if (s.fontSize) document.body.style.fontSize = s.fontSize + "px";
-  if (s.font) document.body.style.fontFamily = s.font;
-})();
-
 var subtext = "v0.2, games not added, styling incomplete. :3"; // set the subtext
 
 // more settings in main.css
