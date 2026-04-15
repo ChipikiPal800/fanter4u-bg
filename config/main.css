@@ -884,3 +884,18 @@ body {
 html {
   margin-top: 0px !important;
 }
+
+/* modern SVG cc */
+body {
+  cursor: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 27"%3E%3Cpolygon points="2,2 20,13 13,13 18,25 13,23 9,15 2,20" fill="%232d5ae3" stroke="%23ffffff" stroke-width="1.5"/%3E%3C/svg%3E') 4 4, auto;
+}
+
+/* pointer cursor for cliking elements */
+.game, button, a, .settings-btn, .fav-btn, .theme-option-btn, .game img, #searchInput, .fav-sidebar-btn, .link {
+  cursor: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 27"%3E%3Cpolygon points="2,2 20,13 13,13 18,25 13,23 9,15 2,20" fill="%23ffcc00" stroke="%23ffffff" stroke-width="1.5"/%3E%3C/svg%3E') 8 4, pointer !important;
+}
+
+/* Text cursor for inputs */
+input, textarea, #searchInput {
+  cursor: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"%3E%3Crect x="4" y="2" width="2" height="20" fill="%234a9eff"/%3E%3C/svg%3E') 3 12, text;
+}
