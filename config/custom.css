@@ -1,4 +1,4 @@
-/* aply theme text color to cards and all text elements */
+/* apply theme text color to cards and all text elements */
 .game p,
 .settings-card h2,
 .settings-card p,
@@ -21,7 +21,7 @@
   color: var(--text-color) !important;
 }
 
-/* apply teme text color to inputs */
+/* apply theme text color to inputs */
 #searchInput,
 #safetyUrl {
   color: var(--text-color) !important;
@@ -35,8 +35,8 @@
 .theme-tab-card {
   background: var(--card-bg, rgba(20, 30, 50, 0.8)) !important;
 }
-/* Ensure games container is visible */
 
+/* Ensure games container is visible */
 #gamesContainer {
   min-height: 200px;
 }
