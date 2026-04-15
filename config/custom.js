@@ -43,9 +43,9 @@ function setupSearch() {
   });
 }
 
-// ===== LOADING SCREEN SYSTEM  ====
+<script>
+// ===== LOADING SCREEN SYSTEM (COMPLETE - WITH FIXES) =====
 (function() {
-  
   // Add loading class to body
   document.body.classList.add('loading');
   
@@ -95,25 +95,32 @@ function setupSearch() {
   const matrixInterval = setInterval(drawMatrix, 50);
   window.addEventListener('resize', resizeCanvas);
   
-  // ===== FALLING MATRIX CODE =====
+  // ===== FALLING MATRIX CODE WITH RANDOM COLORS =====
   function createFallingCode() {
     const el = document.createElement('div');
     el.className = 'falling-matrix';
-    const length = Math.floor(Math.random() * 20) + 10;
+    const length = Math.floor(Math.random() * 25) + 10;
     let code = '';
     for (let i = 0; i < length; i++) {
       code += Math.random() > 0.5 ? '1' : '0';
     }
     el.textContent = code;
     el.style.left = Math.random() * 100 + '%';
-    el.style.fontSize = (Math.random() * 10 + 10) + 'px';
-    el.style.animationDuration = (Math.random() * 2 + 1) + 's';
-    el.style.opacity = Math.random() * 0.5 + 0.3;
+    el.style.fontSize = (Math.random() * 12 + 8) + 'px';
+    el.style.animationDuration = (Math.random() * 2.5 + 1) + 's';
+    
+    // Random color for each falling code string
+    const colors = ['#00ff88', '#ff4444', '#ffcc00'];
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    el.style.color = randomColor;
+    el.style.textShadow = `0 0 5px ${randomColor}`;
+    el.style.opacity = Math.random() * 0.6 + 0.4;
+    
     document.body.appendChild(el);
     setTimeout(() => el.remove(), 3000);
   }
   
-  // ===== BROKEN WALL =====
+  // ===== BROKEN WALL (MORE RED POPUPS) =====
   function createBrokenWall() {
     const wall = document.createElement('div');
     wall.className = 'broken-wall';
@@ -121,12 +128,34 @@ function setupSearch() {
     wall.style.top = Math.random() * 100 + '%';
     wall.style.width = (Math.random() * 200 + 80) + 'px';
     wall.style.height = (Math.random() * 120 + 60) + 'px';
-    if (Math.random() > 0.7) wall.classList.add('cracked');
+    
+    // 50% chance to be red/cracked (more red popups)
+    if (Math.random() > 0.5) {
+      wall.classList.add('cracked');
+    }
+    
     brokenWallContainer.appendChild(wall);
     setTimeout(() => wall.remove(), 800);
   }
   
-  // ===== PROGRESS SIMULATION (SLOWER) =====
+  // Create multiple red popups at once
+  function createRedPopupCluster() {
+    const clusterSize = Math.floor(Math.random() * 5) + 3; // 3-7 red popups
+    for (let i = 0; i < clusterSize; i++) {
+      setTimeout(() => {
+        const wall = document.createElement('div');
+        wall.className = 'broken-wall cracked';
+        wall.style.left = Math.random() * 100 + '%';
+        wall.style.top = Math.random() * 100 + '%';
+        wall.style.width = (Math.random() * 150 + 60) + 'px';
+        wall.style.height = (Math.random() * 100 + 40) + 'px';
+        brokenWallContainer.appendChild(wall);
+        setTimeout(() => wall.remove(), 800);
+      }, i * 80);
+    }
+  }
+  
+  // ===== PROGRESS SIMULATION =====
   let progress = 0;
   const messages = [
     "Initializing fanter.OS...",
@@ -143,17 +172,18 @@ function setupSearch() {
   ];
   let msgIndex = 0;
   
-  // Start random effects
+  // Start random effects (more frequent red popups)
   const effectsInterval = setInterval(() => {
     if (progress < 100) {
-      if (Math.random() > 0.7) createBrokenWall();
-      if (Math.random() > 0.8) createFallingCode();
+      if (Math.random() > 0.6) createBrokenWall();
+      if (Math.random() > 0.7) createFallingCode();
+      if (Math.random() > 0.85) createRedPopupCluster(); // Extra red clusters
     }
-  }, 500);
+  }, 400);
   
-  // SLOWER PROGRESS UPDATE - Change these values to control speed
+  // Progress update
   const progressInterval = setInterval(() => {
-    progress += Math.random() * 3 + 1;  // Slower: 1-4% per update (was 2-10%)
+    progress += Math.random() * 3 + 1;
     if (progress >= 100) {
       progress = 100;
       clearInterval(progressInterval);
@@ -162,45 +192,58 @@ function setupSearch() {
       progressBar.style.width = '100%';
       statusEl.textContent = "Complete! Starting fanter.OS...";
       
-      // Wait for games to actually load AND render
-      waitForGamesToLoadAndRender();
+      // Force wait for games to load
+      forceWaitForGames();
     } else {
       progressBar.style.width = progress + '%';
-      const newIndex = Math.floor(progress / 9);  // More messages = slower perceived loading
+      const newIndex = Math.floor(progress / 9);
       if (newIndex > msgIndex && newIndex < messages.length) {
         msgIndex = newIndex;
         statusEl.textContent = messages[msgIndex];
       }
     }
-  }, 300);  // Update every 300ms (was 200ms)
+  }, 300);
   
-  // ===== WAIT FOR GAMES TO ACTUALLY LOAD AND RENDER =====
-  function waitForGamesToLoadAndRender() {
+  // ===== FORCE WAIT FOR GAMES (FIXED) =====
+  function forceWaitForGames() {
     let attempts = 0;
-    const maxAttempts = 50; // 5 seconds max
+    const maxAttempts = 60;
     
     const checkInterval = setInterval(() => {
       attempts++;
       
-      // Check if games are in the DOM
+      // Try multiple ways to detect games
       const gamesContainer = document.getElementById('gamesContainer');
       const hasGames = gamesContainer && gamesContainer.children.length > 0;
+      const hasGamesData = typeof gamesData !== 'undefined' && gamesData && gamesData.length > 0;
       
-      if (hasGames) {
+      console.log(`Attempt ${attempts}: Games in DOM: ${hasGames}, GamesData loaded: ${hasGamesData}`);
+      
+      if (hasGames || hasGamesData) {
         clearInterval(checkInterval);
-        // Extra delay to ensure everything is ready
+        // Force games to be visible if they exist
+        if (gamesContainer && gamesContainer.children.length === 0 && hasGamesData) {
+          // If gamesData exists but DOM is empty, force reload
+          if (typeof handleSearchInput === 'function') {
+            handleSearchInput();
+          }
+        }
+        
         setTimeout(() => {
           startTransition();
-        }, 500);
+        }, 800);
       } else if (attempts >= maxAttempts) {
         clearInterval(checkInterval);
-        startTransition(); // Force transition after timeout
+        startTransition();
       }
     }, 100);
   }
   
-  // ===== TRANSITION EFFECT =====
+  // ===== TRANSITION EFFECT WITH COLORFUL CODE RISE =====
   function startTransition() {
+    // Create rising code effect before transition
+    createRisingCode();
+    
     // White flash
     whiteFlash.style.opacity = '1';
     
@@ -221,7 +264,7 @@ function setupSearch() {
           // Show content
           document.body.classList.remove('loading');
           
-          // Animate games (with longer delay to ensure visibility)
+          // Animate games
           setTimeout(() => {
             animateGamesRandomly();
             animateUIElements();
@@ -240,19 +283,122 @@ function setupSearch() {
     }, 300);
   }
   
+  // ===== RISING CODE EFFECT (COLORS CHANGE THEN RISE UP) =====
+  function createRisingCode() {
+    const codeContainer = document.createElement('div');
+    codeContainer.style.cssText = `
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 100005;
+      overflow: hidden;
+    `;
+    document.body.appendChild(codeContainer);
+    
+    const colors = ['#00ff88', '#ff4444', '#ffcc00'];
+    const codeStrings = [
+      "01001110 01111001 01100001 01101110",
+      "01110011 01111001 01110011 01110100 01100101 01101101",
+      "01000110 01100001 01101110 01110100 01100101 01110010",
+      "01101100 01101111 01100001 01100100 01101001 01101110 01100111",
+      "01110011 01111001 01110011 01110100 01100101 01101101 00100000 01101111 01101110 01101100 01101001 01101110 01100101",
+      "01100001 01100011 01100011 01100101 01110011 01110011 00100000 01100111 01110010 01100001 01101110 01110100 01100101 01100100",
+      "01100110 01100001 01101110 01110100 01100101 01110010 00100000 01101111 01110011",
+      "01001000 01100001 01100011 01101011 01101001 01101110 01100111"
+    ];
+    
+    // Create multiple rising code lines
+    for (let i = 0; i < 15; i++) {
+      setTimeout(() => {
+        const codeLine = document.createElement('div');
+        const randomCode = codeStrings[Math.floor(Math.random() * codeStrings.length)];
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        
+        codeLine.textContent = randomCode;
+        codeLine.style.cssText = `
+          position: absolute;
+          bottom: -50px;
+          left: ${Math.random() * 100}%;
+          color: ${randomColor};
+          font-family: 'Courier New', monospace;
+          font-size: ${Math.random() * 16 + 12}px;
+          font-weight: bold;
+          white-space: nowrap;
+          opacity: 0;
+          text-shadow: 0 0 10px ${randomColor};
+          animation: riseAndFade ${Math.random() * 2 + 1.5}s ease-out forwards;
+        `;
+        codeContainer.appendChild(codeLine);
+        
+        // Add animation keyframes if not exists
+        if (!document.querySelector('#riseAnimation')) {
+          const style = document.createElement('style');
+          style.id = 'riseAnimation';
+          style.textContent = `
+            @keyframes riseAndFade {
+              0% {
+                bottom: -50px;
+                opacity: 0;
+                transform: scale(0.5);
+              }
+              20% {
+                opacity: 1;
+                transform: scale(1);
+              }
+              80% {
+                opacity: 1;
+              }
+              100% {
+                bottom: 100vh;
+                opacity: 0;
+                transform: scale(1.2);
+              }
+            }
+          `;
+          document.head.appendChild(style);
+        }
+        
+        setTimeout(() => {
+          if (codeLine) codeLine.remove();
+        }, 3000);
+      }, i * 100);
+    }
+    
+    // Remove container after animation
+    setTimeout(() => {
+      if (codeContainer) codeContainer.remove();
+    }, 4000);
+  }
+  
   // ===== RANDOM GAME APPEARANCE =====
   function animateGamesRandomly() {
     const games = document.querySelectorAll('.game');
     const gameArray = Array.from(games);
     
-    // First, make sure all games are visible but hidden
+    if (gameArray.length === 0) {
+      // If no games found, try to reload them
+      if (typeof handleSearchInput === 'function') {
+        setTimeout(() => {
+          handleSearchInput();
+          setTimeout(() => {
+            const retryGames = document.querySelectorAll('.game');
+            animateGamesRandomly();
+          }, 500);
+        }, 100);
+      }
+      return;
+    }
+    
     gameArray.forEach(game => {
       game.style.opacity = '0';
       game.style.transform = 'scale(0)';
-      game.style.display = 'inline-block'; // Ensure they're visible
+      game.style.display = 'inline-block';
     });
     
-    // Shuffle array for random appearance
+    // Shuffle array
     for (let i = gameArray.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [gameArray[i], gameArray[j]] = [gameArray[j], gameArray[i]];
@@ -266,7 +412,7 @@ function setupSearch() {
         setTimeout(() => {
           game.style.animation = '';
         }, 400);
-      }, index * 50); // 50ms between each game (smooth appearance)
+      }, index * 40);
     });
   }
   
@@ -295,7 +441,7 @@ function setupSearch() {
     });
   }
   
-  // Also ensure search bar and settings button are hidden initially
+  // Hide UI elements initially
   const searchInput = document.getElementById('searchInput');
   const settingsBtn = document.querySelector('.center .settings-btn');
   if (searchInput) {
@@ -314,3 +460,4 @@ function setupSearch() {
   
   console.log('Loading screen active - waiting for games to render...');
 })();
+</script>
