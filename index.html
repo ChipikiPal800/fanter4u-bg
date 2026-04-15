@@ -26,27 +26,29 @@
     <div id="whiteFlash"></div>
     <div id="revealOverlay"></div>
 
-    <!-- Main Content -->
-    <button class="fav-sidebar-btn" id="favSidebarBtn" onclick="window.toggleFavSidebar()">★</button>
-    
-    <div class="center">
-      <h1 id="title"></h1>
-      <p id="subtitle"></p>
-      <button class="settings-btn" onclick="window.location.href='settings.html'">⚙ Settings</button>
-    </div>
-    
-    <div class="center">
-      <input type="text" id="searchInput" placeholder="search 4 games" />
-    </div>
-    
-    <div id="gamesContainer"></div>
-    
-    <div class="footer">
-      <a style="font-weight: 700">a site created by abcatlmfao, / chipikipal800, / abcatlmfao69;</a>
-      <a style="font-weight: 700" class="link" href="https://dsc.gg/parcoil">parcoil network</a>
+    <!-- Main Content - HIDDEN initially -->
+    <div id="mainContent" style="opacity: 0; visibility: hidden;">
+      <button class="fav-sidebar-btn" id="favSidebarBtn" onclick="window.toggleFavSidebar()">★</button>
+      
+      <div class="center">
+        <h1 id="title"></h1>
+        <p id="subtitle"></p>
+        <button class="settings-btn" onclick="window.location.href='settings.html'">⚙ Settings</button>
+      </div>
+      
+      <div class="center">
+        <input type="text" id="searchInput" placeholder="search 4 games" />
+      </div>
+      
+      <div id="gamesContainer"></div>
+      
+      <div class="footer">
+        <a style="font-weight: 700">a site created by abcatlmfao, / chipikipal800, / abcatlmfao69;</a>
+        <a style="font-weight: 700" class="link" href="https://dsc.gg/parcoil">parcoil network</a>
+      </div>
     </div>
 
-    <!-- Scripts - ORDER MATTERS! -->
+    <!-- Scripts -->
     <script src="config/theme-loader.js"></script>
     <script src="config/main.js"></script>
 
@@ -74,7 +76,6 @@
     <script>
       // ===== CUSTOM CURSOR WITH TRAIL =====
       (function() {
-        // Create main cursor orb
         const cursor = document.createElement('div');
         cursor.className = 'custom-cursor';
         document.body.appendChild(cursor);
@@ -160,7 +161,6 @@
         });
         
         setTimeout(() => cursor.style.opacity = '1', 100);
-        console.log('Custom cursor initialized!');
       })();
     </script>
 
@@ -168,14 +168,19 @@
     <script>
       // ===== LOADING SCREEN SYSTEM =====
       (function() {
-        document.body.classList.add('loading');
-        
         const loadingScreen = document.getElementById('loadingScreen');
         const progressBar = document.querySelector('.loading-progress-bar');
         const statusEl = document.getElementById('loadingStatus');
         const whiteFlash = document.getElementById('whiteFlash');
         const revealOverlay = document.getElementById('revealOverlay');
         const brokenWallContainer = document.getElementById('brokenWallContainer');
+        const mainContent = document.getElementById('mainContent');
+        
+        // HIDE main content initially
+        if (mainContent) {
+          mainContent.style.opacity = '0';
+          mainContent.style.visibility = 'hidden';
+        }
         
         // Matrix Rain
         const canvas = document.getElementById('matrixCanvas');
@@ -245,7 +250,6 @@
         }
         
         let progress = 0;
-        let gamesChecked = false;
         
         const messages = [
           "Initializing fanter.OS...",
@@ -317,11 +321,18 @@
               revealOverlay.style.transform = 'scaleX(1)';
               setTimeout(() => {
                 whiteFlash.style.opacity = '0';
-                document.body.classList.remove('loading');
+                
+                // SHOW main content
+                if (mainContent) {
+                  mainContent.style.opacity = '1';
+                  mainContent.style.visibility = 'visible';
+                }
+                
                 setTimeout(() => {
                   animateGamesRandomly();
                   animateUIElements();
                 }, 100);
+                
                 setTimeout(() => {
                   revealOverlay.style.transform = 'scaleX(0)';
                   setTimeout(() => {
@@ -337,38 +348,54 @@
         function animateGamesRandomly() {
           const games = document.querySelectorAll('.game');
           const gameArray = Array.from(games);
+          
+          console.log(`🎮 Animating ${gameArray.length} games`);
+          
+          // Reset all games to hidden state
           gameArray.forEach(game => {
             game.style.opacity = '0';
             game.style.transform = 'scale(0)';
+            game.style.display = 'inline-block';
+            game.style.transition = 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
           });
+          
+          // Shuffle array for random appearance
           for (let i = gameArray.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [gameArray[i], gameArray[j]] = [gameArray[j], gameArray[i]];
           }
+          
+          // Reveal games with pop animation - FASTER (30ms between games)
           gameArray.forEach((game, index) => {
             setTimeout(() => {
               game.style.opacity = '1';
               game.style.transform = 'scale(1)';
-              game.style.transition = 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
-            }, index * 50);
+              // Add bounce effect
+              game.style.animation = 'gamePop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards';
+              setTimeout(() => {
+                game.style.animation = '';
+              }, 300);
+            }, index * 30); // 30ms between each game = faster appearance
           });
         }
         
         function animateUIElements() {
           const elements = [
-            { el: document.getElementById('searchInput'), dir: 'left', delay: 100 },
-            { el: document.querySelector('.center .settings-btn'), dir: 'right', delay: 200 },
-            { el: document.querySelector('.center h1'), dir: 'up', delay: 150 },
-            { el: document.querySelector('.center p'), dir: 'up', delay: 250 },
-            { el: document.querySelector('.fav-sidebar-btn'), dir: 'left', delay: 300 }
+            { el: document.getElementById('searchInput'), dir: 'left', delay: 50 },
+            { el: document.querySelector('.center .settings-btn'), dir: 'right', delay: 100 },
+            { el: document.querySelector('.center h1'), dir: 'up', delay: 80 },
+            { el: document.querySelector('.center p'), dir: 'up', delay: 120 },
+            { el: document.querySelector('.fav-sidebar-btn'), dir: 'left', delay: 150 }
           ];
+          
           elements.forEach(item => {
             if (!item.el) return;
             item.el.style.opacity = '0';
             if (item.dir === 'left') item.el.style.transform = 'translateX(-100px)';
             if (item.dir === 'right') item.el.style.transform = 'translateX(100px)';
             if (item.dir === 'up') item.el.style.transform = 'translateY(-30px)';
-            item.el.style.transition = 'all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            item.el.style.transition = 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            
             setTimeout(() => {
               item.el.style.opacity = '1';
               item.el.style.transform = 'translateX(0) translateY(0)';
@@ -376,19 +403,8 @@
           });
         }
         
-        const searchInput = document.getElementById('searchInput');
-        const settingsBtn = document.querySelector('.center .settings-btn');
-        if (searchInput) {
-          searchInput.style.opacity = '0';
-          searchInput.style.transform = 'translateX(-100px)';
-        }
-        if (settingsBtn) {
-          settingsBtn.style.opacity = '0';
-          settingsBtn.style.transform = 'translateX(100px)';
-        }
-        
         loadingScreen.addEventListener('click', (e) => e.stopPropagation());
-        console.log('Loading screen active!');
+        console.log('Loading screen active - main content hidden!');
       })();
     </script>
   </body>
