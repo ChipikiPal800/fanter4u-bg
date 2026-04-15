@@ -31,10 +31,13 @@
     const safetyUrl = localStorage.getItem("safetyUrl");
     if (!safetyKey || !safetyUrl) return;
     const now = Date.now();
-    if (e.key === safetyKey && e.key === lastKey && now - lastKeyTime < 400) {
+    const pressedKey = e.key.toLowerCase();
+    const storedKey = safetyKey.toLowerCase();
+    if (pressedKey === storedKey && pressedKey === lastKey && now - lastKeyTime < 500) {
+      e.preventDefault();
       window.location.href = safetyUrl;
     }
-    lastKey = e.key;
+    lastKey = pressedKey;
     lastKeyTime = now;
   });
 </script>
