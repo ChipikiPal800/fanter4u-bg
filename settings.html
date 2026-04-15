@@ -64,9 +64,6 @@
         <button class="settings-btn" onclick="localStorage.removeItem('favourites'); alert('Favourites cleared!')">clear favourites</button>
       </div>
 
-     
-
-
     </div> <!-- closes settings-grid -->
 
     <!-- Theme Menu -->
@@ -159,7 +156,6 @@
       </div>
     </div>
     
-  
     <div id="safetyKeyOverlay" style="display:none;">
       <div id="safetyKeyMenu">
         <h2> safety key🔑</h2>
@@ -180,6 +176,7 @@
     </div>
 
     <script>
+      // ========== FAVOURITES BUTTON ==========
       function updateFavBtn() {
         const btn = document.getElementById("favToggleBtn");
         const on = localStorage.getItem("favFilter") === "true";
@@ -188,244 +185,199 @@
         btn.style.boxShadow = on ? "0 8px 25px rgba(0, 204, 102, 0.4)" : "";
       }
 
-      function toggleFavFilter() {
+      window.toggleFavFilter = function() {
         const current = localStorage.getItem("favFilter") === "true";
         localStorage.setItem("favFilter", (!current).toString());
         updateFavBtn();
-      }
+      };
 
-     updateFavBtn();
+      updateFavBtn();
 
-    function openSafetyKeyMenu() {
-      const overlay = document.getElementById("safetyKeyOverlay");
-      const urlInput = document.getElementById("safetyUrl");
-      const keyDisplay = document.getElementById("keyDisplay");
-      overlay.style.display = "flex";
-      requestAnimationFrame(() => {
+      // ========== SAFETY KEY ==========
+      window.openSafetyKeyMenu = function() {
+        const overlay = document.getElementById("safetyKeyOverlay");
+        const urlInput = document.getElementById("safetyUrl");
+        const keyDisplay = document.getElementById("keyDisplay");
+        overlay.style.display = "flex";
         requestAnimationFrame(() => {
-          overlay.classList.add("visible");
+          requestAnimationFrame(() => {
+            overlay.classList.add("visible");
+          });
         });
+        const savedUrl = localStorage.getItem("safetyUrl") || "";
+        const savedKey = localStorage.getItem("safetyKey") || "";
+        urlInput.value = savedUrl;
+        if (savedKey) {
+          keyDisplay.textContent = savedKey.toUpperCase();
+          keyDisplay.classList.add("set");
+        } else {
+          keyDisplay.textContent = "press a key...";
+          keyDisplay.classList.remove("set");
+        }
+      };
+
+      window.closeSafetyKeyMenu = function() {
+        const overlay = document.getElementById("safetyKeyOverlay");
+        overlay.classList.remove("visible");
+        setTimeout(() => {
+          overlay.style.display = "none";
+        }, 400);
+      };
+
+      window.saveSafetyKey = function() {
+        const url = document.getElementById("safetyUrl").value.trim();
+        const key = localStorage.getItem("safetyKeyTemp") || localStorage.getItem("safetyKey");
+        if (!url) { alert("please enter a url!"); return; }
+        if (!key) { alert("please select a key!"); return; }
+        localStorage.setItem("safetyUrl", url);
+        localStorage.setItem("safetyKey", key);
+        closeSafetyKeyMenu();
+        alert("safety key saved! ✅");
+      };
+
+      document.getElementById("safetyKeyInput").addEventListener("keydown", (e) => {
+        e.preventDefault();
+        const key = e.key;
+        localStorage.setItem("safetyKeyTemp", key);
+        const display = document.getElementById("keyDisplay");
+        display.textContent = key.toUpperCase();
+        display.classList.add("set");
       });
-      const savedUrl = localStorage.getItem("safetyUrl") || "";
-      const savedKey = localStorage.getItem("safetyKey") || "";
-      urlInput.value = savedUrl;
-      if (savedKey) {
-        keyDisplay.textContent = savedKey.toUpperCase();
-        keyDisplay.classList.add("set");
-      } else {
-        keyDisplay.textContent = "press a key...";
-        keyDisplay.classList.remove("set");
+
+      document.getElementById("safetyKeyOverlay").addEventListener("click", (e) => {
+        if (e.target.id === "safetyKeyOverlay") closeSafetyKeyMenu();
+      });
+
+      // ========== THEME MENU ==========
+      let themeSettings = JSON.parse(localStorage.getItem("themeSettings") || "{}");
+      let selectedBg = themeSettings.bg || "chill";
+      let selectedFontFamily = themeSettings.font || "ubuntu";
+      let selectedFontSize = themeSettings.fontSize || 16;
+      let selectedFontColor = themeSettings.fontColor || "#ffffff";
+      let selectedTheme = themeSettings.theme || "chill";
+
+      window.openThemeMenu = function() {
+        const overlay = document.getElementById("themeOverlay");
+        overlay.style.display = "flex";
+        requestAnimationFrame(() => requestAnimationFrame(() => overlay.classList.add("visible")));
+        showThemeTabSelector();
+        syncSelections();
+      };
+
+      window.closeThemeMenu = function() {
+        const overlay = document.getElementById("themeOverlay");
+        overlay.classList.remove("visible");
+        setTimeout(() => overlay.style.display = "none", 400);
+      };
+
+      window.showThemeTabSelector = function() {
+        document.getElementById("themeTabSelector").style.display = "block";
+        document.querySelectorAll(".theme-tab-content").forEach(t => t.style.display = "none");
+      };
+
+      window.showThemeTab = function(tab) {
+        document.getElementById("themeTabSelector").style.display = "none";
+        document.querySelectorAll(".theme-tab-content").forEach(t => t.style.display = "none");
+        document.getElementById("themeTab-" + tab).style.display = "block";
+      };
+
+      window.selectBg = function(type) {
+        selectedBg = type;
+        document.querySelectorAll("[id^='bg-']").forEach(b => b.classList.remove("selected"));
+        document.getElementById("bg-" + type).classList.add("selected");
+        document.getElementById("colorPickerWrap").style.display = type === "solid" ? "block" : "none";
+      };
+
+      window.selectFont = function(font) {
+        selectedFontFamily = font;
+        document.querySelectorAll("[id^='font-']").forEach(b => b.classList.remove("selected"));
+        document.getElementById("font-" + font).classList.add("selected");
+        updateFontPreview();
+      };
+
+      window.updateFontPreview = function() {
+        const preview = document.getElementById("fontPreview");
+        const size = document.getElementById("fontSizeSlider").value;
+        const color = document.getElementById("fontColorPicker").value;
+        selectedFontSize = size;
+        selectedFontColor = color;
+        if (preview) {
+          preview.style.fontSize = size + "px";
+          preview.style.color = color;
+          preview.style.fontFamily = selectedFontFamily;
+        }
+      };
+
+      window.selectTheme = function(theme) {
+        selectedTheme = theme;
+        document.querySelectorAll("[id^='theme-']").forEach(b => b.classList.remove("selected"));
+        document.getElementById("theme-" + theme).classList.add("selected");
+      };
+
+      function syncSelections() {
+        const fontSizeSlider = document.getElementById("fontSizeSlider");
+        const fontColorPicker = document.getElementById("fontColorPicker");
+        const solidPicker = document.getElementById("solidColorPicker");
+        
+        if (fontSizeSlider) fontSizeSlider.value = selectedFontSize;
+        if (fontColorPicker) fontColorPicker.value = selectedFontColor;
+        selectBg(selectedBg);
+        selectFont(selectedFontFamily);
+        selectTheme(selectedTheme);
+        updateFontPreview();
+        
+        if (themeSettings.solidColor && solidPicker) {
+          solidPicker.value = themeSettings.solidColor;
+        }
       }
-    }
 
-    function closeSafetyKeyMenu() {
-      const overlay = document.getElementById("safetyKeyOverlay");
-      overlay.classList.remove("visible");
-      setTimeout(() => {
-        overlay.style.display = "none";
-      }, 400);
-    }
-
-    function saveSafetyKey() {
-      const url = document.getElementById("safetyUrl").value.trim();
-      const key = localStorage.getItem("safetyKeyTemp") || localStorage.getItem("safetyKey");
-      if (!url) { alert("please enter a url!"); return; }
-      if (!key) { alert("please select a key!"); return; }
-      localStorage.setItem("safetyUrl", url);
-      localStorage.setItem("safetyKey", key);
-      closeSafetyKeyMenu();
-      alert("safety key saved! ✅");
-    }
-
-    document.getElementById("safetyKeyInput").addEventListener("keydown", (e) => {
-      e.preventDefault();
-      const key = e.key;
-      localStorage.setItem("safetyKeyTemp", key);
-      const display = document.getElementById("keyDisplay");
-      display.textContent = key.toUpperCase();
-      display.classList.add("set");
-    });
-
-    document.getElementById("safetyKeyOverlay").addEventListener("click", (e) => {
-      if (e.target.id === "safetyKeyOverlay") closeSafetyKeyMenu();
-    });
-
-    window.openSafetyKeyMenu = openSafetyKeyMenu;
-    window.closeSafetyKeyMenu = closeSafetyKeyMenu;
-    window.saveSafetyKey = saveSafetyKey;
-
-      // Theme menu
-    let themeSettings = JSON.parse(localStorage.getItem("themeSettings") || "{}");
-    let selectedBg = themeSettings.bg || "chill";
-    let selectedFontFamily = themeSettings.font || "ubuntu";
-    let selectedFontSize = themeSettings.fontSize || 16;
-    let selectedFontColor = themeSettings.fontColor || "#ffffff";
-    let selectedTheme = themeSettings.theme || "chill";
-
-    function openThemeMenu() {
-      const overlay = document.getElementById("themeOverlay");
-      overlay.style.display = "flex";
-      requestAnimationFrame(() => requestAnimationFrame(() => overlay.classList.add("visible")));
-      showThemeTabSelector();
-      syncSelections();
-    }
-
-    function closeThemeMenu() {
-      const overlay = document.getElementById("themeOverlay");
-      overlay.classList.remove("visible");
-      setTimeout(() => overlay.style.display = "none", 400);
-    }
-
-    function showThemeTabSelector() {
-      document.getElementById("themeTabSelector").style.display = "block";
-      document.querySelectorAll(".theme-tab-content").forEach(t => t.style.display = "none");
-    }
-
-    function showThemeTab(tab) {
-      document.getElementById("themeTabSelector").style.display = "none";
-      document.querySelectorAll(".theme-tab-content").forEach(t => t.style.display = "none");
-      document.getElementById("themeTab-" + tab).style.display = "block";
-    }
-
-    function selectBg(type) {
-      selectedBg = type;
-      document.querySelectorAll("[id^='bg-']").forEach(b => b.classList.remove("selected"));
-      document.getElementById("bg-" + type).classList.add("selected");
-      document.getElementById("colorPickerWrap").style.display = type === "solid" ? "block" : "none";
-    }
-
-    function selectFont(font) {
-      selectedFontFamily = font;
-      document.querySelectorAll("[id^='font-']").forEach(b => b.classList.remove("selected"));
-      document.getElementById("font-" + font).classList.add("selected");
-      updateFontPreview();
-    }
-
-    function updateFontPreview() {
-      const preview = document.getElementById("fontPreview");
-      const size = document.getElementById("fontSizeSlider").value;
-      const color = document.getElementById("fontColorPicker").value;
-      selectedFontSize = size;
-      selectedFontColor = color;
-      preview.style.fontSize = size + "px";
-      preview.style.color = color;
-      preview.style.fontFamily = selectedFontFamily;
-    }
-
-    function selectTheme(theme) {
-      selectedTheme = theme;
-      document.querySelectorAll("[id^='theme-']").forEach(b => b.classList.remove("selected"));
-      document.getElementById("theme-" + theme).classList.add("selected");
-    }
-
-    function syncSelections() {
-      document.getElementById("fontSizeSlider").value = selectedFontSize;
-      document.getElementById("fontColorPicker").value = selectedFontColor;
-      selectBg(selectedBg);
-      selectFont(selectedFontFamily);
-      selectTheme(selectedTheme);
-      updateFontPreview();
-      // Also sync solid color picker
-      if (themeSettings.solidColor) {
-        document.getElementById("solidColorPicker").value = themeSettings.solidColor;
-      }
-    }
-
-   function saveTheme() {
-  const solidColor = document.getElementById("solidColorPicker").value;
-  const fontSize = document.getElementById("fontSizeSlider").value;
-  const fontColor = document.getElementById("fontColorPicker").value;
-  
-  const themeToSave = {
-    bg: selectedBg,
-    solidColor: solidColor,
-    font: selectedFontFamily,
-    fontSize: parseInt(fontSize),
-    fontColor: fontColor,
-    theme: selectedTheme
-  };
-  
-  localStorage.setItem("themeSettings", JSON.stringify(themeToSave));
-  
-  // Apply to settings page immediately
-  applyThemeToPage();
-  
-  closeThemeMenu();
-  alert("Theme saved! ✅");
-}
-      
-      localStorage.setItem("themeSettings", JSON.stringify(themeSettings));
-      
-      // Apply to settings page immediately
-      applyThemeToPage();
-      
-      closeThemeMenu();
-      alert("Theme saved! ✅ Changes will appear on all pages after refresh.");
-    }
-
-    // Apply theme to current page
-    function applyThemeToPage() {
-      const s = themeSettings;
-      
-      // Remove old classes
-      document.body.classList.remove(
-        'theme-bg-chill', 'theme-bg-parallax', 'theme-bg-solid', 'theme-bg-aurora', 'theme-bg-void',
-        'theme-dark', 'theme-light', 'theme-rainbow', 'theme-neon'
-      );
-      
-      if (s.bg) document.body.classList.add(`theme-bg-${s.bg}`);
-      if (s.solidColor && s.bg === 'solid') {
-        document.body.style.setProperty('--solid-bg-color', s.solidColor);
-      }
-      if (s.theme && s.theme !== 'chill') document.body.classList.add(`theme-${s.theme}`);
-      if (s.fontColor) document.documentElement.style.setProperty('--text-color', s.fontColor);
-      if (s.fontSize) document.body.style.fontSize = s.fontSize + 'px';
-      if (s.font) {
-        const fontMap = {
-          'ubuntu': 'Ubuntu, sans-serif',
-          'orbitron': 'Orbitron, monospace',
-          'rajdhani': 'Rajdhani, sans-serif',
-          'exo2': "'Exo 2', sans-serif",
-          'spacegrotesk': "'Space Grotesk', sans-serif"
+      window.saveTheme = function() {
+        const solidColor = document.getElementById("solidColorPicker").value;
+        const fontSize = document.getElementById("fontSizeSlider").value;
+        const fontColor = document.getElementById("fontColorPicker").value;
+        
+        const themeToSave = {
+          bg: selectedBg,
+          solidColor: solidColor,
+          font: selectedFontFamily,
+          fontSize: parseInt(fontSize),
+          fontColor: fontColor,
+          theme: selectedTheme
         };
-        document.body.style.fontFamily = fontMap[s.font] || s.font;
-      }
-    }
+        
+        localStorage.setItem("themeSettings", JSON.stringify(themeToSave));
+        
+        // Apply to current page
+        if (typeof window.loadAndApplyTheme === 'function') {
+          window.loadAndApplyTheme();
+        }
+        
+        closeThemeMenu();
+        alert("Theme saved! ✅");
+      };
 
-    document.getElementById("themeOverlay").addEventListener("click", (e) => {
-      if (e.target.id === "themeOverlay") closeThemeMenu();
-    });
+      document.getElementById("themeOverlay").addEventListener("click", (e) => {
+        if (e.target.id === "themeOverlay") closeThemeMenu();
+      });
 
-    window.openThemeMenu = openThemeMenu;
-    window.closeThemeMenu = closeThemeMenu;
-    window.showThemeTab = showThemeTab;
-    window.showThemeTabSelector = showThemeTabSelector;
-    window.selectBg = selectBg;
-    window.selectFont = selectFont;
-    window.selectTheme = selectTheme;
-    window.updateFontPreview = updateFontPreview;
-    window.saveTheme = saveTheme;
-
-  </script>
-
-    <script>
-let lastKeyTime = 0;
-  let lastKey = "";
-  document.addEventListener("keydown", (e) => {
-    const safetyKey = localStorage.getItem("safetyKey");
-    const safetyUrl = localStorage.getItem("safetyUrl");
-    if (!safetyKey || !safetyUrl) return;
-    const now = Date.now();
-    const pressedKey = e.key.toLowerCase();
-    const storedKey = safetyKey.toLowerCase();
-    if (pressedKey === storedKey && pressedKey === lastKey && now - lastKeyTime < 1000) {
-      e.preventDefault();
-      window.location.href = safetyUrl;
-    }
-    lastKey = pressedKey;
-    lastKeyTime = now;
-  });
-</script>
+      // ========== SAFETY KEY DOUBLE-TAP (for settings page) ==========
+      let lastKeyTime = 0;
+      let lastKey = "";
+      document.addEventListener("keydown", (e) => {
+        const safetyKey = localStorage.getItem("safetyKey");
+        const safetyUrl = localStorage.getItem("safetyUrl");
+        if (!safetyKey || !safetyUrl) return;
+        const now = Date.now();
+        const pressedKey = e.key.toLowerCase();
+        const storedKey = safetyKey.toLowerCase();
+        if (pressedKey === storedKey && pressedKey === lastKey && now - lastKeyTime < 1000) {
+          e.preventDefault();
+          window.location.href = safetyUrl;
+        }
+        lastKey = pressedKey;
+        lastKeyTime = now;
+      });
+    </script>
     
   </body>
 </html>
