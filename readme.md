@@ -6,7 +6,7 @@ a clean, customizable unblocked games hub
 has themes, favorites, ratings, accounts, achievements, and a bunch of other stuff i kept adding because it was fun ( not even finished yet :3 )
 features so far:
 
-by the way, this was made for people with common sense so if something doesnt make sense; ask an ai like claude if you dont understand something lol, sorry.
+by the way, this was made for people with common sense so if something doesnt make sense; ask an ai like claude if you dont understand something , sorry.
 
 🎮 game library - loads from a json file, searchable, filterable by favorites
 
@@ -60,17 +60,19 @@ game details modal (click a game for more info)
 
 how to run:
 
-clone the repo
+fork the repo
 
 put your games in config/games.json (there's an example structure in the code)
 
 host it anywhere (github pages works great)
 
-if you want global ratings to work, make a free jsonbin account and add your api key/bin id to main.js
+if you want global ratings to work, make a free jsonbin account and add your api key/bin id to the main.js
 
 credits:
 
-built by abcatlmfao / chipikipal800 (same person but different accounts (me) )
+built by abcatlmfao
+
+contributors (ideas etc.): creamypeanut, bloxy, :), 
 
 parcoil network for the game api (https://dsc.gg/parcoil)
 
