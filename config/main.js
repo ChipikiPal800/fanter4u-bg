@@ -572,3 +572,195 @@ function loadUserFavorites() {
   
   console.log(`✅ Loaded ${favorites.length} favorites from account`);
 }
+
+// ===== ACHIEVEMENTS SYSTEM =====
+
+// List of all achievements
+const ACHIEVEMENTS = [
+  { id: 1, name: "First Steps", desc: "Create an account", requirement: "register", icon: "🌟", requiredValue: 1 },
+  { id: 2, name: "First Rating", desc: "Rate your first game", requirement: "ratingsGiven", requiredValue: 1, icon: "⭐" },
+  { id: 3, name: "Favorited", desc: "Favorite your first game", requirement: "favoritesCount", requiredValue: 1, icon: "💖" },
+  { id: 4, name: "Game On", desc: "Play your first game", requirement: "gamesPlayed", requiredValue: 1, icon: "🎮" },
+  { id: 5, name: "Getting Started", desc: "Rate 10 games", requirement: "ratingsGiven", requiredValue: 10, icon: "🔟" },
+  { id: 6, name: "Collector", desc: "Favorite 10 games", requirement: "favoritesCount", requiredValue: 10, icon: "💎" },
+  { id: 7, name: "Marathon", desc: "Play 20 games", requirement: "gamesPlayed", requiredValue: 20, icon: "🏃‍♂️" },
+  { id: 8, name: "Rater", desc: "Rate 25 games", requirement: "ratingsGiven", requiredValue: 25, icon: "⭐⭐⭐" },
+  { id: 9, name: "Super Fan", desc: "Favorite 25 games", requirement: "favoritesCount", requiredValue: 25, icon: "👑" },
+  { id: 10, name: "Completionist", desc: "Earn all other achievements", requirement: "totalAchievements", requiredValue: 9, icon: "🎯" }
+];
+
+// Get user achievements from localStorage
+function getUserAchievements() {
+  return JSON.parse(localStorage.getItem('fanter_achievements') || '{}');
+}
+
+// Save user achievements
+function saveUserAchievements(achievements) {
+  localStorage.setItem('fanter_achievements', JSON.stringify(achievements));
+  
+  // Also save to user account if logged in
+  const currentUser = getCurrentUser();
+  if (currentUser) {
+    currentUser.achievements = achievements;
+    updateUserInStorage(currentUser);
+  }
+}
+
+// Check and unlock achievements
+function checkAchievements() {
+  const currentUser = getCurrentUser();
+  if (!currentUser) return;
+  
+  let achievements = getUserAchievements();
+  let unlockedAny = false;
+  
+  // Get user stats
+  const stats = currentUser.stats || { ratingsGiven: 0, favoritesCount: 0, gamesPlayed: 0 };
+  const totalUnlocked = Object.keys(achievements).filter(id => achievements[id] === true).length;
+  
+  ACHIEVEMENTS.forEach(ach => {
+    // Skip if already unlocked
+    if (achievements[ach.id]) return;
+    
+    let isUnlocked = false;
+    let currentValue = 0;
+    
+    switch (ach.requirement) {
+      case "register":
+        isUnlocked = true; // User is logged in, so they registered
+        break;
+      case "ratingsGiven":
+        currentValue = stats.ratingsGiven || 0;
+        isUnlocked = currentValue >= ach.requiredValue;
+        break;
+      case "favoritesCount":
+        currentValue = stats.favoritesCount || 0;
+        isUnlocked = currentValue >= ach.requiredValue;
+        break;
+      case "gamesPlayed":
+        currentValue = stats.gamesPlayed || 0;
+        isUnlocked = currentValue >= ach.requiredValue;
+        break;
+      case "totalAchievements":
+        isUnlocked = totalUnlocked >= ach.requiredValue;
+        break;
+    }
+    
+    if (isUnlocked) {
+      achievements[ach.id] = true;
+      unlockedAny = true;
+      showAchievementToast(ach);
+      console.log(`🏆 Achievement Unlocked: ${ach.name}`);
+    }
+  });
+  
+  // Also check Completionist after other unlocks
+  const newTotal = Object.keys(achievements).filter(id => achievements[id] === true).length;
+  if (!achievements[10] && newTotal >= 9) {
+    achievements[10] = true;
+    unlockedAny = true;
+    const completionist = ACHIEVEMENTS.find(a => a.id === 10);
+    showAchievementToast(completionist);
+    console.log(`🏆 Achievement Unlocked: Completionist!`);
+  }
+  
+  if (unlockedAny) {
+    saveUserAchievements(achievements);
+    
+    // Update stats in user account
+    currentUser.achievements = achievements;
+    updateUserInStorage(currentUser);
+  }
+}
+
+// Show achievement toast notification
+function showAchievementToast(achievement) {
+  let toast = document.querySelector('.achievement-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.className = 'achievement-toast';
+    document.body.appendChild(toast);
+  }
+  
+  toast.innerHTML = `
+    <span class="achievement-icon">${achievement.icon}</span>
+    <div class="achievement-content">
+      <div class="achievement-title">ACHIEVEMENT UNLOCKED!</div>
+      <div class="achievement-name">${achievement.name}</div>
+      <div class="achievement-desc">${achievement.desc}</div>
+    </div>
+  `;
+  
+  toast.classList.add('show');
+  
+  // Play a subtle sound effect (optional - just visual for now)
+  
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 4000);
+}
+
+// Get achievement progress for a user
+function getAchievementProgress(achievement, userStats) {
+  let current = 0;
+  let required = achievement.requiredValue;
+  
+  switch (achievement.requirement) {
+    case "register":
+      return { current: 1, required: 1, percent: 100 };
+    case "ratingsGiven":
+      current = userStats?.ratingsGiven || 0;
+      break;
+    case "favoritesCount":
+      current = userStats?.favoritesCount || 0;
+      break;
+    case "gamesPlayed":
+      current = userStats?.gamesPlayed || 0;
+      break;
+    case "totalAchievements":
+      const unlocked = Object.keys(getUserAchievements()).filter(id => getUserAchievements()[id] === true).length;
+      current = unlocked;
+      break;
+  }
+  
+  const percent = Math.min(100, Math.floor((current / required) * 100));
+  return { current, required, percent };
+}
+
+// Call checkAchievements after relevant actions
+// Add these calls to existing functions:
+
+// Add to register function (in fantaccount.html) - call after creating user
+// Add to submitRating function - call after saving rating
+// Add to toggleFavourite function - cll after saving favorite
+// Add to trackPlayedGame function - call after saving played game
+
+// Also add a function to render achievements on profile page
+
+function renderAchievementsHTML(achievements, userStats) {
+  let html = '<div class="achievement-grid">';
+  
+  ACHIEVEMENTS.forEach(ach => {
+    const isUnlocked = achievements[ach.id] === true;
+    const progress = getAchievementProgress(ach, userStats);
+    
+    html += `
+      <div class="achievement-badge ${isUnlocked ? 'unlocked' : 'locked'}">
+        <div class="badge-icon">${ach.icon}</div>
+        <div class="badge-info">
+          <div class="badge-name">${ach.name}</div>
+          <div class="badge-desc">${ach.desc}</div>
+          ${!isUnlocked ? `
+            <div class="badge-progress">${progress.current}/${progress.required}</div>
+            <div class="achievement-progress-bar">
+              <div class="achievement-progress-fill" style="width: ${progress.percent}%;"></div>
+            </div>
+          ` : '<div class="badge-progress" style="color:#ffcc00">✓ Unlocked!</div>'}
+        </div>
+      </div>
+    `;
+  });
+  
+  html += '</div>';
+  return html;
+}
