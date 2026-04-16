@@ -8,7 +8,7 @@
     <script src="config/theme-loader.js"></script>
     <script src="config/main.js"></script>
     <style>
-      /* Chinchilla Helper Styles */
+      /* Chinchilla Helper Styles - Realistic Gray Chinchilla */
       .settings-header {
         display: flex;
         align-items: center;
@@ -33,6 +33,37 @@
         color: white;
       }
       
+      .settings-toggle {
+        width: 50px;
+        height: 24px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        cursor: pointer;
+        position: relative;
+        transition: 0.2s;
+      }
+      
+      .settings-toggle.active {
+        background: #00ff88;
+      }
+      
+      .settings-toggle::after {
+        content: '';
+        width: 20px;
+        height: 20px;
+        background: white;
+        border-radius: 50%;
+        position: absolute;
+        top: 2px;
+        left: 4px;
+        transition: 0.2s;
+      }
+      
+      .settings-toggle.active::after {
+        left: 26px;
+      }
+      
+      /* Realistic Chinchilla */
       .chinchilla-container {
         position: fixed;
         bottom: 20px;
@@ -47,15 +78,12 @@
       }
       
       .chinchilla {
-        width: 100px;
+        width: 120px;
         height: 100px;
-        background: linear-gradient(135deg, #8B6914, #A0782C);
-        border-radius: 50%;
         position: relative;
         cursor: pointer;
         transition: transform 0.2s ease;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-        animation: chinchillaBounce 2s ease-in-out infinite;
+        filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
       }
       
       .chinchilla:hover {
@@ -66,44 +94,114 @@
         transform: scale(0.95);
       }
       
-      @keyframes chinchillaBounce {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-5px); }
-      }
-      
-      /* Chinchilla Face */
-      .chinchilla-face {
+      /* Body - realistic gray */
+      .chinchilla-body {
         position: absolute;
-        top: 50%;
+        bottom: 0;
         left: 50%;
-        transform: translate(-50%, -50%);
-        text-align: center;
+        transform: translateX(-50%);
+        width: 70px;
+        height: 55px;
+        background: radial-gradient(ellipse at 60% 40%, #8a8a8a, #6b6b6b);
+        border-radius: 50% 50% 45% 45%;
+        box-shadow: inset -5px -5px 10px rgba(0,0,0,0.2), inset 5px 5px 10px rgba(255,255,255,0.1);
       }
       
-      .chinchilla-eyes {
-        display: flex;
-        gap: 15px;
-        justify-content: center;
-        margin-bottom: 8px;
-      }
-      
-      .chinchilla-eye {
-        width: 12px;
-        height: 12px;
-        background: white;
+      /* Belly - lighter */
+      .chinchilla-belly {
+        position: absolute;
+        bottom: 5px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 45px;
+        height: 35px;
+        background: radial-gradient(ellipse at 50% 40%, #c4c4c4, #a0a0a0);
         border-radius: 50%;
+      }
+      
+      /* Head */
+      .chinchilla-head {
+        position: absolute;
+        top: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 55px;
+        height: 50px;
+        background: radial-gradient(circle at 60% 40%, #8a8a8a, #6b6b6b);
+        border-radius: 50%;
+        z-index: 2;
+      }
+      
+      /* Ears - normal sized */
+      .chinchilla-ear-left, .chinchilla-ear-right {
+        position: absolute;
+        width: 18px;
+        height: 22px;
+        background: radial-gradient(ellipse at 50% 60%, #8a8a8a, #5a5a5a);
+        border-radius: 50% 50% 40% 40%;
+        top: -12px;
+        z-index: 1;
+        animation: earWiggle 3s infinite;
+      }
+      
+      .chinchilla-ear-left {
+        left: 5px;
+        transform: rotate(-15deg);
+      }
+      
+      .chinchilla-ear-right {
+        right: 5px;
+        transform: rotate(15deg);
+      }
+      
+      /* Inner ear */
+      .chinchilla-ear-left::after, .chinchilla-ear-right::after {
+        content: '';
+        position: absolute;
+        width: 10px;
+        height: 12px;
+        background: radial-gradient(ellipse at 50% 50%, #d4a0a0, #b88080);
+        border-radius: 50%;
+        top: 4px;
+        left: 4px;
+      }
+      
+      @keyframes earWiggle {
+        0%, 100% { transform: rotate(0deg); }
+        25% { transform: rotate(5deg); }
+        75% { transform: rotate(-5deg); }
+      }
+      
+      /* Eyes - dark */
+      .chinchilla-eye-left, .chinchilla-eye-right {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        background: #1a1a1a;
+        border-radius: 50%;
+        top: 15px;
+        z-index: 3;
         animation: blink 4s infinite;
       }
       
-      .chinchilla-eye::after {
+      .chinchilla-eye-left {
+        left: 12px;
+      }
+      
+      .chinchilla-eye-right {
+        right: 12px;
+      }
+      
+      /* Eye shine */
+      .chinchilla-eye-left::after, .chinchilla-eye-right::after {
         content: '';
-        width: 6px;
-        height: 6px;
-        background: black;
-        border-radius: 50%;
         position: absolute;
-        top: 3px;
-        left: 3px;
+        width: 3px;
+        height: 3px;
+        background: white;
+        border-radius: 50%;
+        top: 2px;
+        left: 2px;
       }
       
       @keyframes blink {
@@ -111,35 +209,103 @@
         97% { transform: scaleY(0.1); }
       }
       
+      /* Nose */
       .chinchilla-nose {
-        width: 8px;
-        height: 6px;
-        background: #FF6B6B;
-        border-radius: 50%;
-        margin: 0 auto;
-      }
-      
-      .chinchilla-ears {
         position: absolute;
-        top: -15px;
-        left: 15px;
-        right: 15px;
-        display: flex;
-        justify-content: space-between;
-      }
-      
-      .chinchilla-ear {
-        width: 20px;
-        height: 25px;
-        background: #8B6914;
+        width: 6px;
+        height: 5px;
+        background: #ff9999;
         border-radius: 50%;
-        animation: earWiggle 3s infinite;
+        bottom: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 3;
       }
       
-      @keyframes earWiggle {
-        0%, 100% { transform: rotate(0deg); }
-        25% { transform: rotate(5deg); }
-        75% { transform: rotate(-5deg); }
+      /* Whiskers - long and white */
+      .chinchilla-whisker-left, .chinchilla-whisker-right {
+        position: absolute;
+        width: 25px;
+        height: 1px;
+        background: white;
+        top: 28px;
+        z-index: 3;
+        opacity: 0.8;
+      }
+      
+      .chinchilla-whisker-left {
+        left: 0px;
+        transform: rotate(-10deg);
+        transform-origin: right;
+      }
+      
+      .chinchilla-whisker-right {
+        right: 0px;
+        transform: rotate(10deg);
+        transform-origin: left;
+      }
+      
+      .chinchilla-whisker-left2, .chinchilla-whisker-right2 {
+        position: absolute;
+        width: 22px;
+        height: 1px;
+        background: white;
+        top: 32px;
+        z-index: 3;
+        opacity: 0.8;
+      }
+      
+      .chinchilla-whisker-left2 {
+        left: 2px;
+        transform: rotate(-5deg);
+        transform-origin: right;
+      }
+      
+      .chinchilla-whisker-right2 {
+        right: 2px;
+        transform: rotate(5deg);
+        transform-origin: left;
+      }
+      
+      /* Tail - fluffy, curling toward back */
+      .chinchilla-tail {
+        position: absolute;
+        right: -15px;
+        bottom: 10px;
+        width: 25px;
+        height: 20px;
+        background: radial-gradient(ellipse at 30% 50%, #7a7a7a, #5a5a5a);
+        border-radius: 50% 40% 50% 30%;
+        transform: rotate(-30deg);
+        z-index: 0;
+      }
+      
+      /* Legs */
+      .chinchilla-leg-front, .chinchilla-leg-back {
+        position: absolute;
+        width: 12px;
+        height: 15px;
+        background: #6b6b6b;
+        border-radius: 40%;
+        bottom: 0;
+      }
+      
+      .chinchilla-leg-front {
+        left: 15px;
+      }
+      
+      .chinchilla-leg-back {
+        right: 15px;
+      }
+      
+      /* Talking animation */
+      .chinchilla.talking .chinchilla-head {
+        animation: headBob 0.2s ease-in-out;
+      }
+      
+      @keyframes headBob {
+        0%, 100% { transform: translateX(-50%) translateY(0); }
+        50% { transform: translateX(-50%) translateY(-3px); }
       }
       
       /* Speech Bubble */
@@ -159,6 +325,7 @@
         pointer-events: none;
         backdrop-filter: blur(10px);
         box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        z-index: 1001;
       }
       
       .speech-bubble.visible {
@@ -193,16 +360,6 @@
         font-family: 'Orbitron', monospace;
       }
       
-      /* Chinchilla animations */
-      .chinchilla.talking {
-        animation: chinchillaTalk 0.3s ease-in-out;
-      }
-      
-      @keyframes chinchillaTalk {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(0.95); }
-      }
-      
       .speech-bubble.pulse {
         animation: bubblePulse 0.3s ease;
       }
@@ -229,29 +386,42 @@
       <button class="settings-btn" onclick="window.location.href='index.html'">← back</button>
     </div>
 
-    <!-- Chinchilla Helper -->
+    <!-- Realistic Chinchilla Helper -->
     <div id="chinchillaContainer" class="chinchilla-container hidden">
       <div class="speech-bubble" id="speechBubble">
         <p class="speech-text" id="speechText">Hark! I am thy humble guide...</p>
         <p class="speech-author">- Sir Chinchilla</p>
       </div>
       <div class="chinchilla" id="chinchilla">
-        <div class="chinchilla-ears">
-          <div class="chinchilla-ear"></div>
-          <div class="chinchilla-ear"></div>
-        </div>
-        <div class="chinchilla-face">
-          <div class="chinchilla-eyes">
-            <div class="chinchilla-eye"></div>
-            <div class="chinchilla-eye"></div>
-          </div>
-          <div class="chinchilla-nose"></div>
-        </div>
+        <!-- Tail -->
+        <div class="chinchilla-tail"></div>
+        <!-- Back Leg -->
+        <div class="chinchilla-leg-back"></div>
+        <!-- Body -->
+        <div class="chinchilla-body"></div>
+        <!-- Belly -->
+        <div class="chinchilla-belly"></div>
+        <!-- Front Leg -->
+        <div class="chinchilla-leg-front"></div>
+        <!-- Ears -->
+        <div class="chinchilla-ear-left"></div>
+        <div class="chinchilla-ear-right"></div>
+        <!-- Head -->
+        <div class="chinchilla-head"></div>
+        <!-- Eyes -->
+        <div class="chinchilla-eye-left"></div>
+        <div class="chinchilla-eye-right"></div>
+        <!-- Nose -->
+        <div class="chinchilla-nose"></div>
+        <!-- Whiskers -->
+        <div class="chinchilla-whisker-left"></div>
+        <div class="chinchilla-whisker-right"></div>
+        <div class="chinchilla-whisker-left2"></div>
+        <div class="chinchilla-whisker-right2"></div>
       </div>
     </div>
 
     <div class="settings-grid">
-
       <div class="settings-card">
         <div class="settings-card-icon">🎨</div>
         <h2>theme</h2>
@@ -330,10 +500,8 @@
         <p>seasonal, dynamic & custom themes.</p>
         <button class="settings-btn" onclick="openPresetMenu()">customize</button>
       </div>
-
     </div>
 
-    <!-- All the menu overlays (same as before) -->
     <!-- Theme Menu -->
     <div id="themeOverlay" style="display:none;">
       <div id="themeMenu">
@@ -435,55 +603,35 @@
       </div>
     </div>
 
-    <!-- Other menus (game, visual, audio, performance, privacy, preset) would go here -->
-    <!-- For brevity, I'm not repeating them, but they should be included -->
-
     <script>
       // ========== CHINCHILLA HELPER ==========
       let chinchillaEnabled = localStorage.getItem('chinchillaEnabled') === 'true';
       let currentFactIndex = 0;
       let chinchillaFacts = [
-        // Theme related facts
         "The 'Theme' setting doth allow thee to change the very fabric of this realm's appearance! 'Tis magic in digital form!",
         "Backgrounds of chill, parallax, aurora, and void await thy selection in the Theme menu. Each hath its own character!",
         "The font styling option lets thee speak in Ubuntu, Orbitron, or Rajdhani tongues. Choose wisely, young squire!",
         "Theme presets art ready-made colors and styles. Dark mode for night owls, Light for day dwellers, Rainbow for the joyous!",
-        
-        // Safety Key facts
         "The Safety Key is thy emergency escape! Press a chosen key twice and thou shalt be whisked to safety!",
         "Set thy Safety Key to any letter or number. I recommend 'Q' or 'E' for quick escapes, good traveler!",
-        
-        // Favourites facts
         "The Favourites setting alloweth thee to star thy beloved games. Only the chosen ones shall appear when filtered!",
         "Click the star on any game to add it to thy collection. Thy favourites art saved forever in this browser's memory!",
-        
-        // Game Settings facts
         "Game Settings let thee change the very structure of thy game library! More columns, larger cards, or compact displays!",
         "Hide animations if thy device art old or slow. Performance shall improve greatly, I promise thee!",
         "Random Game button be perfect for when thou canst not decide what to play. Fate shall choose for thee!",
-        
-        // Visual Settings facts
         "Visual Settings allow thee to change the accent color! Make this realm shine in blue, gold, or any hue thou desirest!",
         "The blur intensity controls how dreamy thy background appears. Higher blur, more mystery!",
         "Border styles range from glowing to neon to minimal. Each gives thy cards a different personality!",
         "Corner roundness makes thy cards soft like pillows or sharp like swords. The choice is thine!",
-        
-        // Audio Settings facts
         "Audio Settings bring sound to this silent world! Hover sounds, click effects, and background music await!",
         "Background music can play while thou browsest. Lo-fi beats perfect for gaming sessions!",
         "Mute all is thy friend when thou shouldst be studying instead of playing. I won't tell!",
-        
-        // Performance facts
         "Low Performance Mode strips away fancy animations for speed. Perfect for school computers!",
         "Lazy Loading means games only load when thou scrollest to them. Faster page loading for all!",
         "Disable shadows and animations for maximum speed. Thy old laptop shall thank thee!",
-        
-        // Privacy facts
         "Incognito Mode hides thy recently played games. For when thou shouldst be working!",
         "Clear history removes thy search records. What happens in fanter, stays in fanter!",
         "Reset all settings returns everything to default. A fresh start for a fresh adventurer!",
-        
-        // General facts
         "I am Sir Chinchilla, thy humble guide through these digital lands. Click me for more wisdom!",
         "The creators of this realm - abcatlmfao and chipikipal800 - worked many moons to bring thee this experience!",
         "Thy settings art saved in localStorage. They remain even if thou closest this tab!",
@@ -541,7 +689,6 @@
       function showRandomFact() {
         if (!chinchillaEnabled) return;
         
-        // Get random fact that's different from current
         let newIndex;
         do {
           newIndex = Math.floor(Math.random() * chinchillaFacts.length);
@@ -558,7 +705,6 @@
         
         speechText.textContent = text;
         
-        // Add animation
         bubble.classList.add('visible');
         bubble.classList.add('pulse');
         chinchilla.classList.add('talking');
@@ -588,7 +734,6 @@
         updateSpeechBubble(fact);
       }
       
-      // Initialize chinchilla on load
       function initChinchilla() {
         const toggleBtn = document.getElementById('helperToggleBtn');
         if (chinchillaEnabled) {
@@ -602,12 +747,10 @@
           toggleBtn.classList.remove('active');
         }
         
-        // Add click handler to chinchilla
         document.getElementById('chinchilla').addEventListener('click', () => {
           showRandomFact();
         });
         
-        // Add hover effects to settings cards for contextual tips
         document.querySelectorAll('.settings-card').forEach(card => {
           const title = card.querySelector('h2')?.innerText.toLowerCase();
           card.addEventListener('mouseenter', () => {
@@ -727,7 +870,7 @@
         if (e.target.id === "safetyKeyOverlay") closeSafetyKeyMenu();
       });
 
-      // ========== THEME MENU (existing) ==========
+      // ========== THEME MENU ==========
       let themeSettings = JSON.parse(localStorage.getItem("themeSettings") || "{}");
       let selectedBg = themeSettings.bg || "chill";
       let selectedFontFamily = themeSettings.font || "ubuntu";
