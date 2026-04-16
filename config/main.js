@@ -59,13 +59,13 @@ document.addEventListener('DOMContentLoaded', function() {
       gameDiv.appendChild(gameName);
       gameDiv.appendChild(favBtn);
       
-      // ADD THIS LINE FOR RATINGS
+      // THIS LINE FOR RATINGS
       gameDiv.insertAdjacentHTML('beforeend', createRatingHTML(game.name, userVotes[game.name] || 0));
       
       gamesContainer.appendChild(gameDiv);
     });
     
-    // ADD THIS LINE TO ATTACH RATING LISTENERS
+    // THIS LINE TO ATTACH RATING LISTENERS
     attachRatingListeners();
   }
 
@@ -222,8 +222,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 // ===== GAME RATINGS SYSTEM (Global) =====
-const RATINGS_BIN_ID = "YOUR_BIN_ID"; // Replace with your JSONBin.io Bin ID
-const RATINGS_API_KEY = "YOUR_API_KEY"; // Replace with your JSONBin.io API Key
+const RATINGS_BIN_ID = "69e045ec856a6821893bc134"; // Replace with your JSONBin.io Bin ID
+const RATINGS_API_KEY = "$2a$10$2cPmKAGNYxPTRLV03OfVruvfhNpW/VHtJSzR.AVNHumZ7etLdT33."; // Replace with your JSONBin.io API Key
 
 let globalRatings = {}; // Stores { "gameName": { average: 4.2, count: 15, total: 63 } }
 let userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
