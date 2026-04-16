@@ -1,9 +1,9 @@
-// ===== MAIN.JS - COMPLETE REWRITE =====
+// ===== MAIN.JS - COMPLETE REWRITE WITH ACHIEVEMENTS & NEW TAB =====
 
 // Wait for DOM to be fully loaded before running
 document.addEventListener('DOMContentLoaded', function() {
   var sitename = "fanter beta.";
-  var subtext = "v0.326, added achivements, fixed most bugs i found & added more settings; more coming soon! :3";
+  var subtext = "v0.3, achievements added, bugfixes and more coming soon! :3";
 
   var serverUrl1 = "https://gms.parcoil.com";
   var currentPageTitle = document.title;
@@ -27,17 +27,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     localStorage.setItem("favourites", JSON.stringify(favs));
     
-    // Sync to account if logged in
     if (typeof syncFavoriteToAccount === 'function') {
       syncFavoriteToAccount(gameName, isAdding);
     }
     
-    // Check achievements after favoriting
     if (typeof checkAchievements === 'function') {
       setTimeout(() => checkAchievements(), 100);
     }
     
-    // Update the favorite button if it exists
     const favBtn = document.querySelector(`.fav-btn[data-game="${gameName.replace(/['"]/g, '\\"')}"]`);
     if (favBtn) {
       favBtn.textContent = isAdding ? "★" : "☆";
@@ -62,18 +59,28 @@ document.addEventListener('DOMContentLoaded', function() {
       gameImage.src = imageSrc;
       gameImage.alt = game.name;
       
-      // GAME CLICK HANDLER - Track played game
+      // GAME CLICK HANDLER - OPENS IN NEW TAB
       gameImage.onclick = () => {
-        // Track that this game was played (if logged in)
+        // Track game play count for Addicted/Committed achievements
+        if (typeof trackGamePlayCount === 'function') {
+          trackGamePlayCount(game.name);
+        }
+        
+        // Check for food game (Big Back achievement)
+        if (typeof isFoodGame === 'function' && isFoodGame(game.name)) {
+          if (typeof checkAndUnlockAchievement === 'function') {
+            checkAndUnlockAchievement(57);
+          }
+        }
+        
+        // Track played game for account stats
         if (typeof trackPlayedGame === 'function') {
           trackPlayedGame(game.name);
         }
         
-        if (game.url.startsWith('http')) {
-          window.location.href = game.url;
-        } else {
-          window.location.href = `play.html?gameurl=${game.url}/`;
-        }
+        // OPEN IN NEW TAB INSTEAD OF REPLACING
+        const gameUrl = game.url.startsWith('http') ? game.url : `play.html?gameurl=${game.url}/`;
+        window.open(gameUrl, '_blank');
       };
       
       const gameName = document.createElement("p");
@@ -104,7 +111,6 @@ document.addEventListener('DOMContentLoaded', function() {
       gamesContainer.appendChild(gameDiv);
     });
     
-    // Attach rating listeners if available
     if (typeof attachRatingListeners === 'function') {
       attachRatingListeners();
     }
@@ -114,6 +120,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById("searchInput");
     if (!searchInput) return;
     const searchInputValue = searchInput.value.toLowerCase();
+    
+    // Check for secret dev names achievement
+    if (typeof checkSecretNames === 'function') {
+      checkSecretNames(searchInputValue);
+    }
+    
     let filteredGames;
     const favFilterOn = localStorage.getItem("favFilter") === "true";
     if (favFilterOn) {
@@ -235,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
     .then((response) => response.json())
     .then((data) => {
       gamesData = data;
-    window.gamesData = gamesData;  
+      window.gamesData = gamesData; // Make global for other scripts
       handleSearchInput();
       const btn = document.getElementById("favSidebarBtn");
       if (btn && localStorage.getItem("favFilter") === "true") {
@@ -245,7 +257,6 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       console.log(`✅ Loaded ${gamesData.length} games successfully!`);
       
-      // Load user favorites after games are loaded
       if (typeof loadUserFavorites === 'function') {
         loadUserFavorites();
       }
@@ -273,7 +284,6 @@ const RATINGS_API_KEY = "$2a$10$2cPmKAGNYxPTRLV03OfVruvfhNpW/VHtJSzR.AVNHumZ7etL
 let globalRatings = {};
 let userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
 
-// Load ratings from JSONBin
 async function loadGlobalRatings() {
   try {
     const response = await fetch(`https://api.jsonbin.io/v3/b/${RATINGS_BIN_ID}/latest`, {
@@ -290,7 +300,6 @@ async function loadGlobalRatings() {
   refreshAllRatings();
 }
 
-// Save ratings to JSONBin
 async function saveGlobalRatings() {
   try {
     const response = await fetch(`https://api.jsonbin.io/v3/b/${RATINGS_BIN_ID}`, {
@@ -307,13 +316,11 @@ async function saveGlobalRatings() {
   }
 }
 
-// Submit a rating for a game
 function submitRating(gameName, rating) {
   if (!globalRatings[gameName]) {
     globalRatings[gameName] = { total: 0, count: 0, average: 0 };
   }
   
-  // Track user rating count
   const currentUser = JSON.parse(localStorage.getItem('fanter_currentUser') || 'null');
   if (currentUser) {
     currentUser.stats = currentUser.stats || { ratingsGiven: 0, favoritesCount: 0, gamesPlayed: 0 };
@@ -328,14 +335,12 @@ function submitRating(gameName, rating) {
     }
   }
   
-  // Check if user already voted
   if (userVotes[gameName]) {
     const oldRating = userVotes[gameName];
     globalRatings[gameName].total -= oldRating;
     globalRatings[gameName].count -= 1;
   }
   
-  // Add new vote
   globalRatings[gameName].total += rating;
   globalRatings[gameName].count += 1;
   globalRatings[gameName].average = globalRatings[gameName].total / globalRatings[gameName].count;
@@ -347,13 +352,14 @@ function submitRating(gameName, rating) {
   showRatingToast(`You rated "${gameName}" ${rating}★!`);
   updateStarDisplay(gameName, rating);
   
-  // Check achievements after rating
   if (typeof checkAchievements === 'function') {
     setTimeout(() => checkAchievements(), 100);
   }
+  if (typeof checkLoyalCustomer === 'function') {
+    setTimeout(() => checkLoyalCustomer(), 100);
+  }
 }
 
-// Update star display for a specific game
 function updateStarDisplay(gameName, userRating) {
   const ratingContainer = document.querySelector(`.game-rating[data-game="${CSS.escape(gameName)}"]`);
   if (!ratingContainer) return;
@@ -374,7 +380,6 @@ function updateStarDisplay(gameName, userRating) {
   }
 }
 
-// Refresh all ratings on the page
 function refreshAllRatings() {
   document.querySelectorAll('.game-rating').forEach(container => {
     const gameName = container.getAttribute('data-game');
@@ -399,7 +404,6 @@ function refreshAllRatings() {
   });
 }
 
-// Show toast notification
 function showRatingToast(message) {
   let toast = document.querySelector('.rating-toast');
   if (!toast) {
@@ -414,7 +418,6 @@ function showRatingToast(message) {
   }, 2000);
 }
 
-// Create rating stars HTML for a game card
 function createRatingHTML(gameName, currentRating = 0) {
   const gameRating = globalRatings[gameName];
   const avgRating = gameRating ? gameRating.average.toFixed(1) : '0.0';
@@ -434,7 +437,6 @@ function createRatingHTML(gameName, currentRating = 0) {
   `;
 }
 
-// Attach rating event listeners
 function attachRatingListeners() {
   document.querySelectorAll('.stars').forEach(starsContainer => {
     const gameName = starsContainer.getAttribute('data-game');
@@ -467,7 +469,6 @@ function attachRatingListeners() {
   });
 }
 
-// Load ratings when page loads
 loadGlobalRatings();
 
 
@@ -481,7 +482,6 @@ function updateAccountButtonDisplay() {
   }
 }
 
-// Update account button when page loads
 document.addEventListener('DOMContentLoaded', function() {
   updateAccountButtonDisplay();
 });
@@ -508,23 +508,6 @@ function updateUserInStorage(updatedUser) {
     users[index] = updatedUser;
     localStorage.setItem('fanter_users', JSON.stringify(users));
   }
-}
-
-function syncFavoritesFromAccount() {
-  const currentUser = getCurrentUser();
-  if (!currentUser) return;
-  
-  const accountFavorites = currentUser.favorites || [];
-  let localFavorites = JSON.parse(localStorage.getItem("favourites") || "[]");
-  const mergedFavorites = [...new Set([...accountFavorites, ...localFavorites])];
-  
-  localStorage.setItem("favourites", JSON.stringify(mergedFavorites));
-  
-  currentUser.favorites = mergedFavorites;
-  currentUser.stats.favoritesCount = mergedFavorites.length;
-  updateUserInStorage(currentUser);
-  
-  console.log(`✅ Synced ${mergedFavorites.length} favorites from account`);
 }
 
 function syncFavoriteToAccount(gameName, isAdding) {
@@ -571,11 +554,6 @@ function trackPlayedGame(gameName) {
   updateUserInStorage(currentUser);
   
   console.log(`✅ Tracked played game: ${gameName}`);
-  
-  // Check achievements after playing
-  if (typeof checkAchievements === 'function') {
-    setTimeout(() => checkAchievements(), 100);
-  }
 }
 
 function loadUserFavorites() {
@@ -592,325 +570,208 @@ function loadUserFavorites() {
   console.log(`✅ Loaded ${favorites.length} favorites from account`);
 }
 
-// ===== ACHIEVEMENTS SYSTEM =====
 
-// List of all achievements
-const ACHIEVEMENTS = [
-  { id: 1, name: "First Steps", desc: "Create an account", requirement: "register", icon: "🌟", requiredValue: 1 },
-  { id: 2, name: "First Rating", desc: "Rate your first game", requirement: "ratingsGiven", requiredValue: 1, icon: "⭐" },
-  { id: 3, name: "Favorited", desc: "Favorite your first game", requirement: "favoritesCount", requiredValue: 1, icon: "💖" },
-  { id: 4, name: "Game On", desc: "Play your first game", requirement: "gamesPlayed", requiredValue: 1, icon: "🎮" },
-  { id: 5, name: "Getting Started", desc: "Rate 10 games", requirement: "ratingsGiven", requiredValue: 10, icon: "🔟" },
-  { id: 6, name: "Collector", desc: "Favorite 10 games", requirement: "favoritesCount", requiredValue: 10, icon: "💎" },
-  { id: 7, name: "Marathon", desc: "Play 20 games", requirement: "gamesPlayed", requiredValue: 20, icon: "🏃‍♂️" },
-  { id: 8, name: "Rater", desc: "Rate 25 games", requirement: "ratingsGiven", requiredValue: 25, icon: "⭐⭐⭐" },
-  { id: 9, name: "Super Fan", desc: "Favorite 25 games", requirement: "favoritesCount", requiredValue: 25, icon: "👑" },
-  { id: 10, name: "Completionist", desc: "Earn all other achievements", requirement: "totalAchievements", requiredValue: 9, icon: "🎯" }
-];
+// ===== ACHIEVEMENT TRIGGERS =====
 
-// Get user achievements from localStorage
-function getUserAchievements() {
-  return JSON.parse(localStorage.getItem('fanter_achievements') || '{}');
-}
+let gamePlayCounts = JSON.parse(localStorage.getItem('gamePlayCounts') || '{}');
 
-// Save user achievements
-function saveUserAchievements(achievements) {
-  localStorage.setItem('fanter_achievements', JSON.stringify(achievements));
+function trackGamePlayCount(gameName) {
+  gamePlayCounts[gameName] = (gamePlayCounts[gameName] || 0) + 1;
+  localStorage.setItem('gamePlayCounts', JSON.stringify(gamePlayCounts));
   
-  // Also save to user account if logged in
-  const currentUser = getCurrentUser();
-  if (currentUser) {
-    currentUser.achievements = achievements;
-    updateUserInStorage(currentUser);
+  if (gamePlayCounts[gameName] >= 50) {
+    if (typeof checkAndUnlockAchievement === 'function') checkAndUnlockAchievement(59);
+  }
+  if (gamePlayCounts[gameName] >= 100) {
+    if (typeof checkAndUnlockAchievement === 'function') checkAndUnlockAchievement(60);
   }
 }
 
-// Check and unlock achievements
-function checkAchievements() {
-  const currentUser = getCurrentUser();
-  if (!currentUser) return;
+let themeChangeCount = parseInt(localStorage.getItem('themeChangeCount') || '0');
+
+function trackThemeChange() {
+  themeChangeCount++;
+  localStorage.setItem('themeChangeCount', themeChangeCount);
+  if (themeChangeCount >= 10) {
+    if (typeof checkAndUnlockAchievement === 'function') checkAndUnlockAchievement(56);
+  }
+}
+
+let idleStartTime = null;
+let idleAchievementGranted = false;
+
+function startIdleTracking() {
+  if (idleAchievementGranted) return;
   
-  let achievements = getUserAchievements();
-  let unlockedAny = false;
+  let lastActivity = Date.now();
   
-  // Get user stats
-  const stats = currentUser.stats || { ratingsGiven: 0, favoritesCount: 0, gamesPlayed: 0 };
-  const totalUnlocked = Object.keys(achievements).filter(id => achievements[id] === true).length;
+  function resetIdleTimer() {
+    lastActivity = Date.now();
+  }
   
-  ACHIEVEMENTS.forEach(ach => {
-    // Skip if already unlocked
-    if (achievements[ach.id]) return;
-    
-    let isUnlocked = false;
-    let currentValue = 0;
-    
-    switch (ach.requirement) {
-      case "register":
-        isUnlocked = true;
-        break;
-      case "ratingsGiven":
-        currentValue = stats.ratingsGiven || 0;
-        isUnlocked = currentValue >= ach.requiredValue;
-        break;
-      case "favoritesCount":
-        currentValue = stats.favoritesCount || 0;
-        isUnlocked = currentValue >= ach.requiredValue;
-        break;
-      case "gamesPlayed":
-        currentValue = stats.gamesPlayed || 0;
-        isUnlocked = currentValue >= ach.requiredValue;
-        break;
-      case "totalAchievements":
-        isUnlocked = totalUnlocked >= ach.requiredValue;
-        break;
+  function checkIdle() {
+    if (!idleAchievementGranted) {
+      const idleTime = (Date.now() - lastActivity) / 1000 / 60;
+      if (idleTime >= 60) {
+        if (typeof checkAndUnlockAchievement === 'function') checkAndUnlockAchievement(55);
+        idleAchievementGranted = true;
+      }
     }
-    
-    if (isUnlocked) {
-      achievements[ach.id] = true;
-      unlockedAny = true;
-      showAchievementToast(ach);
-      console.log(`🏆 Achievement Unlocked: ${ach.name}`);
+  }
+  
+  document.addEventListener('mousemove', resetIdleTimer);
+  document.addEventListener('keydown', resetIdleTimer);
+  document.addEventListener('click', resetIdleTimer);
+  setInterval(checkIdle, 60000);
+}
+
+const FOOD_GAMES = ['burger', 'pizza', 'taco', 'sushi', 'cake', 'cookie', 'food', 'chef', 'restaurant', 'cooking', 'baking', 'donut', 'ice cream', 'candy', 'chocolate'];
+
+function isFoodGame(gameName) {
+  const lowerName = gameName.toLowerCase();
+  return FOOD_GAMES.some(food => lowerName.includes(food));
+}
+
+const SECRET_NAMES = [':)', 'creamypeanut', 'bloxy', 'abcatlmfao'];
+
+function checkSecretNames(searchTerm) {
+  const searchLower = searchTerm.toLowerCase();
+  let foundCount = 0;
+  SECRET_NAMES.forEach(name => {
+    if (searchLower.includes(name.toLowerCase())) {
+      foundCount++;
     }
   });
-  
-  // Also check Completionist after other unlocks
-  const newTotal = Object.keys(achievements).filter(id => achievements[id] === true).length;
-  if (!achievements[10] && newTotal >= 9) {
-    achievements[10] = true;
-    unlockedAny = true;
-    const completionist = ACHIEVEMENTS.find(a => a.id === 10);
-    showAchievementToast(completionist);
-    console.log(`🏆 Achievement Unlocked: Completionist!`);
+  if (foundCount >= SECRET_NAMES.length) {
+    if (typeof checkAndUnlockAchievement === 'function') checkAndUnlockAchievement(53);
   }
-  
-  if (unlockedAny) {
-    saveUserAchievements(achievements);
-    
-    // Update stats in user account
-    currentUser.achievements = achievements;
-    updateUserInStorage(currentUser);
-  }
-  
-  return achievements;
 }
 
-// Show achievement toast notification
-function showAchievementToast(achievement) {
-  let toast = document.querySelector('.achievement-toast');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.className = 'achievement-toast';
-    document.body.appendChild(toast);
+let pageLoadTime = Date.now();
+window.addEventListener('beforeunload', () => {
+  const timeOnPage = (Date.now() - pageLoadTime) / 1000;
+  if (timeOnPage <= 10) {
+    localStorage.setItem('pendingAltF4', 'true');
   }
-  
-  toast.innerHTML = `
-    <span class="achievement-icon">${achievement.icon}</span>
-    <div class="achievement-content">
-      <div class="achievement-title">ACHIEVEMENT UNLOCKED!</div>
-      <div class="achievement-name">${achievement.name}</div>
-      <div class="achievement-desc">${achievement.desc}</div>
-    </div>
+});
+
+function checkAltF4() {
+  if (localStorage.getItem('pendingAltF4') === 'true') {
+    localStorage.removeItem('pendingAltF4');
+    if (typeof checkAndUnlockAchievement === 'function') checkAndUnlockAchievement(54);
+  }
+}
+
+function checkOGFanter() {
+  const currentUser = getCurrentUser();
+  if (currentUser && currentUser.createdAt) {
+    const joinDate = new Date(currentUser.createdAt);
+    const oneMonthLater = new Date();
+    oneMonthLater.setMonth(oneMonthLater.getMonth() - 1);
+    
+    if (joinDate >= oneMonthLater) {
+      if (typeof checkAndUnlockAchievement === 'function') checkAndUnlockAchievement(58);
+    }
+  }
+}
+
+function checkLoyalCustomer() {
+  if (!window.gamesData) return;
+  const ratedGames = Object.keys(userVotes || {}).length;
+  if (ratedGames >= window.gamesData.length) {
+    if (typeof checkAndUnlockAchievement === 'function') checkAndUnlockAchievement(62);
+  }
+}
+
+function checkTotalPlayTime() {
+  const sessionStart = localStorage.getItem('sessionStart');
+  if (sessionStart) {
+    const totalPausedTime = parseInt(localStorage.getItem('totalPausedTime') || '0');
+    const activeTime = (Date.now() - parseInt(sessionStart) - totalPausedTime) / 1000 / 60 / 60;
+    if (activeTime >= 50) {
+      if (typeof checkAndUnlockAchievement === 'function') checkAndUnlockAchievement(61);
+    }
+  }
+}
+
+function triggerPageCrash() {
+  const crashOverlay = document.createElement('div');
+  crashOverlay.id = 'crash-overlay';
+  crashOverlay.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000088;
+    z-index: 999999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Courier New', monospace;
+    color: white;
+    text-align: center;
+    animation: fadeIn 0.3s ease;
   `;
   
-  toast.classList.add('show');
-  
-  setTimeout(() => {
-    toast.classList.remove('show');
-  }, 4000);
-}
-
-// Get achievement progress for a user
-function getAchievementProgress(achievement, userStats) {
-  let current = 0;
-  let required = achievement.requiredValue;
-  
-  switch (achievement.requirement) {
-    case "register":
-      return { current: 1, required: 1, percent: 100 };
-    case "ratingsGiven":
-      current = userStats?.ratingsGiven || 0;
-      break;
-    case "favoritesCount":
-      current = userStats?.favoritesCount || 0;
-      break;
-    case "gamesPlayed":
-      current = userStats?.gamesPlayed || 0;
-      break;
-    case "totalAchievements":
-      const achievements = getUserAchievements();
-      const unlocked = Object.keys(achievements).filter(id => achievements[id] === true).length;
-      current = unlocked;
-      break;
-  }
-  
-  const percent = Math.min(100, Math.floor((current / required) * 100));
-  return { current, required, percent };
-}
-
-// Render achievements HTML for profile page
-function renderAchievementsHTML(achievements, userStats) {
-  let html = '<div class="achievement-grid">';
-  
-  ACHIEVEMENTS.forEach(ach => {
-    const isUnlocked = achievements[ach.id] === true;
-    const progress = getAchievementProgress(ach, userStats);
-    
-    html += `
-      <div class="achievement-badge ${isUnlocked ? 'unlocked' : 'locked'}">
-        <div class="badge-icon">${ach.icon}</div>
-        <div class="badge-info">
-          <div class="badge-name">${ach.name}</div>
-          <div class="badge-desc">${ach.desc}</div>
-          ${!isUnlocked ? `
-            <div class="badge-progress">${progress.current}/${progress.required}</div>
-            <div class="achievement-progress-bar">
-              <div class="achievement-progress-fill" style="width: ${progress.percent}%;"></div>
-            </div>
-          ` : '<div class="badge-progress" style="color:#ffcc00">✓ Unlocked!</div>'}
-        </div>
+  crashOverlay.innerHTML = `
+    <div style="background: white; color: black; padding: 20px; border: 2px solid silver; max-width: 500px; margin: 20px;">
+      <pre style="font-size: 20px; margin: 0;">😵</pre>
+      <h1 style="font-size: 24px; margin: 10px 0;">:(</h1>
+      <p style="font-size: 16px;">Your Fanter ran into a problem and needs to restart. We're just collecting some error info, then we'll restart for you.</p>
+      <p style="font-size: 14px; margin-top: 20px;">*** STOP: 0x000000F4 (0x00000000, 0x00000000, 0x00000000, 0x00000000)</p>
+      <p style="font-size: 12px; margin-top: 30px;">*** fanter.sys - Address F4N73R base at F4N73R, DateStamp 4f75a7b3</p>
+      <p style="font-size: 12px;">*** CHINCHILLA.exe - Address F4N73R base at F4N73R, DateStamp 4f75a7b3</p>
+      <div style="margin-top: 30px;">
+        <div style="display: inline-block; width: 20px; height: 20px; background: white; margin: 0 5px; animation: blink 1s step-end infinite;"></div>
+        <span style="margin-left: 10px;">Contact your system admin or abcatlmfao for support</span>
       </div>
-    `;
-  });
+    </div>
+    <p style="margin-top: 20px; font-size: 12px;">Restarting in <span id="crash-countdown">5</span> seconds...</p>
+  `;
   
-  html += '</div>';
-  return html;
-}
-
-// ===== ACHIEVEMENT TRIGGER FUNCTIONS =====
-
-// Call this when user logs in
-function triggerLoginAchievements() {
-  const currentUser = getCurrentUser();
-  if (!currentUser) return;
+  document.body.appendChild(crashOverlay);
   
-  let achievements = getUserAchievements();
-  let changed = false;
-  
-  // Check login days streak
-  const lastLogin = localStorage.getItem('lastLoginDate');
-  const today = new Date().toDateString();
-  
-  if (lastLogin !== today) {
-    let loginDays = (currentUser.stats.loginDays || 0) + 1;
-    let loginStreak = (currentUser.stats.loginStreak || 0);
-    
-    // Check if consecutive day
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    if (lastLogin === yesterday.toDateString()) {
-      loginStreak++;
-    } else {
-      loginStreak = 1;
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
-    
-    currentUser.stats.loginDays = loginDays;
-    currentUser.stats.loginStreak = loginStreak;
-    localStorage.setItem('lastLoginDate', today);
-    updateUserInStorage(currentUser);
-    changed = true;
-  }
-  
-  if (changed) {
-    setTimeout(() => checkAchievements(), 100);
-  }
-}
-
-// Call this when rating a game (already in submitRating)
-// Call this when favoriting a game (already in toggleFavourite)
-// Call this when playing a game (already in trackPlayedGame)
-
-// Manual achievement grant (for The Owner's Gift)
-function grantManualAchievement(achievementId, userId) {
-  let users = JSON.parse(localStorage.getItem('fanter_users') || '[]');
-  const user = users.find(u => u.id === userId || u.username === userId);
-  if (!user) return false;
-  
-  let achievements = user.achievements || {};
-  if (achievements[achievementId]) return false;
-  
-  achievements[achievementId] = true;
-  user.achievements = achievements;
-  
-  localStorage.setItem('fanter_users', JSON.stringify(users));
-  if (getCurrentUser()?.id === user.id) {
-    localStorage.setItem('fanter_currentUser', JSON.stringify(user));
-    checkAchievements();
-  }
-  
-  return true;
-}
-
-// Secret achievement: Konami Code
-function setupKonamiCode() {
-  let konamiSequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
-  let konamiIndex = 0;
-  
-  document.addEventListener('keydown', (e) => {
-    if (e.key === konamiSequence[konamiIndex]) {
-      konamiIndex++;
-      if (konamiIndex === konamiSequence.length) {
-        const currentUser = getCurrentUser();
-        if (currentUser) {
-          let achievements = getUserAchievements();
-          if (!achievements[52]) {
-            achievements[52] = true;
-            saveUserAchievements(achievements);
-            showAchievementToast(ACHIEVEMENTS_DATA.secret.achievements.find(a => a.id === 52));
-          }
-        }
-        konamiIndex = 0;
-      }
-    } else {
-      konamiIndex = 0;
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
     }
-  });
-}
-
-// Secret achievement: Console Warrior
-function setupConsoleWarrior() {
-  const originalLog = console.log;
-  console.log = function(...args) {
-    if (args[0] === 'i love fanter') {
-      const currentUser = getCurrentUser();
-      if (currentUser) {
-        let achievements = getUserAchievements();
-        if (!achievements[55]) {
-          achievements[55] = true;
-          saveUserAchievements(achievements);
-          showAchievementToast(ACHIEVEMENTS_DATA.secret.achievements.find(a => a.id === 55));
-        }
-      }
+  `;
+  document.head.appendChild(style);
+  
+  if (typeof checkAndUnlockAchievement === 'function') checkAndUnlockAchievement(63);
+  
+  let seconds = 5;
+  const countdownEl = document.getElementById('crash-countdown');
+  const interval = setInterval(() => {
+    seconds--;
+    if (countdownEl) countdownEl.textContent = seconds;
+    if (seconds <= 0) {
+      clearInterval(interval);
+      window.location.reload();
     }
-    originalLog.apply(console, args);
-  };
+  }, 1000);
 }
 
-// Secret achievement: Night Owl
-function checkNightOwl() {
-  const hour = new Date().getHours();
-  if (hour >= 2 && hour < 4) {
-    const currentUser = getCurrentUser();
-    if (currentUser) {
-      let achievements = getUserAchievements();
-      if (!achievements[54]) {
-        achievements[54] = true;
-        saveUserAchievements(achievements);
-        showAchievementToast(ACHIEVEMENTS_DATA.secret.achievements.find(a => a.id === 54));
-      }
-    }
-  }
+function initAchievementTriggers() {
+  checkAltF4();
+  checkOGFanter();
+  checkTotalPlayTime();
+  startIdleTracking();
+  setInterval(checkTotalPlayTime, 60000);
+  setInterval(checkLoyalCustomer, 30000);
 }
 
-// Initialize secret achievement listeners
-function initSecretAchievements() {
-  setupKonamiCode();
-  setupConsoleWarrior();
-  checkNightOwl();
-  setInterval(checkNightOwl, 60000); // Check every minute
-}
+initAchievementTriggers();
 
-// Call this when page loads
-document.addEventListener('DOMContentLoaded', () => {
-  initSecretAchievements();
-  triggerLoginAchievements();
-});
+window.crashFanter = function() {
+  triggerPageCrash();
+};
+console.log('💀 Type "crashFanter()" for a surprise...');
