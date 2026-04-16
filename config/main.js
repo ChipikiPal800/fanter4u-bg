@@ -235,6 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
     .then((response) => response.json())
     .then((data) => {
       gamesData = data;
+    window.gamesData = gamesData;  
       handleSearchInput();
       const btn = document.getElementById("favSidebarBtn");
       if (btn && localStorage.getItem("favFilter") === "true") {
