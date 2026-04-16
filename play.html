@@ -34,6 +34,64 @@
       width: 100%;
     }
 
+    /* ===== LOADING SCREEN ===== */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 5, 5, 0.98);
+      backdrop-filter: blur(10px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    .loading-overlay.hide {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 3px solid rgba(45, 90, 227, 0.3);
+      border-top: 3px solid #2d5ae3;
+      border-right: 3px solid #ffcc00;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      color: #00ff88;
+      font-family: 'Orbitron', monospace;
+      font-size: 14px;
+      letter-spacing: 2px;
+      animation: blink 1.5s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .loading-game-name {
+      color: rgba(255,255,255,0.5);
+      font-size: 12px;
+      margin-top: 15px;
+      font-family: monospace;
+    }
+
     /* ===== SIDE MENU ===== */
     .game-sidebar {
       width: 320px;
@@ -213,6 +271,12 @@
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
       overflow: hidden;
       transition: all 0.3s ease;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .game-container.visible {
+      opacity: 1;
     }
 
     .game-container.fullscreen {
@@ -347,6 +411,13 @@
   </style>
 </head>
 <body>
+  <!-- Loading Screen -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">LOADING GAME...</div>
+    <div class="loading-game-name" id="loadingGameName">Preparing fanter player</div>
+  </div>
+
   <!-- Floating particles -->
   <div class="particles" id="particles"></div>
 
@@ -439,17 +510,22 @@
     const urlParams = new URLSearchParams(window.location.search);
     let gameUrl = urlParams.get("gameurl");
     let gameName = urlParams.get("game") || "Game";
+    const decodedGameName = decodeURIComponent(gameName);
 
     console.log("🔍 Game URL:", gameUrl);
-    console.log("📝 Game name:", gameName);
+    console.log("📝 Game name:", decodedGameName);
+
+    // Update loading text with game name
+    const loadingGameNameEl = document.getElementById('loadingGameName');
+    if (loadingGameNameEl) {
+      loadingGameNameEl.textContent = `Loading ${decodedGameName}...`;
+    }
 
     const isExternal = gameUrl && (gameUrl.startsWith('http://') || gameUrl.startsWith('https://'));
     
     let embedUrl;
     if (isExternal) {
       embedUrl = gameUrl;
-      const externalNotice = document.getElementById('externalNotice');
-      if (externalNotice) externalNotice.style.display = 'block';
     } else if (gameUrl) {
       embedUrl = `https://gms.parcoil.com/${gameUrl}`;
     } else {
@@ -457,14 +533,45 @@
     }
 
     const gameFrame = document.getElementById('gameFrame');
-    if (gameFrame) {
-      gameFrame.src = embedUrl;
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const gameContainer = document.getElementById('gameContainer');
+    
+    // When iframe loads, hide loading screen and show game
+    function onGameLoad() {
+      console.log("✅ Game loaded successfully!");
+      if (loadingOverlay) {
+        loadingOverlay.classList.add('hide');
+      }
+      if (gameContainer) {
+        gameContainer.classList.add('visible');
+      }
     }
     
+    // Set up iframe load event
+    if (gameFrame) {
+      gameFrame.onload = onGameLoad;
+      gameFrame.src = embedUrl;
+      
+      // Fallback timeout (if iframe never triggers onload)
+      setTimeout(() => {
+        if (loadingOverlay && !loadingOverlay.classList.contains('hide')) {
+          console.log("⚠️ Game load timeout, forcing hide loading screen");
+          onGameLoad();
+        }
+      }, 8000);
+    }
+    
+    // Update UI elements
     const gameTitle = document.getElementById('gameTitle');
     const gameNameDisplay = document.getElementById('gameNameDisplay');
-    if (gameTitle) gameTitle.textContent = decodeURIComponent(gameName);
-    if (gameNameDisplay) gameNameDisplay.textContent = decodeURIComponent(gameName);
+    if (gameTitle) gameTitle.textContent = decodedGameName;
+    if (gameNameDisplay) gameNameDisplay.textContent = decodedGameName;
+    
+    // Show external notice if needed
+    if (isExternal) {
+      const externalNotice = document.getElementById('externalNotice');
+      if (externalNotice) externalNotice.style.display = 'block';
+    }
 
     // ===== SIDEBAR COLLAPSE =====
     let sidebarCollapsed = localStorage.getItem('sidebarCollapsed_play') === 'true';
@@ -568,7 +675,6 @@
     });
     
     // ===== FULLSCREEN TOGGLE =====
-    const gameContainer = document.getElementById('gameContainer');
     const fullscreenBtn = document.getElementById('fullscreenBtn');
     const refreshBtn = document.getElementById('refreshBtn');
     const fullscreenHint = document.getElementById('fullscreenHint');
@@ -608,7 +714,6 @@
     });
     
     // ===== SAFETY KEY TO EXIT FULLSCREEN =====
-    // Check for user's saved safety key
     let lastKeyTime = 0;
     let lastKey = "";
     
@@ -625,7 +730,6 @@
       if (pressedKey === storedKey && pressedKey === lastKey && now - lastKeyTime < 1000) {
         e.preventDefault();
         toggleFullscreen();
-        // Show a small notification
         const toast = document.createElement('div');
         toast.textContent = `🔑 Safety key pressed - exiting fullscreen`;
         toast.style.cssText = `
@@ -654,6 +758,13 @@
     if (refreshBtn) {
       refreshBtn.onclick = () => {
         if (gameFrame) {
+          // Show loading again
+          if (loadingOverlay) {
+            loadingOverlay.classList.remove('hide');
+          }
+          if (gameContainer) {
+            gameContainer.classList.remove('visible');
+          }
           gameFrame.src = embedUrl;
         }
       };
@@ -669,7 +780,7 @@
       }
     }
     
-    trackGamePlay(decodeURIComponent(gameName));
+    trackGamePlay(decodedGameName);
     
     // Add fade out animation for toast
     const style = document.createElement('style');
