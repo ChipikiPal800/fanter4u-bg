@@ -1,3 +1,5 @@
+// ===== MAIN.JS - COMPLETE REWRITE =====
+
 // Wait for DOM to be fully loaded before running
 document.addEventListener('DOMContentLoaded', function() {
   var sitename = "fanter beta.";
@@ -12,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     return JSON.parse(localStorage.getItem("favourites") || "[]");
   }
 
-  function toggleFavourite(gameName) {
+  window.toggleFavourite = function(gameName) {
     let favs = getFavourites();
     let isAdding = false;
     
@@ -30,12 +32,17 @@ document.addEventListener('DOMContentLoaded', function() {
       syncFavoriteToAccount(gameName, isAdding);
     }
     
+    // Check achievements after favoriting
+    if (typeof checkAchievements === 'function') {
+      setTimeout(() => checkAchievements(), 100);
+    }
+    
     // Update the favorite button if it exists
     const favBtn = document.querySelector(`.fav-btn[data-game="${gameName.replace(/['"]/g, '\\"')}"]`);
     if (favBtn) {
       favBtn.textContent = isAdding ? "★" : "☆";
     }
-  }
+  };
 
   function displayFilteredGames(filteredGames) {
     const gamesContainer = document.getElementById("gamesContainer");
@@ -80,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
       favBtn.title = "favourite";
       favBtn.onclick = (e) => {
         e.stopPropagation();
-        toggleFavourite(game.name);
+        window.toggleFavourite(game.name);
         favBtn.textContent = getFavourites().includes(game.name) ? "★" : "☆";
       };
       
@@ -338,6 +345,11 @@ function submitRating(gameName, rating) {
   saveGlobalRatings();
   showRatingToast(`You rated "${gameName}" ${rating}★!`);
   updateStarDisplay(gameName, rating);
+  
+  // Check achievements after rating
+  if (typeof checkAchievements === 'function') {
+    setTimeout(() => checkAchievements(), 100);
+  }
 }
 
 // Update star display for a specific game
@@ -468,6 +480,7 @@ function updateAccountButtonDisplay() {
   }
 }
 
+// Update account button when page loads
 document.addEventListener('DOMContentLoaded', function() {
   updateAccountButtonDisplay();
 });
@@ -557,6 +570,11 @@ function trackPlayedGame(gameName) {
   updateUserInStorage(currentUser);
   
   console.log(`✅ Tracked played game: ${gameName}`);
+  
+  // Check achievements after playing
+  if (typeof checkAchievements === 'function') {
+    setTimeout(() => checkAchievements(), 100);
+  }
 }
 
 function loadUserFavorites() {
@@ -627,7 +645,7 @@ function checkAchievements() {
     
     switch (ach.requirement) {
       case "register":
-        isUnlocked = true; // User is logged in, so they registered
+        isUnlocked = true;
         break;
       case "ratingsGiven":
         currentValue = stats.ratingsGiven || 0;
@@ -671,6 +689,8 @@ function checkAchievements() {
     currentUser.achievements = achievements;
     updateUserInStorage(currentUser);
   }
+  
+  return achievements;
 }
 
 // Show achievement toast notification
@@ -692,8 +712,6 @@ function showAchievementToast(achievement) {
   `;
   
   toast.classList.add('show');
-  
-  // Play a subtle sound effect (optional - just visual for now)
   
   setTimeout(() => {
     toast.classList.remove('show');
@@ -718,7 +736,8 @@ function getAchievementProgress(achievement, userStats) {
       current = userStats?.gamesPlayed || 0;
       break;
     case "totalAchievements":
-      const unlocked = Object.keys(getUserAchievements()).filter(id => getUserAchievements()[id] === true).length;
+      const achievements = getUserAchievements();
+      const unlocked = Object.keys(achievements).filter(id => achievements[id] === true).length;
       current = unlocked;
       break;
   }
@@ -727,16 +746,7 @@ function getAchievementProgress(achievement, userStats) {
   return { current, required, percent };
 }
 
-// Call checkAchievements after relevant actions
-// Add these calls to existing functions:
-
-// Add to register function (in fantaccount.html) - call after creating user
-// Add to submitRating function - call after saving rating
-// Add to toggleFavourite function - cll after saving favorite
-// Add to trackPlayedGame function - call after saving played game
-
-// Also add a function to render achievements on profile page
-
+// Render achievements HTML for profile page
 function renderAchievementsHTML(achievements, userStats) {
   let html = '<div class="achievement-grid">';
   
