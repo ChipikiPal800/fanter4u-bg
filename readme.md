@@ -41,6 +41,7 @@ by the way, this was made for people with common sense so if something doesnt ma
 
 
 🎨 visual settings - accent color, blur intensity, card transparency, border styles, shadows, corner roundness
+
 🔊 audio settings - hover sounds, background music (working), click effects, mute all (work in progress but the ui is there)
 
 
