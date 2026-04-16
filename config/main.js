@@ -21,7 +21,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     localStorage.setItem("favourites", JSON.stringify(favs));
   }
-
   function displayFilteredGames(filteredGames) {
     const gamesContainer = document.getElementById("gamesContainer");
     if (!gamesContainer) return;
@@ -59,9 +58,18 @@ document.addEventListener('DOMContentLoaded', function() {
       gameDiv.appendChild(gameImage);
       gameDiv.appendChild(gameName);
       gameDiv.appendChild(favBtn);
+      
+      // ADD THIS LINE FOR RATINGS
+      gameDiv.insertAdjacentHTML('beforeend', createRatingHTML(game.name, userVotes[game.name] || 0));
+      
       gamesContainer.appendChild(gameDiv);
     });
+    
+    // ADD THIS LINE TO ATTACH RATING LISTENERS
+    attachRatingListeners();
   }
+
+  
 
   function handleSearchInput() {
     const searchInput = document.getElementById("searchInput");
