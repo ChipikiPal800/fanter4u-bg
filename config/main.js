@@ -423,3 +423,26 @@ function attachRatingListeners() {
 
 // Load ratings when page loads
 loadGlobalRatings();
+
+// ===== ACCOUNT SYSTEM HELPER FUNCTIONS =====
+// These functions sync the account button across all pages
+
+function updateAccountButtonDisplay() {
+  const currentUser = JSON.parse(localStorage.getItem('fanter_currentUser') || 'null');
+  const accountNameSpan = document.getElementById('accountName');
+  if (accountNameSpan) {
+    accountNameSpan.textContent = currentUser ? (currentUser.displayName || currentUser.username) : 'Guest';
+  }
+}
+
+// Update account button when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  updateAccountButtonDisplay();
+});
+
+// Also update when localStorage changes (for same-tab updates)
+window.addEventListener('storage', function(e) {
+  if (e.key === 'fanter_currentUser') {
+    updateAccountButtonDisplay();
+  }
+});
