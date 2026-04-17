@@ -1,4 +1,4 @@
-// ===== MAIN.JS - COMPLETE CLEAN VERSION =====
+// ===== MAIN.JS - COMPLETE WITH ALL FEATURES =====
 
 // Make gamesData global
 window.gamesData = [];
@@ -6,7 +6,7 @@ window.gamesData = [];
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
   var sitename = "fanter beta.";
-  var subtext = "v0.03, sorry for not adding much, i spent 3 hours fixing a bug :c ";
+  var subtext = "v0.02, achievements added, bugfixes and more coming soon! :3";
 
   var serverUrl1 = "https://gms.parcoil.com";
   var currentPageTitle = document.title;
@@ -35,68 +35,63 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   };
 
-window.displayFilteredGames = function(filteredGames) {
-  const gamesContainer = document.getElementById("gamesContainer");
-  if (!gamesContainer) return;
-  gamesContainer.innerHTML = "";
-  
-  for (let i = 0; i < filteredGames.length; i++) {
-    const game = filteredGames[i];
-    const gameDiv = document.createElement("div");
-    gameDiv.classList.add("game");
+  window.displayFilteredGames = function(filteredGames) {
+    var gamesContainer = document.getElementById("gamesContainer");
+    if (!gamesContainer) return;
+    gamesContainer.innerHTML = "";
     
-    const gameImage = document.createElement("img");
-    let imageSrc;
-    if (game.image && game.image.indexOf('http') === 0) {
-      imageSrc = game.image;
-    } else if (game.image) {
-      imageSrc = serverUrl1 + "/" + game.url + "/" + game.image;
-    } else {
-      imageSrc = 'https://via.placeholder.com/200x200?text=No+Image';
+    for (var i = 0; i < filteredGames.length; i++) {
+      var game = filteredGames[i];
+      var gameDiv = document.createElement("div");
+      gameDiv.classList.add("game");
+      
+      var gameImage = document.createElement("img");
+      var imageSrc;
+      if (game.image && game.image.indexOf('http') === 0) {
+        imageSrc = game.image;
+      } else if (game.image) {
+        imageSrc = serverUrl1 + "/" + game.url + "/" + game.image;
+      } else {
+        imageSrc = 'https://via.placeholder.com/200x200?text=No+Image';
+      }
+      gameImage.src = imageSrc;
+      gameImage.alt = game.name;
+      gameImage.style.cursor = 'pointer';
+      gameImage.style.width = '100%';
+      
+      gameImage.onclick = (function(url, name) {
+        return function() {
+          var playUrl = 'play.html?gameurl=' + encodeURIComponent(url) + '&game=' + encodeURIComponent(name);
+          window.open(playUrl, '_blank');
+        };
+      })(game.url, game.name);
+      
+      var gameNameElem = document.createElement("p");
+      gameNameElem.textContent = game.name;
+      
+      var favBtn = document.createElement("button");
+      favBtn.classList.add("fav-btn");
+      favBtn.setAttribute("data-game", game.name);
+      var isFav = getFavourites().indexOf(game.name) !== -1;
+      favBtn.textContent = isFav ? "★" : "☆";
+      favBtn.onclick = (function(n) {
+        return function(e) {
+          e.stopPropagation();
+          window.toggleFavourite(n);
+          var nowFav = getFavourites().indexOf(n) !== -1;
+          e.target.textContent = nowFav ? "★" : "☆";
+        };
+      })(game.name);
+      
+      gameDiv.appendChild(gameImage);
+      gameDiv.appendChild(gameNameElem);
+      gameDiv.appendChild(favBtn);
+      
+      gamesContainer.appendChild(gameDiv);
     }
-    gameImage.src = imageSrc;
-    gameImage.alt = game.name;
-    gameImage.style.cursor = 'pointer';
-    gameImage.style.width = '100%';
     
-    // THIS IS THE EXACT CODE THAT WORKED IN YOUR CONSOLE
-    gameImage.onclick = function() {
-      console.log("CLICK DETECTED on:", this.alt);
-      const playUrl = 'play.html?gameurl=' + encodeURIComponent(game.url) + '&game=' + encodeURIComponent(this.alt);
-      console.log("🚀 OPENING:", playUrl);
-      window.open(playUrl, '_blank');
-    };
-    
-    const gameNameElem = document.createElement("p");
-    gameNameElem.textContent = game.name;
-    
-    const favBtn = document.createElement("button");
-    favBtn.classList.add("fav-btn");
-    favBtn.setAttribute("data-game", game.name);
-    const isFav = getFavourites().indexOf(game.name) !== -1;
-    favBtn.textContent = isFav ? "★" : "☆";
-    favBtn.onclick = function(e) {
-      e.stopPropagation();
-      window.toggleFavourite(game.name);
-      const nowFav = getFavourites().indexOf(game.name) !== -1;
-      this.textContent = nowFav ? "★" : "☆";
-    };
-    
-    gameDiv.appendChild(gameImage);
-    gameDiv.appendChild(gameNameElem);
-    gameDiv.appendChild(favBtn);
-    
-    gamesContainer.appendChild(gameDiv);
-  }
-  
-  console.log("✅ Displayed " + filteredGames.length + " games");
-};
-
-
-
-
-
-  
+    console.log("Displayed " + filteredGames.length + " games");
+  };
 
   function handleSearchInput() {
     var searchInput = document.getElementById("searchInput");
@@ -578,6 +573,7 @@ function checkTotalPlayTime() {
   }
 }
 
+// ===== ACHIEVEMENT UNLOCK WITH COIN REWARDS =====
 function checkAndUnlockAchievement(achievementId) {
   var currentUser = getCurrentUser();
   if (!currentUser) return;
@@ -587,6 +583,21 @@ function checkAndUnlockAchievement(achievementId) {
   
   achievements[achievementId] = true;
   localStorage.setItem('fanter_achievements', JSON.stringify(achievements));
+  
+  // Coin rewards based on category
+  var coinReward = 0;
+  if (achievementId <= 10) coinReward = 3;      // Newbie (0.1 each)
+  else if (achievementId <= 20) coinReward = 5; // Beginner (0.2 each)
+  else if (achievementId <= 30) coinReward = 10; // Climbing (0.4 each)
+  else if (achievementId <= 40) coinReward = 17.5; // Difficult (0.7 each)
+  else if (achievementId <= 50) coinReward = 25; // Elite (1.0 each)
+  else coinReward = 50; // Secret (2.0 each)
+  
+  // Add coins to user
+  if (coinReward > 0) {
+    currentUser.coins = (currentUser.coins || 0) + coinReward;
+    updateUserInStorage(currentUser);
+  }
   
   currentUser.achievements = achievements;
   updateUserInStorage(currentUser);
@@ -602,11 +613,11 @@ function checkAndUnlockAchievement(achievementId) {
     59: "🎮", 60: "💪", 61: "🛋️", 62: "⭐", 63: "💻"
   };
   
-  showAchievementToastNotification(achievementNames[achievementId] || "Achievement Unlocked!", achievementIcons[achievementId] || "🏆");
-  console.log('🏆 Achievement Unlocked: ' + (achievementNames[achievementId] || "Unknown"));
+  showAchievementToastNotification(achievementNames[achievementId] || "Achievement Unlocked!", achievementIcons[achievementId] || "🏆", coinReward);
+  console.log('🏆 Achievement Unlocked: ' + (achievementNames[achievementId] || "Unknown") + ' +' + coinReward + '🪙');
 }
 
-function showAchievementToastNotification(name, icon) {
+function showAchievementToastNotification(name, icon, coins) {
   var toast = document.querySelector('.achievement-toast');
   if (!toast) {
     toast = document.createElement('div');
@@ -614,7 +625,7 @@ function showAchievementToastNotification(name, icon) {
     document.body.appendChild(toast);
   }
   
-  toast.innerHTML = '<span class="achievement-icon">' + icon + '</span><div class="achievement-content"><div class="achievement-title">ACHIEVEMENT UNLOCKED!</div><div class="achievement-name">' + name + '</div></div>';
+  toast.innerHTML = '<span class="achievement-icon">' + icon + '</span><div class="achievement-content"><div class="achievement-title">ACHIEVEMENT UNLOCKED!</div><div class="achievement-name">' + name + '</div><div class="achievement-reward" style="color:#ffcc00; font-size:11px; margin-top:4px;">+' + coins + ' 🪙</div></div>';
   
   toast.classList.add('show');
   setTimeout(function() {
