@@ -1,4 +1,4 @@
-// ===== MAIN.JS - COMPLETE FULL VERSION =====
+// ===== MAIN.JS - COMPLETE VERSION =====
 
 // Make gamesData global
 window.gamesData = [];
@@ -57,183 +57,159 @@ document.addEventListener('DOMContentLoaded', function() {
       return;
     }
     
+    // Get user data for stats
+    var favourites = getFavourites();
+    
     for (var i = 0; i < filteredGames.length; i++) {
       var game = filteredGames[i];
       var gameDiv = document.createElement("div");
-      gameDiv.classList.add("game");
+      gameDiv.className = "game";
+      gameDiv.setAttribute("data-game-name", game.name);
       
-      // Game image container
-      var gameImageContainer = document.createElement("div");
-      gameImageContainer.className = "game-image-container";
+      // Get game stats
+      var earnedCoins = window.gameEarnings[game.name] || 0;
+      var playCount = window.gamePlayCounts[game.name] || 0;
+      var isFav = favourites.indexOf(game.name) !== -1;
+      var avgRating = (typeof globalRatings !== 'undefined' && globalRatings[game.name]) ? globalRatings[game.name].average.toFixed(1) : '0.0';
+      var ratingCount = (typeof globalRatings !== 'undefined' && globalRatings[game.name]) ? globalRatings[game.name].count : 0;
       
-      var gameImage = document.createElement("img");
+      // Get game image
       var imageSrc;
       if (game.image && game.image.indexOf('http') === 0) {
         imageSrc = game.image;
       } else if (game.image) {
         imageSrc = serverUrl1 + "/" + game.url + "/" + game.image;
       } else {
-        imageSrc = 'https://via.placeholder.com/200x200?text=No+Image';
-      }
-      gameImage.src = imageSrc;
-      gameImage.alt = game.name;
-      gameImage.loading = "lazy";
-      gameImageContainer.appendChild(gameImage);
-      
-      // Game info container
-      var gameInfo = document.createElement("div");
-      gameInfo.className = "game-info";
-      
-      var gameName = document.createElement("div");
-      gameName.className = "game-name";
-      gameName.textContent = game.name;
-      
-      var gameDetails = document.createElement("div");
-      gameDetails.className = "game-details";
-      gameDetails.textContent = getGameDescription(game.name, game.category);
-      
-      var earnedCoins = window.gameEarnings[game.name] || 0;
-      var playCount = window.gamePlayCounts[game.name] || 0;
-      var gameRating = (typeof globalRatings !== 'undefined' && globalRatings[game.name]) ? globalRatings[game.name].average.toFixed(1) : '0.0';
-      
-      var gameStats = document.createElement("div");
-      gameStats.className = "game-stats";
-      gameStats.innerHTML = '<span>⭐ ' + gameRating + '</span><span>🎮 ' + playCount + ' plays</span>';
-      
-      var gameCategory = document.createElement("div");
-      gameCategory.className = "game-category";
-      gameCategory.style.cssText = 'display:inline-block;font-size:10px;padding:3px 10px;border-radius:20px;background:' + getCategoryColor(game.category) + '20;color:' + getCategoryColor(game.category) + ';margin-bottom:10px;';
-      gameCategory.innerHTML = getCategoryIcon(game.category) + ' ' + (game.category || 'other');
-      
-      var gameRelease = document.createElement("div");
-      gameRelease.className = "game-release";
-      gameRelease.textContent = '📅 added: ' + (game.releaseDate || new Date().toLocaleDateString());
-      
-      var gameEarningsDiv = document.createElement("div");
-      gameEarningsDiv.className = "game-earnings";
-      gameEarningsDiv.textContent = '🪙 earned: ' + Math.floor(earnedCoins * 100) / 100 + ' coins';
-      
-      var gameLoadTime = document.createElement("div");
-      gameLoadTime.className = "game-load-time";
-      gameLoadTime.textContent = (game.url && game.url.indexOf('http') === 0) ? '⏱️ est. load time: 2-4 seconds' : '⏱️ est. load time: 1-2 seconds';
-      
-      var gameActions = document.createElement("div");
-      gameActions.className = "game-actions";
-      
-      var playBtn = document.createElement("button");
-      playBtn.className = "game-play-btn";
-      playBtn.textContent = "🎮 play now";
-      playBtn.onclick = (function(url, name) {
-        return function() {
-          if (typeof trackPlayedGame === 'function') trackPlayedGame(name);
-          if (typeof trackGamePlayCount === 'function') trackGamePlayCount(name);
-          if (typeof isFoodGame === 'function' && isFoodGame(name)) {
-            if (typeof checkAndUnlockAchievement === 'function') checkAndUnlockAchievement(57);
-          }
-          var playUrl = 'play.html?gameurl=' + encodeURIComponent(url) + '&game=' + encodeURIComponent(name);
-          window.open(playUrl, '_blank');
-        };
-      })(game.url, game.name);
-      
-      var favBtn = document.createElement("button");
-      favBtn.className = "game-fav-btn";
-      favBtn.setAttribute("data-game", game.name);
-      var isFav = getFavourites().indexOf(game.name) !== -1;
-      favBtn.textContent = isFav ? "★" : "☆";
-      favBtn.classList.toggle('active', isFav);
-      favBtn.onclick = (function(e, name) {
-        return function(ev) {
-          ev.stopPropagation();
-          window.toggleFavourite(name);
-          var nowFav = getFavourites().indexOf(name) !== -1;
-          ev.target.textContent = nowFav ? "★" : "☆";
-          ev.target.classList.toggle('active', nowFav);
-        };
-      })(null, game.name);
-      
-      gameActions.appendChild(playBtn);
-      gameActions.appendChild(favBtn);
-      
-      // Rating stars
-      var gameRatingDiv = document.createElement("div");
-      gameRatingDiv.className = "game-rating";
-      gameRatingDiv.setAttribute("data-game", game.name);
-      
-      var starsDiv = document.createElement("div");
-      starsDiv.className = "stars";
-      for (var s = 1; s <= 5; s++) {
-        var star = document.createElement("span");
-        star.className = "star";
-        star.setAttribute("data-value", s);
-        star.textContent = "★";
-        star.onclick = (function(name, value) {
-          return function() {
-            if (typeof submitRating === 'function') submitRating(name, value);
-          };
-        })(game.name, s);
-        starsDiv.appendChild(star);
+        imageSrc = 'https://via.placeholder.com/320x180?text=No+Image';
       }
       
-      var avgDiv = document.createElement("div");
-      avgDiv.className = "rating-average";
-      avgDiv.innerHTML = '⭐ ' + gameRating;
+      // Get category color
+      var categoryColor = getCategoryColor(game.category);
+      var categoryIcon = getCategoryIcon(game.category);
       
-      gameRatingDiv.appendChild(starsDiv);
-      gameRatingDiv.appendChild(avgDiv);
-      
-      gameInfo.appendChild(gameName);
-      gameInfo.appendChild(gameDetails);
-      gameInfo.appendChild(gameStats);
-      gameInfo.appendChild(gameCategory);
-      gameInfo.appendChild(gameRelease);
-      gameInfo.appendChild(gameEarningsDiv);
-      gameInfo.appendChild(gameLoadTime);
-      gameInfo.appendChild(gameActions);
-      gameInfo.appendChild(gameRatingDiv);
-      
-      gameDiv.appendChild(gameImageContainer);
-      gameDiv.appendChild(gameInfo);
+      // Build HTML
+      gameDiv.innerHTML = `
+        <div class="game-image-container">
+          <img src="${imageSrc}" alt="${escapeHtml(game.name)}" loading="lazy">
+        </div>
+        <div class="game-info">
+          <div class="game-title-row">
+            <span class="game-name">${escapeHtml(game.name)}</span>
+            <button class="game-fav-btn ${isFav ? 'active' : ''}" data-game="${escapeHtml(game.name)}">${isFav ? '★' : '☆'}</button>
+          </div>
+          <div class="game-desc">${escapeHtml(game.desc || getDefaultDescription(game.category))}</div>
+          <div class="game-stats-row">
+            <span>🎮 ${playCount} plays</span>
+            <span>🪙 ${Math.floor(earnedCoins * 100) / 100}</span>
+            <span>⏱️ ${game.loadTime || '1-3 sec'}</span>
+          </div>
+          <div class="game-meta">
+            <span class="game-category" style="background: ${categoryColor}20; color: ${categoryColor}">${categoryIcon} ${game.category || 'other'}</span>
+            <span class="game-dev">📅 ${game.releaseDate ? new Date(game.releaseDate).toLocaleDateString() : 'recent'}</span>
+          </div>
+          <div class="game-rating-row">
+            <div class="game-stars">
+              ${[1,2,3,4,5].map(s => `<span class="game-star" data-value="${s}">★</span>`).join('')}
+            </div>
+            <span class="game-rating-text">⭐ ${avgRating} (${ratingCount})</span>
+          </div>
+          <button class="game-play-btn" data-game="${escapeHtml(game.name)}" data-url="${escapeHtml(game.url)}">🎮 PLAY NOW</button>
+        </div>
+      `;
       
       gamesContainer.appendChild(gameDiv);
     }
     
-    console.log("✅ Displayed " + filteredGames.length + " games");
+    // Attach event listeners
+    attachGameCardEvents();
   };
   
-  function getGameDescription(name, category) {
-    var descriptions = {
-      'action': 'fast-paced, intense gameplay that\'ll keep you on the edge of your seat',
-      'puzzle': 'challenge your brain with tricky puzzles and mind-bending mechanics',
-      'racing': 'burn rubber and race to the finish line in high-speed competition',
-      'sports': 'compete in your favorite sports from basketball to soccer',
-      'adventure': 'embark on an epic journey through mysterious lands',
-      'platformer': 'jump, run, and dodge through challenging levels',
-      'strategy': 'plan your moves and outsmart your opponents',
-      'horror': 'survive the terror and uncover dark secrets',
-      'arcade': 'classic arcade action that never gets old',
-      'simulation': 'build, manage, and create your own world',
-      'sandbox': 'no rules, no limits - just pure creativity'
-    };
-    return descriptions[category] || 'a fun ' + (category || 'arcade') + ' game that\'ll keep you entertained for hours';
-  }
-  
-  function getCategoryIcon(category) {
-    var icons = {
-      'action': '⚔️', 'puzzle': '🧩', 'racing': '🏎️', 'sports': '⚽',
-      'adventure': '🗺️', 'platformer': '🏃', 'strategy': '♟️',
-      'horror': '👻', 'arcade': '🕹️', 'simulation': '🏭', 'sandbox': '🎨'
-    };
-    return icons[category] || '🎮';
-  }
-  
-  function getCategoryColor(category) {
-    var colors = {
-      'action': '#ff4444', 'puzzle': '#44ff44', 'racing': '#ff8844',
-      'sports': '#44ff88', 'adventure': '#44aaff', 'platformer': '#ff44ff',
-      'strategy': '#88ff44', 'horror': '#aa44ff', 'arcade': '#ff44aa',
-      'simulation': '#44ffcc', 'sandbox': '#ff8844'
-    };
-    return colors[category] || '#aaaaaa';
+  function attachGameCardEvents() {
+    // Play buttons
+    document.querySelectorAll('.game-play-btn').forEach(function(btn) {
+      btn.onclick = function(e) {
+        e.stopPropagation();
+        var gameName = btn.getAttribute('data-game');
+        var gameUrl = btn.getAttribute('data-url');
+        if (gameName && gameUrl) {
+          if (typeof trackPlayedGame === 'function') trackPlayedGame(gameName);
+          var playUrl = 'play.html?gameurl=' + encodeURIComponent(gameUrl) + '&game=' + encodeURIComponent(gameName);
+          window.open(playUrl, '_blank');
+        }
+      };
+    });
+    
+    // Favorite buttons
+    document.querySelectorAll('.game-fav-btn').forEach(function(btn) {
+      btn.onclick = function(e) {
+        e.stopPropagation();
+        var gameName = btn.getAttribute('data-game');
+        if (gameName && typeof window.toggleFavourite === 'function') {
+          window.toggleFavourite(gameName);
+          var isFav = JSON.parse(localStorage.getItem("favourites") || "[]").indexOf(gameName) !== -1;
+          btn.textContent = isFav ? '★' : '☆';
+          btn.classList.toggle('active', isFav);
+        }
+      };
+    });
+    
+    // Rating stars
+    document.querySelectorAll('.game-star').forEach(function(star) {
+      star.onclick = function(e) {
+        e.stopPropagation();
+        var gameDiv = star.closest('.game');
+        var gameName = gameDiv.getAttribute('data-game-name');
+        var value = parseInt(star.getAttribute('data-value'));
+        if (gameName && typeof submitRating === 'function') {
+          submitRating(gameName, value);
+          // Update stars in this card
+          var stars = gameDiv.querySelectorAll('.game-star');
+          for (var i = 0; i < stars.length; i++) {
+            if (i < value) {
+              stars[i].classList.add('active');
+            } else {
+              stars[i].classList.remove('active');
+            }
+          }
+          // Update rating text
+          var ratingText = gameDiv.querySelector('.game-rating-text');
+          if (ratingText && typeof globalRatings !== 'undefined' && globalRatings[gameName]) {
+            ratingText.innerHTML = '⭐ ' + globalRatings[gameName].average.toFixed(1) + ' (' + globalRatings[gameName].count + ')';
+          }
+        }
+      };
+    });
+    
+    // Game card click to show modal
+    document.querySelectorAll('.game').forEach(function(card) {
+      card.onclick = function(e) {
+        // Don't trigger if clicking on buttons
+        if (e.target.tagName === 'BUTTON' || e.target.classList.contains('game-star')) return;
+        var gameName = card.getAttribute('data-game-name');
+        if (gameName && window.gamesData) {
+          var gameData = null;
+          for (var i = 0; i < window.gamesData.length; i++) {
+            if (window.gamesData[i].name === gameName) {
+              gameData = window.gamesData[i];
+              break;
+            }
+          }
+          if (gameData && typeof showGameModal === 'function') {
+            var img = card.querySelector('.game-image-container img');
+            showGameModal(
+              gameData.name,
+              gameData.url,
+              img ? img.src : '',
+              gameData.desc || getDefaultDescription(gameData.category),
+              gameData.category,
+              gameData.loadTime,
+              gameData.developer,
+              gameData.releaseDate
+            );
+          }
+        }
+      };
+    });
   }
 
   function handleSearchInput() {
@@ -289,6 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log("✅ Loaded " + window.gamesData.length + " games successfully!");
       if (typeof updateGameOfDay === 'function') updateGameOfDay();
       if (typeof loadUserFavorites === 'function') loadUserFavorites();
+      if (typeof setupModalOnGameClick === 'function') setupModalOnGameClick();
     })
     .catch(function(error) { console.error("Error fetching games:", error); });
 
@@ -304,6 +281,52 @@ document.addEventListener('DOMContentLoaded', function() {
   if (subtitleEl) subtitleEl.innerHTML = subtext;
 });
 
+// ===== HELPER FUNCTIONS =====
+function getCategoryColor(category) {
+  var colors = {
+    'action': '#ff4444', 'puzzle': '#44ff44', 'racing': '#ff8844',
+    'sports': '#44ff88', 'adventure': '#44aaff', 'platformer': '#ff44ff',
+    'strategy': '#88ff44', 'horror': '#aa44ff', 'arcade': '#ff44aa',
+    'simulation': '#44ffcc', 'sandbox': '#ff8844'
+  };
+  return colors[category] || '#aaaaaa';
+}
+
+function getCategoryIcon(category) {
+  var icons = {
+    'action': '⚔️', 'puzzle': '🧩', 'racing': '🏎️', 'sports': '⚽',
+    'adventure': '🗺️', 'platformer': '🏃', 'strategy': '♟️',
+    'horror': '👻', 'arcade': '🕹️', 'simulation': '🏭', 'sandbox': '🎨'
+  };
+  return icons[category] || '🎮';
+}
+
+function getDefaultDescription(category) {
+  var desc = {
+    'action': 'fast-paced action game that\'ll keep you on the edge of your seat',
+    'puzzle': 'challenge your brain with tricky puzzles and mind-bending mechanics',
+    'racing': 'burn rubber and race to the finish line in high-speed competition',
+    'sports': 'compete in your favorite sports from basketball to soccer',
+    'adventure': 'embark on an epic journey through mysterious lands',
+    'platformer': 'jump, run, and dodge through challenging levels',
+    'strategy': 'plan your moves and outsmart your opponents',
+    'horror': 'survive the terror and uncover dark secrets',
+    'arcade': 'classic arcade action that never gets old',
+    'simulation': 'build, manage, and create your own world',
+    'sandbox': 'no rules, no limits - just pure creativity'
+  };
+  return desc[category] || 'a fun game that\'ll keep you entertained for hours';
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>]/g, function(m) {
+    if (m === '&') return '&amp;';
+    if (m === '<') return '&lt;';
+    if (m === '>') return '&gt;';
+    return m;
+  });
+}
 
 // ===== GAME RATINGS SYSTEM =====
 const RATINGS_BIN_ID = "69e045ec856a6821893bc134";
@@ -396,21 +419,32 @@ function submitRating(gameName, rating) {
 
 function updateStarDisplay(gameName, userRating) {
   var ratingContainer = document.querySelector('.game-rating[data-game="' + CSS.escape(gameName) + '"]');
-  if (!ratingContainer) return;
-  
-  var stars = ratingContainer.querySelectorAll('.star');
-  for (var i = 0; i < stars.length; i++) {
-    if (i < userRating) {
-      stars[i].classList.add('active');
-    } else {
-      stars[i].classList.remove('active');
+  if (ratingContainer) {
+    var stars = ratingContainer.querySelectorAll('.star');
+    for (var i = 0; i < stars.length; i++) {
+      if (i < userRating) {
+        stars[i].classList.add('active');
+      } else {
+        stars[i].classList.remove('active');
+      }
     }
   }
   
-  var avgDisplay = ratingContainer.querySelector('.rating-average');
-  var gameRating = globalRatings[gameName];
-  if (avgDisplay && gameRating) {
-    avgDisplay.innerHTML = '<span class="star-small">★</span> ' + gameRating.average.toFixed(1);
+  // Also update in the game card if present
+  var gameCard = document.querySelector('.game[data-game-name="' + CSS.escape(gameName) + '"]');
+  if (gameCard) {
+    var cardStars = gameCard.querySelectorAll('.game-star');
+    for (var i = 0; i < cardStars.length; i++) {
+      if (i < userRating) {
+        cardStars[i].classList.add('active');
+      } else {
+        cardStars[i].classList.remove('active');
+      }
+    }
+    var ratingText = gameCard.querySelector('.game-rating-text');
+    if (ratingText && globalRatings[gameName]) {
+      ratingText.innerHTML = '⭐ ' + globalRatings[gameName].average.toFixed(1) + ' (' + globalRatings[gameName].count + ')';
+    }
   }
 }
 
@@ -430,10 +464,18 @@ function refreshAllRatings() {
         stars[s].classList.remove('active');
       }
     }
-    
-    var avgDisplay = container.querySelector('.rating-average');
-    if (avgDisplay && gameRating) {
-      avgDisplay.innerHTML = '<span class="star-small">★</span> ' + gameRating.average.toFixed(1);
+  }
+  
+  // Also refresh game cards
+  var gameCards = document.querySelectorAll('.game');
+  for (var i = 0; i < gameCards.length; i++) {
+    var card = gameCards[i];
+    var gameName = card.getAttribute('data-game-name');
+    if (gameName && globalRatings[gameName]) {
+      var ratingText = card.querySelector('.game-rating-text');
+      if (ratingText) {
+        ratingText.innerHTML = '⭐ ' + globalRatings[gameName].average.toFixed(1) + ' (' + globalRatings[gameName].count + ')';
+      }
     }
   }
 }
@@ -453,7 +495,6 @@ function showRatingToast(message) {
 }
 
 loadGlobalRatings();
-
 
 // ===== ACCOUNT SYSTEM HELPER FUNCTIONS =====
 function updateAccountButtonDisplay() {
@@ -518,23 +559,64 @@ function syncFavoriteToAccount(gameName, isAdding) {
 
 function trackPlayedGame(gameName) {
   var currentUser = getCurrentUser();
-  if (!currentUser) return;
+  var multiplier = getActiveCoinMultiplier();
+  var baseEarnings = 0.05;
+  var earned = baseEarnings * multiplier;
   
-  var playedGames = currentUser.playedGames || [];
+  window.gameEarnings[gameName] = (window.gameEarnings[gameName] || 0) + earned;
+  localStorage.setItem('gameEarnings', JSON.stringify(window.gameEarnings));
   
-  if (playedGames.indexOf(gameName) === -1) {
-    playedGames.unshift(gameName);
-  } else {
-    var index = playedGames.indexOf(gameName);
-    playedGames.splice(index, 1);
-    playedGames.unshift(gameName);
+  window.gamePlayCounts[gameName] = (window.gamePlayCounts[gameName] || 0) + 1;
+  localStorage.setItem('gamePlayCounts', JSON.stringify(window.gamePlayCounts));
+  
+  if (currentUser) {
+    currentUser.coins = (currentUser.coins || 0) + earned;
+    
+    var playedGames = currentUser.playedGames || [];
+    if (playedGames.indexOf(gameName) === -1) {
+      playedGames.unshift(gameName);
+    } else {
+      var index = playedGames.indexOf(gameName);
+      playedGames.splice(index, 1);
+      playedGames.unshift(gameName);
+    }
+    if (playedGames.length > 50) playedGames.pop();
+    
+    currentUser.playedGames = playedGames;
+    currentUser.stats.gamesPlayed = playedGames.length;
+    updateUserInStorage(currentUser);
   }
   
-  if (playedGames.length > 50) playedGames.pop();
+  // Update UI
+  updateHeaderCoins();
   
-  currentUser.playedGames = playedGames;
-  currentUser.stats.gamesPlayed = playedGames.length;
-  updateUserInStorage(currentUser);
+  // Update game card if visible
+  var gameCard = document.querySelector('.game[data-game-name="' + CSS.escape(gameName) + '"]');
+  if (gameCard) {
+    var statsRow = gameCard.querySelector('.game-stats-row');
+    if (statsRow) {
+      var playCountSpan = statsRow.querySelector('span:first-child');
+      var earningsSpan = statsRow.querySelector('span:nth-child(2)');
+      if (playCountSpan) playCountSpan.innerHTML = '🎮 ' + window.gamePlayCounts[gameName];
+      if (earningsSpan) earningsSpan.innerHTML = '🪙 ' + Math.floor(window.gameEarnings[gameName] * 100) / 100;
+    }
+  }
+  
+  console.log('🎮 Played: ' + gameName + ' | +' + earned.toFixed(2) + '🪙 (' + multiplier + 'x multiplier)');
+  return earned;
+}
+
+function getActiveCoinMultiplier() {
+  var equippedPet = localStorage.getItem('equippedPet');
+  var petMultipliers = {
+    'chinchilla': 1.0,
+    'dragon': 1.5,
+    'cat': 1.2,
+    'dog': 1.2,
+    'owl': 1.3,
+    'fox': 1.4
+  };
+  return petMultipliers[equippedPet] || 1.0;
 }
 
 function loadUserFavorites() {
@@ -549,6 +631,13 @@ function loadUserFavorites() {
   }
 }
 
+function updateHeaderCoins() {
+  var currentUser = getCurrentUser();
+  var coinEl = document.getElementById('headerCoinAmount');
+  if (coinEl && currentUser) {
+    coinEl.textContent = Math.floor((currentUser.coins || 0) * 100) / 100;
+  }
+}
 
 // ===== ACHIEVEMENT TRIGGERS =====
 function trackGamePlayCount(gameName) {
@@ -712,6 +801,8 @@ function checkAndUnlockAchievement(achievementId) {
   
   showAchievementToastNotification(achievementNames[achievementId] || "Achievement Unlocked!", achievementIcons[achievementId] || "🏆", coinReward);
   console.log('🏆 Achievement Unlocked: ' + (achievementNames[achievementId] || "Unknown") + ' +' + coinReward + '🪙');
+  
+  if (typeof updateHeaderCoins === 'function') updateHeaderCoins();
 }
 
 function showAchievementToastNotification(name, icon, coins) {
@@ -777,306 +868,4 @@ window.crashFanter = function() {
   triggerPageCrash();
 };
 
-function updateHeaderCoins() {
-  var currentUser = getCurrentUser();
-  var coinEl = document.getElementById('headerCoinAmount');
-  if (coinEl && currentUser) {
-    coinEl.textContent = Math.floor((currentUser.coins || 0) * 100) / 100;
-  }
-}
-
-function getActiveCoinMultiplier() {
-  var equippedPet = localStorage.getItem('equippedPet');
-  var petMultipliers = {
-    'chinchilla': 1.0,
-    'dragon': 1.5,
-    'cat': 1.2,
-    'dog': 1.2,
-    'owl': 1.3,
-    'fox': 1.4
-  };
-  return petMultipliers[equippedPet] || 1.0;
-}
-
-function escapeHtml(str) {
-  if (!str) return '';
-  return str.replace(/[&<>]/g, function(m) {
-    if (m === '&') return '&amp;';
-    if (m === '<') return '&lt;';
-    if (m === '>') return '&gt;';
-    return m;
-  });
-}
-
 console.log('💀 Type "crashFanter()" for a surprise...');
-
-
-// ===== GAME DETAILS MODAL - STEAM STYLE =====
-
-let currentModalGame = null;
-
-function showGameModal(gameName, gameUrl, gameImage, gameDescription, gameCategory) {
-  // Get user data
-  let currentUser = JSON.parse(localStorage.getItem('fanter_currentUser') || 'null');
-  let gamePlayCount = window.gamePlayCounts?.[gameName] || 0;
-  let gameEarned = window.gameEarnings?.[gameName] || 0;
-  let isFavorited = JSON.parse(localStorage.getItem("favourites") || "[]").includes(gameName);
-  
-  // Get user rating
-  let userRating = 0;
-  if (typeof userVotes !== 'undefined' && userVotes[gameName]) {
-    userRating = userVotes[gameName];
-  }
-  
-  // Get global rating
-  let avgRating = '0.0';
-  if (typeof globalRatings !== 'undefined' && globalRatings[gameName]) {
-    avgRating = globalRatings[gameName].average.toFixed(1);
-  }
-  
-  // Calculate playtime in hours
-  let playtimeHours = Math.floor(gamePlayCount * 0.5); // Rough estimate: 30 min per play
-  
-  // Remove existing modal
-  let existingModal = document.getElementById('gameModal');
-  if (existingModal) existingModal.remove();
-  
-  // Create modal
-  let modal = document.createElement('div');
-  modal.id = 'gameModal';
-  modal.className = 'game-modal-overlay';
-  
-  // Get category color
-  let categoryColors = {
-    'action': '#ff4444', 'puzzle': '#44ff44', 'racing': '#ff8844',
-    'sports': '#44ff88', 'adventure': '#44aaff', 'platformer': '#ff44ff',
-    'strategy': '#88ff44', 'horror': '#aa44ff', 'arcade': '#ff44aa',
-    'simulation': '#44ffcc', 'sandbox': '#ff8844'
-  };
-  let categoryColor = categoryColors[gameCategory] || '#aaaaaa';
-  
-  modal.innerHTML = `
-    <div class="game-modal">
-      <button class="modal-close" onclick="closeGameModal()">✕</button>
-      <div class="modal-header">
-        <img class="modal-header-img" src="${gameImage}" alt="${gameName}">
-        <div class="modal-header-overlay">
-          <div class="modal-game-title">${escapeHtml(gameName)}</div>
-          <div class="modal-game-tag" style="background: ${categoryColor}20; color: ${categoryColor}">
-            ${getCategoryIcon(gameCategory)} ${gameCategory || 'other'}
-          </div>
-        </div>
-      </div>
-      <div class="modal-body">
-        <div class="modal-sidebar">
-          <div class="playtime-card">
-            <div class="playtime-label">TIME PLAYED</div>
-            <div class="playtime-value">${playtimeHours}h</div>
-          </div>
-          <div class="stats-card">
-            <div class="stat-row">
-              <span class="stat-label">🏆 ACHIEVEMENTS</span>
-              <span class="stat-value">0/0</span>
-            </div>
-            <div class="stat-row">
-              <span class="stat-label">🎮 PLAYS</span>
-              <span class="stat-value">${gamePlayCount}</span>
-            </div>
-            <div class="stat-row">
-              <span class="stat-label">🪙 EARNED</span>
-              <span class="stat-value">${Math.floor(gameEarned * 100) / 100}</span>
-            </div>
-            <div class="stat-row">
-              <span class="stat-label">⭐ GLOBAL RATING</span>
-              <span class="stat-value">${avgRating}/5</span>
-            </div>
-          </div>
-        </div>
-        <div class="modal-main">
-          <div class="game-description">
-            <p>${escapeHtml(gameDescription || 'No description available.')}</p>
-          </div>
-          <div class="achievement-section">
-            <div class="achievement-header">
-              <span class="achievement-title">🏆 ACHIEVEMENTS</span>
-              <span class="achievement-progress">0/0 unlocked</span>
-            </div>
-            <div class="progress-bar">
-              <div class="progress-fill" style="width: 0%"></div>
-            </div>
-            <div class="achievement-item">
-              <div class="achievement-icon">🔒</div>
-              <div class="achievement-info">
-                <div class="achievement-name">Play for 1 hour</div>
-                <div class="achievement-desc">Spend 1 hour playing this game</div>
-              </div>
-              <div class="achievement-rarity">${Math.min(100, Math.floor(gamePlayCount * 2))}%</div>
-            </div>
-            <div class="achievement-item">
-              <div class="achievement-icon">🔒</div>
-              <div class="achievement-info">
-                <div class="achievement-name">Rate this game</div>
-                <div class="achievement-desc">Leave your first rating</div>
-              </div>
-              <div class="achievement-rarity">${userRating > 0 ? '100%' : '0%'}</div>
-            </div>
-          </div>
-          <div class="modal-rating">
-            ${[1,2,3,4,5].map(star => `
-              <span class="modal-star ${userRating >= star ? 'active' : ''}" data-value="${star}">★</span>
-            `).join('')}
-          </div>
-          <div class="your-rating">your rating: ${userRating > 0 ? '★'.repeat(userRating) + '☆'.repeat(5-userRating) : 'not rated'}</div>
-          <div class="modal-actions">
-            <button class="modal-play-btn">🎮 PLAY NOW</button>
-            <button class="modal-fav-btn">${isFavorited ? '★ FAVORITED' : '☆ FAVORITE'}</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-  
-  document.body.appendChild(modal);
-  
-  // Show modal with animation
-  setTimeout(() => {
-    modal.classList.add('show');
-    modal.querySelector('.game-modal').classList.add('show');
-  }, 10);
-  
-  // Close button
-  modal.querySelector('.modal-close').onclick = closeGameModal;
-  modal.onclick = (e) => { if (e.target === modal) closeGameModal(); };
-  
-  // Play button
-  modal.querySelector('.modal-play-btn').onclick = () => {
-    if (typeof trackPlayedGame === 'function') trackPlayedGame(gameName);
-    let playUrl = `play.html?gameurl=${encodeURIComponent(gameUrl)}&game=${encodeURIComponent(gameName)}`;
-    window.open(playUrl, '_blank');
-    closeGameModal();
-  };
-  
-  // Favorite button
-  modal.querySelector('.modal-fav-btn').onclick = () => {
-    if (typeof window.toggleFavourite === 'function') {
-      window.toggleFavourite(gameName);
-      let newFav = JSON.parse(localStorage.getItem("favourites") || "[]").includes(gameName);
-      modal.querySelector('.modal-fav-btn').textContent = newFav ? '★ FAVORITED' : '☆ FAVORITE';
-    }
-  };
-  
-  // Rating stars
-  modal.querySelectorAll('.modal-star').forEach(star => {
-    star.onclick = () => {
-      let value = parseInt(star.dataset.value);
-      if (typeof submitRating === 'function') {
-        submitRating(gameName, value);
-      }
-      modal.querySelectorAll('.modal-star').forEach((s, i) => {
-        s.classList.toggle('active', i < value);
-      });
-      modal.querySelector('.your-rating').textContent = `your rating: ${'★'.repeat(value)}${'☆'.repeat(5-value)}`;
-    };
-    star.onmouseenter = () => {
-      let value = parseInt(star.dataset.value);
-      modal.querySelectorAll('.modal-star').forEach((s, i) => {
-        s.style.color = i < value ? '#ffcc66' : 'rgba(255,255,255,0.2)';
-      });
-    };
-    star.onmouseleave = () => {
-      modal.querySelectorAll('.modal-star').forEach((s, i) => {
-        s.style.color = i < userRating ? '#ffcc00' : 'rgba(255,255,255,0.2)';
-      });
-    };
-  });
-}
-
-function closeGameModal() {
-  let modal = document.getElementById('gameModal');
-  if (modal) {
-    modal.classList.remove('show');
-    setTimeout(() => modal.remove(), 300);
-  }
-}
-
-// Helper function for category icon
-function getCategoryIcon(category) {
-  let icons = {
-    'action': '⚔️', 'puzzle': '🧩', 'racing': '🏎️', 'sports': '⚽',
-    'adventure': '🗺️', 'platformer': '🏃', 'strategy': '♟️',
-    'horror': '👻', 'arcade': '🕹️', 'simulation': '🏭', 'sandbox': '🎨'
-  };
-  return icons[category] || '🎮';
-}
-
-function escapeHtml(str) {
-  if (!str) return '';
-  return str.replace(/[&<>]/g, function(m) {
-    if (m === '&') return '&amp;';
-    if (m === '<') return '&lt;';
-    if (m === '>') return '&gt;';
-    return m;
-  });
-}
-
-// Override the game click to show modal instead of direct play
-function setupModalOnGameClick() {
-  let games = document.querySelectorAll('.game img');
-  for (let i = 0; i < games.length; i++) {
-    let img = games[i];
-    if (img.hasAttribute('data-modal-setup')) continue;
-    
-    let gameName = img.alt;
-    let gameData = null;
-    if (window.gamesData) {
-      for (let j = 0; j < window.gamesData.length; j++) {
-        if (window.gamesData[j].name === gameName) {
-          gameData = window.gamesData[j];
-          break;
-        }
-      }
-    }
-    
-    if (gameData) {
-      let originalClick = img.onclick;
-      img.onclick = (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        showGameModal(
-          gameData.name,
-          gameData.url,
-          img.src,
-          gameData.desc || getDefaultDescription(gameData.category),
-          gameData.category
-        );
-        return false;
-      };
-      img.setAttribute('data-modal-setup', 'true');
-    }
-  }
-}
-
-function getDefaultDescription(category) {
-  let desc = {
-    'action': 'fast-paced action game that\'ll keep you on the edge of your seat',
-    'puzzle': 'challenge your brain with tricky puzzles and mind-bending mechanics',
-    'racing': 'burn rubber and race to the finish line in high-speed competition',
-    'sports': 'compete in your favorite sports from basketball to soccer',
-    'adventure': 'embark on an epic journey through mysterious lands',
-    'platformer': 'jump, run, and dodge through challenging levels',
-    'strategy': 'plan your moves and outsmart your opponents',
-    'horror': 'survive the terror and uncover dark secrets',
-    'arcade': 'classic arcade action that never gets old',
-    'simulation': 'build, manage, and create your own world',
-    'sandbox': 'no rules, no limits - just pure creativity'
-  };
-  return desc[category] || 'a fun game that\'ll keep you entertained for hours';
-}
-
-// Run after games load
-let modalSetupInterval = setInterval(function() {
-  if (window.gamesData && window.gamesData.length > 0 && document.querySelectorAll('.game').length > 0) {
-    clearInterval(modalSetupInterval);
-    setupModalOnGameClick();
-  }
-}, 500);
