@@ -64,10 +64,11 @@ function displayFilteredGames(filteredGames) {
     gameImage.style.cursor = 'pointer';
     gameImage.style.width = '100%';
     
-    // Store the EXACT URL from games.json
+    // Store the EXACT URL
     const originalUrl = game.url;
     const originalName = game.name;
     
+    // CLICK HANDLER WITH CONSOLE LOGS
     gameImage.onclick = function() {
       console.log("=== GAME CLICKED ===");
       console.log("Name:", originalName);
@@ -78,7 +79,6 @@ function displayFilteredGames(filteredGames) {
         return;
       }
       
-      // Build the play.html URL - simple and direct
       const playUrl = `play.html?gameurl=${encodeURIComponent(originalUrl)}&game=${encodeURIComponent(originalName)}`;
       console.log("Opening:", playUrl);
       window.open(playUrl, '_blank');
