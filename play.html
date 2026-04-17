@@ -9,132 +9,92 @@
     body {
       background: linear-gradient(135deg, #0a0a1a, #0f0f2a);
       font-family: 'Ubuntu', sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
-    .game-container { width: 100vw; height: 100vh; display: flex; flex-direction: column; }
-    .game-header {
-      background: rgba(10,15,30,0.9);
-      padding: 15px 20px;
+    .top-bar {
+      background: rgba(10,15,30,0.95);
+      padding: 12px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid rgba(45,90,227,0.3);
     }
-    .game-name { color: #ffcc00; font-family: 'Orbitron', monospace; font-size: 18px; }
-    .game-controls { display: flex; gap: 10px; }
-    .game-control-btn {
+    .game-title { color: #ffcc00; font-family: 'Orbitron', monospace; font-size: 18px; }
+    button {
       background: rgba(20,30,50,0.8);
       border: 1px solid rgba(45,90,227,0.4);
       border-radius: 20px;
-      padding: 5px 12px;
+      padding: 6px 14px;
       color: white;
       cursor: pointer;
     }
-    .game-wrapper { flex: 1; background: #000; position: relative; }
-    .game-frame { width: 100%; height: 100%; border: none; }
-    .sidebar {
-      position: fixed;
-      right: 20px;
-      bottom: 20px;
-      background: rgba(0,0,0,0.7);
-      padding: 10px 15px;
-      border-radius: 30px;
-      color: white;
-      font-size: 12px;
-      z-index: 100;
-    }
-    .fallback-btn {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #2d5ae3;
+    iframe {
+      flex: 1;
+      width: 100%;
       border: none;
-      padding: 12px 24px;
-      border-radius: 30px;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      z-index: 10;
+    }
+    .info {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.6);
+      padding: 5px 10px;
+      border-radius: 8px;
+      color: #0f0;
+      font-family: monospace;
+      font-size: 11px;
+      z-index: 100;
     }
   </style>
 </head>
 <body>
-  <div class="game-container">
-    <div class="game-header">
-      <span class="game-name" id="gameTitle">Loading...</span>
-      <div class="game-controls">
-        <button class="game-control-btn" onclick="window.location.href='index.html'">← back</button>
-      </div>
-    </div>
-    <div class="game-wrapper" id="gameWrapper">
-      <iframe class="game-frame" id="gameFrame" src="about:blank" allowfullscreen></iframe>
-    </div>
+  <div class="top-bar">
+    <span class="game-title" id="gameTitle">Loading...</span>
+    <button onclick="window.location.href='index.html'">← Back</button>
   </div>
-  <div class="sidebar">
-    🪙 <span id="coinAmount">0</span> coins | ⏱️ <span id="playtimeDisplay">00:00:00</span>
-  </div>
+  <iframe id="gameFrame" src="about:blank"></iframe>
+  <div class="info" id="info"></div>
 
   <script>
+    // Get parameters from URL
     const urlParams = new URLSearchParams(window.location.search);
     let gameUrl = urlParams.get("gameurl");
     let gameName = urlParams.get("game") || "Game";
     
+    // Decode
     if (gameUrl) {
       gameUrl = decodeURIComponent(gameUrl);
     }
-    const decodedGameName = decodeURIComponent(gameName);
+    const decodedName = decodeURIComponent(gameName);
     
-    document.getElementById('gameTitle').textContent = decodedGameName;
+    document.getElementById('gameTitle').textContent = decodedName;
+    document.getElementById('info').innerHTML = `🎮 ${decodedName}<br>📡 ${gameUrl}`;
     
-    console.log("🎮 Loading game:", decodedGameName);
-    console.log("🔗 URL:", gameUrl);
-    
-    const gameFrame = document.getElementById('gameFrame');
-    const gameWrapper = document.getElementById('gameWrapper');
+    console.log("=== PLAY PAGE LOADED ===");
+    console.log("Game name:", decodedName);
+    console.log("Game URL:", gameUrl);
     
     if (gameUrl && gameUrl !== 'null' && gameUrl !== 'undefined') {
-      // Try to load in iframe
-      gameFrame.src = gameUrl;
+      const iframe = document.getElementById('gameFrame');
+      iframe.src = gameUrl;
+      console.log("✅ Iframe src set to:", gameUrl);
       
-      // If it's an external game, show a button to open in new tab after 2 seconds
-      const isExternal = gameUrl.startsWith('http');
-      
-      if (isExternal) {
-        setTimeout(() => {
-          // Check if iframe loaded (by checking if it's not blank)
-          try {
-            const frameDoc = gameFrame.contentDocument || gameFrame.contentWindow.document;
-            if (!frameDoc || frameDoc.location.href === 'about:blank') {
-              throw new Error('Blocked');
-            }
-          } catch(e) {
-            // If blocked, show a button
-            if (!document.querySelector('.fallback-btn')) {
-              const btn = document.createElement('button');
-              btn.className = 'fallback-btn';
-              btn.textContent = '🎮 Open Game in New Tab';
-              btn.onclick = () => window.open(gameUrl, '_blank');
-              gameWrapper.appendChild(btn);
-            }
-          }
-        }, 2000);
-      }
+      // Optional: Show when iframe loads
+      iframe.onload = () => {
+        console.log("✅ Iframe loaded successfully!");
+        document.getElementById('info').style.background = "rgba(0,128,0,0.7)";
+      };
+      iframe.onerror = () => {
+        console.error("❌ Iframe failed to load");
+        document.getElementById('info').style.background = "rgba(255,0,0,0.7)";
+      };
     } else {
-      gameWrapper.innerHTML = '<div style="padding:40px;text-align:center;color:#ff4444;">❌ Game URL not found</div>';
+      console.error("❌ No game URL provided");
+      document.getElementById('gameFrame').style.display = 'none';
+      document.body.innerHTML += '<div style="padding:40px;text-align:center;color:#ff4444;">❌ No game URL provided</div>';
     }
-    
-    // Coin timer
-    let startTime = Date.now();
-    let coins = 0;
-    setInterval(() => {
-      const elapsed = Math.floor((Date.now() - startTime) / 1000);
-      const hours = Math.floor(elapsed / 3600);
-      const minutes = Math.floor((elapsed % 3600) / 60);
-      const seconds = elapsed % 60;
-      document.getElementById('playtimeDisplay').textContent = `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
-      coins = elapsed * 0.01;
-      document.getElementById('coinAmount').textContent = coins.toFixed(2);
-    }, 1000);
   </script>
 </body>
 </html>
