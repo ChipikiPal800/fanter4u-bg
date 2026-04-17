@@ -2169,3 +2169,376 @@ body.no-animations * {
   width: 0%;
   border-radius: 3px;
 }
+
+
+
+
+
+
+/* ===== GAME DETAILS MODAL - STEAM STYLE ===== */
+.game-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 20000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.game-modal-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.game-modal {
+  width: 90%;
+  max-width: 900px;
+  max-height: 85vh;
+  background: linear-gradient(135deg, #1a1a2e, #0f0f2a);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+  transform: scale(0.95);
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.game-modal.show {
+  transform: scale(1);
+}
+
+/* Modal Header with background image */
+.modal-header {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.modal-header-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.7);
+}
+
+.modal-header-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+}
+
+.modal-game-title {
+  font-size: 28px;
+  font-weight: bold;
+  color: white;
+  font-family: 'Orbitron', monospace;
+}
+
+.modal-game-tag {
+  display: inline-block;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-top: 10px;
+}
+
+/* Modal Body */
+.modal-body {
+  display: flex;
+  padding: 20px;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.modal-sidebar {
+  width: 200px;
+  flex-shrink: 0;
+}
+
+.modal-main {
+  flex: 1;
+}
+
+/* Playtime Card */
+.playtime-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 15px;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.playtime-label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.playtime-value {
+  font-size: 28px;
+  font-weight: bold;
+  color: #00ff88;
+  font-family: 'Orbitron', monospace;
+}
+
+/* Stats Card */
+.stats-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.stat-value {
+  font-size: 12px;
+  font-weight: bold;
+  color: #ffcc00;
+}
+
+/* Achievement Section */
+.achievement-section {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.achievement-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.achievement-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffcc00;
+}
+
+.achievement-progress {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.progress-bar {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffcc00, #ffaa00);
+  width: 0%;
+  border-radius: 2px;
+}
+
+.achievement-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.achievement-icon {
+  font-size: 28px;
+}
+
+.achievement-info {
+  flex: 1;
+}
+
+.achievement-name {
+  font-size: 13px;
+  font-weight: bold;
+  color: white;
+}
+
+.achievement-desc {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.achievement-rarity {
+  font-size: 10px;
+  color: #ffcc00;
+}
+
+/* Game Description */
+.game-description {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.game-description p {
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Action Buttons */
+.modal-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.modal-play-btn {
+  flex: 1;
+  background: linear-gradient(135deg, #2d5ae3, #1a3a8a);
+  border: none;
+  border-radius: 30px;
+  padding: 12px;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-play-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(45, 90, 227, 0.4);
+}
+
+.modal-fav-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 30px;
+  padding: 12px 20px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-fav-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.modal-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  font-size: 20px;
+  cursor: pointer;
+  color: white;
+  z-index: 10;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+/* Rating Stars in Modal */
+.modal-rating {
+  display: flex;
+  gap: 5px;
+  margin: 15px 0;
+}
+
+.modal-star {
+  font-size: 20px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.2);
+  transition: all 0.1s ease;
+}
+
+.modal-star.active {
+  color: #ffcc00;
+}
+
+.modal-star:hover {
+  transform: scale(1.1);
+}
+
+/* Your Rating */
+.your-rating {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 5px;
+}
+
+@media (max-width: 768px) {
+  .modal-body {
+    flex-direction: column;
+  }
+  .modal-sidebar {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  .playtime-card, .stats-card {
+    flex: 1;
+  }
+  .modal-header {
+    height: 150px;
+  }
+  .modal-game-title {
+    font-size: 20px;
+  }
+}
+
+
+
+/* Slower animations for game cards */
+.game {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  animation: none !important;
+}
+
+.game:hover {
+  transform: translateY(-5px);
+  transition: transform 0.2s ease;
+}
+
+.game img {
+  transition: transform 0.2s ease;
+}
+
+.game img:hover {
+  transform: scale(1.02);
+  transition: transform 0.2s ease;
+}
+
+
+
