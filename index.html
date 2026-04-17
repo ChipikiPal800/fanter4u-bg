@@ -28,12 +28,28 @@
 
   <!-- Main Content -->
   <div id="mainContent" style="opacity: 0; visibility: hidden;">
-    <!-- Account Button -->
+    <!-- Session Timer (Top Left) -->
+    <div id="sessionTimer">
+      <div class="timer-icon">⏱️</div>
+      <div class="timer-display">
+        <span id="timerHours">00</span>:<span id="timerMinutes">00</span>:<span id="timerSeconds">00</span>
+      </div>
+      <div class="timer-label">session time</div>
+    </div>
+
+    <!-- Account Button (Top Right) -->
     <div class="account-btn-container">
       <button class="account-btn" id="accountBtn" onclick="window.location.href='fantaccount.html'">
         <span class="account-icon">👤</span>
         <span class="account-name" id="accountName">Guest</span>
       </button>
+    </div>
+
+    <!-- Coin Display (Below Session Timer) -->
+    <div class="coin-display-header">
+      <span class="coin-icon">🪙</span>
+      <span id="headerCoinAmount" class="coin-amount-header">0</span>
+      <span class="coin-label-header">coins</span>
     </div>
 
     <button class="fav-sidebar-btn" id="favSidebarBtn" onclick="window.toggleFavSidebar()">★</button>
@@ -42,6 +58,7 @@
       <h1 id="title"></h1>
       <p id="subtitle"></p>
       <button class="settings-btn" onclick="window.location.href='settings.html'">⚙ Settings</button>
+      <button class="settings-btn" onclick="window.location.href='shop.html'">🛒 Shop</button>
     </div>
     
     <div class="center">
@@ -63,14 +80,148 @@
   <script src="config/categories.js"></script>
   <script src="config/gamedetails.js"></script>
 
-  <!-- FIX GAME CLICKS - THIS MAKES IFRAMES WORK -->
+  <!-- Session Timer Script -->
+  <script>
+    (function() {
+      let sessionStart = localStorage.getItem('sessionStart');
+      let totalPausedTime = 0;
+      let pausedStart = null;
+      let timerInterval = null;
+      let isTabActive = true;
+      let isPageVisible = true;
+
+      if (!sessionStart) {
+        sessionStart = Date.now();
+        localStorage.setItem('sessionStart', sessionStart);
+      } else {
+        sessionStart = parseInt(sessionStart);
+      }
+
+      if (localStorage.getItem('totalPausedTime')) {
+        totalPausedTime = parseInt(localStorage.getItem('totalPausedTime'));
+      }
+
+      function updateTimerDisplay() {
+        const now = Date.now();
+        const activeTime = now - sessionStart - totalPausedTime;
+        
+        const hours = Math.floor(activeTime / 3600000);
+        const minutes = Math.floor((activeTime % 3600000) / 60000);
+        const seconds = Math.floor((activeTime % 60000) / 1000);
+        
+        const timerHours = document.getElementById('timerHours');
+        const timerMinutes = document.getElementById('timerMinutes');
+        const timerSeconds = document.getElementById('timerSeconds');
+        
+        if (timerHours) timerHours.textContent = hours.toString().padStart(2, '0');
+        if (timerMinutes) timerMinutes.textContent = minutes.toString().padStart(2, '0');
+        if (timerSeconds) timerSeconds.textContent = seconds.toString().padStart(2, '0');
+      }
+
+      function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        updateTimerDisplay();
+        timerInterval = setInterval(updateTimerDisplay, 1000);
+      }
+
+      function pauseTimer() {
+        if (pausedStart === null) {
+          pausedStart = Date.now();
+          if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+          }
+        }
+      }
+
+      function resumeTimer() {
+        if (pausedStart !== null) {
+          totalPausedTime += (Date.now() - pausedStart);
+          localStorage.setItem('totalPausedTime', totalPausedTime);
+          pausedStart = null;
+          startTimer();
+        }
+      }
+
+      function handleVisibilityChange() {
+        if (document.hidden || !isTabActive) {
+          pauseTimer();
+        } else {
+          resumeTimer();
+        }
+      }
+
+      function handleWindowFocus() {
+        isTabActive = true;
+        if (!document.hidden) {
+          resumeTimer();
+        }
+      }
+
+      function handleWindowBlur() {
+        isTabActive = false;
+        pauseTimer();
+      }
+
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      window.addEventListener('focus', handleWindowFocus);
+      window.addEventListener('blur', handleWindowBlur);
+      
+      let idleTimer;
+      function resetIdleTimer() {
+        if (idleTimer) clearTimeout(idleTimer);
+        idleTimer = setTimeout(() => {
+          if (!document.hidden && isTabActive) {
+            pauseTimer();
+          }
+        }, 300000);
+      }
+      
+      document.addEventListener('mousemove', () => {
+        if (pausedStart !== null && !document.hidden && isTabActive) {
+          resumeTimer();
+        }
+        resetIdleTimer();
+      });
+      
+      document.addEventListener('keydown', resetIdleTimer);
+      
+      startTimer();
+      
+      if (document.hidden) {
+        pauseTimer();
+      }
+    })();
+  </script>
+
+  <!-- Coin Display Update Script -->
+  <script>
+    function updateHeaderCoins() {
+      const currentUser = JSON.parse(localStorage.getItem('fanter_currentUser') || 'null');
+      const coinEl = document.getElementById('headerCoinAmount');
+      if (coinEl && currentUser) {
+        coinEl.textContent = Math.floor((currentUser.coins || 0) * 100) / 100;
+      }
+    }
+    
+    // Update coins every second
+    setInterval(updateHeaderCoins, 1000);
+    updateHeaderCoins();
+    
+    // Also update when storage changes
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'fanter_currentUser') {
+        updateHeaderCoins();
+      }
+    });
+  </script>
+
+  <!-- Fix Game Clicks Script -->
   <script>
   function fixGameClicks() {
     setTimeout(function() {
       var games = document.querySelectorAll('.game img');
       if (games.length === 0) return;
-      
-      console.log("🔧 Fixing " + games.length + " game clicks...");
       
       for (var i = 0; i < games.length; i++) {
         var img = games[i];
@@ -96,14 +247,12 @@
     }, 500);
   }
 
-  // Run when games are loaded
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', fixGameClicks);
   } else {
     fixGameClicks();
   }
 
-  // Watch for game updates (search/filter)
   var gamesObserver = new MutationObserver(function() {
     fixGameClicks();
   });
@@ -350,10 +499,5 @@
       loadingScreen.addEventListener('click', (e) => e.stopPropagation());
     })();
   </script>
-  <button class="settings-btn" onclick="window.location.href='shop.html'">🛒 shop</button>
-  <div class="coin-display-header" style="position: fixed; top: 15px; right: 100px; background: rgba(20,30,50,0.85); backdrop-filter: blur(10px); border-radius: 30px; padding: 8px 16px; display: flex; align-items: center; gap: 8px; z-index: 100;">
-  <span>🪙</span>
-  <span id="headerCoinAmount">0</span>
-</div>
 </body>
 </html>
