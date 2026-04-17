@@ -99,7 +99,7 @@
   },
   {
     "name": "five nights at freddys 2 ",
-    "image": ".https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTyHgdbC707702_nFjZwWTu15WCsoIFslXrg&s",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTyHgdbC707702_nFjZwWTu15WCsoIFslXrg&s",
     "url": "https://abcatlmfao.github.io/FNAF2/",
     "new": true,
     "category": "horror"
@@ -154,7 +154,7 @@
     "category": "action"
   },
   {
-    "name": "Aquapark Slides",
+    "name": "aquapark slides",
     "image": "https://play-lh.googleusercontent.com/u1Z-wRullWJBvInhY4gdFxg_Q8Pz6clUQd7thoQNQNHQ1ghNeUf-lsJandlp1vFKhBk",
     "url": "https://chipikipal800.github.io/aquapark-slides-unblocked/",
     "new": true,
@@ -204,58 +204,58 @@
   },
   {
     "name": "bad parenting",
-    "image": "https://www.fortnite.com/@scriptvex/4838-2432-0639",
+    "image": "https://i.scdn.co/image/ab67616d00001e0262d2665fd1709d37ec634ec2",
     "url": "https://oshkii.github.io/badparenting-webport/",
     "new": true,
     "category": "horror"
   },
   {
-    "name": "Baldi's Basics",
-    "image": "splash.png",
-    "url": "baldis-basics",
-    "new": false,
+    "name": "baldi's basics",
+    "image": "https://upload.wikimedia.org/wikipedia/en/1/13/Baldis_Basics_in_Education_and_Learining_cover_art.webp",
+    "url": "https://abcatlmfao.github.io/baldis-basics/",
+    "new": true,
+    "category": "adventure"
+  },
+  {
+    "name": "the man from the window ",
+    "image": "https://static.tvtropes.org/pmwiki/pub/images/zed_technician_the_man_from_the_window.png",
+    "url": "https://brooksch123.github.io/TheManInTheWindow/",
+    "new": true,
     "category": "horror"
   },
   {
-    "name": "Ballistic Chickens",
-    "image": "logo.png",
-    "url": "ballistic-chickens",
-    "new": false,
+    "name": "andy apple farm",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQTMdh1itTrNMc05NPwnVWp1SLjzE5xnxRTpg&s",
+    "url": "https://chipikipal800.github.io/Andy-s-Apple-Farm/",
+    "new": true,
+    "category": "horror"
+  },
+  {
+    "name": "drift king",
+    "image": "https://play-lh.googleusercontent.com/WKoMii0zjkihmZdlhN0gczyDAZp9F99fxm2lInUnNaBYjJJfKshyJ3i7aLrLzwkkRw",
+    "url": "https://chipikipal800.github.io/Drift-King-Unblocked/",
+    "new": true,
+    "category": "multiplayer, racing"
+  },
+  {
+    "name": "infinite craft",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMpVZrdJHV3WnPtTUUWx8qxLMSGqtXwaZUZw&s",
+    "url": "https://fayadgamer13.github.io/infinite_craft_unblocked.github.io/",
+    "new": true,
     "category": "arcade"
   },
   {
-    "name": "Basket Random",
-    "image": "splash.jpeg",
-    "url": "basket-random",
-    "new": false,
-    "category": "sports"
+    "name": "sandboxels",
+    "image": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3664820/5a38bbd2d1ed7118e4818fd48c33294f64e1a3c5/header.jpg?t=1772994627",
+    "url": "https://abcatlmfao.github.io/sandboxels/",
+    "new": true,
+    "category": "arcade"
   },
   {
-    "name": "Basketball Stars",
-    "image": "assets/images/basketball-stars.png",
-    "url": "basketball-stars",
-    "new": false,
-    "category": "sports"
-  },
-  {
-    "name": "Basketbros.io",
-    "image": "thumb.jpg",
-    "url": "basketbros-io",
-    "new": false,
-    "category": "sports"
-  },
-  {
-    "name": "Battle for Gondor",
-    "image": "battleforgondor.JPG",
-    "url": "battleforgondor",
-    "new": false,
-    "category": "strategy"
-  },
-  {
-    "name": "Big Red Button",
-    "image": "bigredbutton.png",
-    "url": "bigredbutton",
-    "new": false,
+    "name": "ovo 2",
+    "image": "https://images.rocketgames.io/uploads/games/o/ovo-2/ovo-2.aedfcd.jpg",
+    "url": "https://chipikipal800.github.io/OvO2/",
+    "new": true,
     "category": "arcade"
   },
   {
