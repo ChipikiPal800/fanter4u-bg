@@ -385,10 +385,20 @@ const ALL_ACHIEVEMENTS = [
         localStorage.setItem('fanter_currentUser', JSON.stringify(guestUser));
       }
 
-// Wait for Supabase to be ready
+// Wait for Supabase to be fully ready
 let supabase = window.supabase;
+let attempts = 0;
+const maxAttempts = 20; // 2 seconds total
+
+while ((!supabase || !supabase.auth) && attempts < maxAttempts) {
+  console.log(`Waiting for Supabase... attempt ${attempts + 1}`);
+  await new Promise(resolve => setTimeout(resolve, 100));
+  supabase = window.supabase;
+  attempts++;
+}
+
 if (!supabase || !supabase.auth) {
-  console.log('Supabase not ready, falling back to localStorage');
+  console.log('Supabase not ready after waiting, falling back to localStorage');
   loadLocalData();
   setupTabs();
   setupLeaderboardFilters();
@@ -397,8 +407,8 @@ if (!supabase || !supabase.auth) {
   return;
 }
 
+console.log('✅ Supabase ready! Checking session...');
 const { data: { session } } = await supabase.auth.getSession();
-
 
       if (session) {
         currentUser = session.user;
