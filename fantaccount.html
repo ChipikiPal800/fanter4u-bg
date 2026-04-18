@@ -283,44 +283,86 @@
 // index.html already created window.supabase - just wait for it
 console.log('Waiting for Supabase...');
 
-    // ===== ALL ACHIEVEMENTS =====
-    const ALL_ACHIEVEMENTS = [
-      // Newbie — 3 coins each
-      { id: 1,  name: "Welcome Aboard",   desc: "Create an account",        icon: "🎉", coins: 3,  req: "register",       required: 1   },
-      { id: 2,  name: "First Impression", desc: "Rate your first game",     icon: "⭐", coins: 3,  req: "ratingsGiven",   required: 1   },
-      { id: 3,  name: "Hearted",          desc: "Favorite your first game", icon: "💖", coins: 3,  req: "favoritesCount", required: 1   },
-      { id: 4,  name: "Let's Play",       desc: "Play your first game",     icon: "🎮", coins: 3,  req: "gamesPlayed",    required: 1   },
-      { id: 5,  name: "Getting There",    desc: "Rate 10 games",            icon: "📈", coins: 3,  req: "ratingsGiven",   required: 10  },
-      { id: 6,  name: "Small Collection", desc: "Favorite 10 games",        icon: "📦", coins: 3,  req: "favoritesCount", required: 10  },
-      { id: 7,  name: "Ten Played",       desc: "Play 10 games",            icon: "🔟", coins: 3,  req: "gamesPlayed",    required: 10  },
-      { id: 8,  name: "Opinionated",      desc: "Rate 25 games",            icon: "🗣️", coins: 3,  req: "ratingsGiven",   required: 25  },
-      { id: 9,  name: "Devoted Fan",      desc: "Favorite 25 games",        icon: "💝", coins: 3,  req: "favoritesCount", required: 25  },
-      { id: 10, name: "Newbie+",          desc: "Play 25 games",            icon: "🌟", coins: 3,  req: "gamesPlayed",    required: 25  },
-      // Beginner — 5 coins each
-      { id: 11, name: "Half Century",     desc: "Rate 50 games",            icon: "🏅", coins: 5,  req: "ratingsGiven",   required: 50  },
-      { id: 12, name: "Big Fan",          desc: "Favorite 50 games",        icon: "❤️", coins: 5,  req: "favoritesCount", required: 50  },
-      { id: 13, name: "Frequent Flyer",   desc: "Play 50 games",            icon: "✈️", coins: 5,  req: "gamesPlayed",    required: 50  },
-      { id: 14, name: "Century",          desc: "Rate 100 games",           icon: "💯", coins: 5,  req: "ratingsGiven",   required: 100 },
-      { id: 15, name: "Super Fan",        desc: "Favorite 100 games",       icon: "🌠", coins: 5,  req: "favoritesCount", required: 100 },
-      { id: 16, name: "Dedicated",        desc: "Play 100 games",           icon: "🏆", coins: 5,  req: "gamesPlayed",    required: 100 },
-      { id: 17, name: "Critic",           desc: "Rate 150 games",           icon: "✍️", coins: 5,  req: "ratingsGiven",   required: 150 },
-      { id: 18, name: "Hoarder",          desc: "Favorite 150 games",       icon: "🗃️", coins: 5,  req: "favoritesCount", required: 150 },
-      { id: 19, name: "Marathoner",       desc: "Play 150 games",           icon: "🏃", coins: 5,  req: "gamesPlayed",    required: 150 },
-      { id: 20, name: "Beginner+",        desc: "Play 200 games",           icon: "⬆️", coins: 5,  req: "gamesPlayed",    required: 200 },
-      // Secrets — 50 coins each
-      { id: 53, name: "The Chosen One",   desc: "Find all secret names in search",   icon: "👑", coins: 50, req: "secret", required: 1 },
-      { id: 54, name: "Alt+F4",           desc: "Leave the site within 10 seconds",  icon: "💀", coins: 50, req: "secret", required: 1 },
-      { id: 55, name: "Mentally Insane",  desc: "Idle for 60 minutes straight",      icon: "🤪", coins: 50, req: "secret", required: 1 },
-      { id: 56, name: "Indecisive",       desc: "Change theme 10+ times",            icon: "🎨", coins: 50, req: "secret", required: 1 },
-      { id: 57, name: "Big Back",         desc: "Play a food-related game",          icon: "🍔", coins: 50, req: "secret", required: 1 },
-      { id: 58, name: "OG Fanter",        desc: "Joined during early access",        icon: "🦖", coins: 50, req: "secret", required: 1 },
-      { id: 59, name: "Addicted",         desc: "Play one game 50 times",            icon: "🎮", coins: 50, req: "secret", required: 1 },
-      { id: 60, name: "Committed",        desc: "Play one game 100 times",           icon: "💪", coins: 50, req: "secret", required: 1 },
-      { id: 61, name: "Top 1 Unemployed", desc: "50 hours active on the site",       icon: "🛋️", coins: 50, req: "secret", required: 1 },
-      { id: 62, name: "Loyal Customer",   desc: "Rate every single game",            icon: "⭐", coins: 50, req: "secret", required: 1 },
-      { id: 63, name: "System Failure",   desc: "Trigger the crash screen",          icon: "💻", coins: 50, req: "secret", required: 1 },
-    ];
+   // ===== ALL ACHIEVEMENTS (63 TOTAL) =====
+const ALL_ACHIEVEMENTS = [
+  // NEWBIE — 3 coins each (IDs 1-10)
+  { id: 1,  name: "Welcome Aboard",   desc: "Create an account",        icon: "🎉", coins: 3,  req: "register",       required: 1   },
+  { id: 2,  name: "First Impression", desc: "Rate your first game",     icon: "⭐", coins: 3,  req: "ratingsGiven",   required: 1   },
+  { id: 3,  name: "Hearted",          desc: "Favorite your first game", icon: "💖", coins: 3,  req: "favoritesCount", required: 1   },
+  { id: 4,  name: "Let's Play",       desc: "Play your first game",     icon: "🎮", coins: 3,  req: "gamesPlayed",    required: 1   },
+  { id: 5,  name: "Getting There",    desc: "Rate 10 games",            icon: "📈", coins: 3,  req: "ratingsGiven",   required: 10  },
+  { id: 6,  name: "Small Collection", desc: "Favorite 10 games",        icon: "📦", coins: 3,  req: "favoritesCount", required: 10  },
+  { id: 7,  name: "Ten Played",       desc: "Play 10 games",            icon: "🔟", coins: 3,  req: "gamesPlayed",    required: 10  },
+  { id: 8,  name: "Opinionated",      desc: "Rate 25 games",            icon: "🗣️", coins: 3,  req: "ratingsGiven",   required: 25  },
+  { id: 9,  name: "Devoted Fan",      desc: "Favorite 25 games",        icon: "💝", coins: 3,  req: "favoritesCount", required: 25  },
+  { id: 10, name: "Newbie+",          desc: "Play 25 games",            icon: "🌟", coins: 3,  req: "gamesPlayed",    required: 25  },
+  
+  // BEGINNER — 5 coins each (IDs 11-20)
+  { id: 11, name: "Half Century",     desc: "Rate 50 games",            icon: "🏅", coins: 5,  req: "ratingsGiven",   required: 50  },
+  { id: 12, name: "Big Fan",          desc: "Favorite 50 games",        icon: "❤️", coins: 5,  req: "favoritesCount", required: 50  },
+  { id: 13, name: "Frequent Flyer",   desc: "Play 50 games",            icon: "✈️", coins: 5,  req: "gamesPlayed",    required: 50  },
+  { id: 14, name: "Century",          desc: "Rate 100 games",           icon: "💯", coins: 5,  req: "ratingsGiven",   required: 100 },
+  { id: 15, name: "Super Fan",        desc: "Favorite 75 games",        icon: "🌠", coins: 5,  req: "favoritesCount", required: 75 },
+  { id: 16, name: "Dedicated",        desc: "Play 100 games",           icon: "🏆", coins: 5,  req: "gamesPlayed",    required: 100 },
+  { id: 17, name: "Critic",           desc: "Rate 150 games",           icon: "✍️", coins: 5,  req: "ratingsGiven",   required: 150 },
+  { id: 18, name: "Fanter so Fun",    desc: "Favorite 100 games",       icon: "🗃️", coins: 5,  req: "favoritesCount", required: 100 },
+  { id: 19, name: "Marathoner",       desc: "Play 150 games",           icon: "🏃", coins: 5,  req: "gamesPlayed",    required: 150 },
+  { id: 20, name: "Beginner+",        desc: "Play 200 games",           icon: "⬆️", coins: 5,  req: "gamesPlayed",    required: 200 },
+  
+  // CLIMBING — 10 coins each (IDs 21-30)
+  { id: 21, name: "Century Approaching", desc: "Rate 100 games",        icon: "📊", coins: 10, req: "ratingsGiven",   required: 100 },
+  { id: 22, name: "Collection Growing",  desc: "Favorite 100 games",    icon: "📈", coins: 10, req: "favoritesCount", required: 100 },
+  { id: 23, name: "Marathon",            desc: "Play 50 games",         icon: "🏃", coins: 10, req: "gamesPlayed",    required: 50  },
+  { id: 24, name: "Weekly Warrior",      desc: "5 day login streak",    icon: "⚔️", coins: 10, req: "loginStreak",    required: 5   },
+  { id: 25, name: "One Session Wonder",  desc: "Play 10 games in one session", icon: "⚡", coins: 10, req: "gamesInSession", required: 10 },
+  { id: 26, name: "Double Time",         desc: "Rate 150 games",        icon: "⏱️", coins: 10, req: "ratingsGiven",   required: 150 },
+  { id: 27, name: "Dedicated Fan",       desc: "Favorite 150 games",    icon: "💪", coins: 10, req: "favoritesCount", required: 150 },
+  { id: 28, name: "Fifty More",          desc: "Play 75 games",         icon: "🎲", coins: 10, req: "gamesPlayed",    required: 75  },
+  { id: 29, name: "Genre Explorer",      desc: "Play 10 different genres", icon: "🗺️", coins: 10, req: "genresPlayed", required: 10 },
+  { id: 30, name: "Climbing+",           desc: "Complete all Climbing", icon: "⛰️", coins: 10, req: "categoryComplete", required: "climbing" },
+  
+  // DIFFICULT — 17.5 coins each (IDs 31-40)
+  { id: 31, name: "Two Hundred Ratings", desc: "Rate 200 games",        icon: "🏆", coins: 17.5, req: "ratingsGiven",   required: 200 },
+  { id: 32, name: "Two Hundred Favorites", desc: "Favorite 200 games",  icon: "💎", coins: 17.5, req: "favoritesCount", required: 200 },
+  { id: 33, name: "Century Player",      desc: "Play 100 games",        icon: "🎖️", coins: 17.5, req: "gamesPlayed",    required: 100 },
+  { id: 34, name: "Monthly Master",      desc: "15 day login streak",   icon: "📆", coins: 17.5, req: "loginStreak",    required: 15  },
+  { id: 35, name: "Streak Master",       desc: "10 day login streak",   icon: "🔥", coins: 17.5, req: "loginStreak",    required: 10  },
+  { id: 36, name: "Perfect Balance",     desc: "Rate 10 games 1★ and 10 games 5★", icon: "⚖️", coins: 17.5, req: "balancedRatings", required: 10 },
+  { id: 37, name: "Pure Taste",          desc: "10 favorites all 5★ rated", icon: "✨", coins: 17.5, req: "pureFavorites", required: 10 },
+  { id: 38, name: "Hidden Gem Hunter",   desc: "Favorite a game with <10 ratings", icon: "💎", coins: 17.5, req: "hiddenGem", required: 1 },
+  { id: 39, name: "Trend Setter",        desc: "Be among first 10 to rate a game", icon: "👑", coins: 17.5, req: "firstRater", required: 1 },
+  { id: 40, name: "Difficult+",          desc: "Complete all Difficult", icon: "💀", coins: 17.5, req: "categoryComplete", required: "difficult" },
 
+
+  // ELITE — 25 coins each (IDs 41-50)
+  { id: 41, name: "Centurion",           desc: "Rate 100 games",        icon: "🏅", coins: 25, req: "ratingsGiven",   required: 100 },
+  { id: 42, name: "Collector's Edition", desc: "Favorite 100 games",    icon: "📀", coins: 25, req: "favoritesCount", required: 100 },
+  { id: 43, name: "Gaming Devotee",      desc: "Play 150 games",        icon: "🎮", coins: 25, req: "gamesPlayed",    required: 150 },
+  { id: 44, name: "Yearly Legend",       desc: "50 day login streak",   icon: "📅", coins: 25, req: "loginStreak",    required: 50  },
+  { id: 45, name: "Iron Will",           desc: "14 day login streak",   icon: "⚙️", coins: 25, req: "loginStreak",    required: 14  },
+  { id: 46, name: "The Decider",         desc: "Rating on 100+ games",  icon: "⚖️", coins: 25, req: "ratingsGiven",   required: 100 },
+  { id: 47, name: "Completionist",       desc: "Complete all lower categories", icon: "🏆", coins: 25, req: "allLowerCategories", required: true },
+  { id: 48, name: "Elite Rater",         desc: "Avg rating within 0.5 of global", icon: "⭐", coins: 25, req: "eliteRater", required: 1 },
+  { id: 49, name: "Community Choice",    desc: "Review liked by 10+ users", icon: "💬", coins: 25, req: "likesReceived", required: 10 },
+  { id: 50, name: "Elite+",              desc: "Complete all Elite",    icon: "👑", coins: 25, req: "categoryComplete", required: "elite" },
+  
+  // SECRET — 50 coins each (IDs 51-63)
+  { id: 51, name: "The Owner's Gift",    desc: "Given by abcatlmfao",   icon: "🎁", coins: 50, req: "secret", required: 1 },
+  { id: 52, name: "Konami Code",         desc: "↑↑↓↓←→←→BA",            icon: "🎮", coins: 50, req: "secret", required: 1 },
+  { id: 53, name: "The Chosen One",      desc: "Find all secret names", icon: "👑", coins: 50, req: "secret", required: 1 },
+  { id: 54, name: "Alt+F4",              desc: "Leave within 10 seconds", icon: "💀", coins: 50, req: "secret", required: 1 },
+  { id: 55, name: "Mentally Insane",     desc: "Idle for 60 minutes",   icon: "🤪", coins: 50, req: "secret", required: 1 },
+  { id: 56, name: "Indecisive",          desc: "Change theme 10+ times", icon: "🎨", coins: 50, req: "secret", required: 1 },
+  { id: 57, name: "Big Back",            desc: "Play a food game",      icon: "🍔", coins: 50, req: "secret", required: 1 },
+  { id: 58, name: "OG Fanter",           desc: "Early access member",   icon: "🦖", coins: 50, req: "secret", required: 1 },
+  { id: 59, name: "Addicted",            desc: "Play one game 50 times", icon: "🎮", coins: 50, req: "secret", required: 1 },
+  { id: 60, name: "Committed",           desc: "Play one game 100 times", icon: "💪", coins: 50, req: "secret", required: 1 },
+  { id: 61, name: "Top 1 Unemployed",    desc: "50 hours active",       icon: "🛋️", coins: 50, req: "secret", required: 1 },
+  { id: 62, name: "Loyal Customer",      desc: "Rate every game",       icon: "⭐", coins: 50, req: "secret", required: 1 },
+  { id: 63, name: "System Failure",      desc: "Trigger crash screen",  icon: "💻", coins: 50, req: "secret", required: 1 }
+];
+
+    
     // ===== STATE =====
     let currentUser = null;
     let localUser = null;
@@ -520,9 +562,12 @@ const { data: { session } } = await supabase.auth.getSession();
       const totalCount = ALL_ACHIEVEMENTS.length;
       const pct = Math.round((unlockedCount / totalCount) * 100);
 
-      const newbie   = ALL_ACHIEVEMENTS.filter(a => a.id >= 1  && a.id <= 10);
-      const beginner = ALL_ACHIEVEMENTS.filter(a => a.id >= 11 && a.id <= 20);
-      const secrets  = ALL_ACHIEVEMENTS.filter(a => a.id >= 53 && a.id <= 63);
+    const newbie    = ALL_ACHIEVEMENTS.filter(a => a.id >= 1  && a.id <= 10);
+    const beginner  = ALL_ACHIEVEMENTS.filter(a => a.id >= 11 && a.id <= 20);
+    const climbing  = ALL_ACHIEVEMENTS.filter(a => a.id >= 21 && a.id <= 30);
+    const difficult = ALL_ACHIEVEMENTS.filter(a => a.id >= 31 && a.id <= 40);
+    const elite     = ALL_ACHIEVEMENTS.filter(a => a.id >= 41 && a.id <= 50);
+    const secrets   = ALL_ACHIEVEMENTS.filter(a => a.id >= 51 && a.id <= 63);
 
       function getProgress(a) {
         if (userAchievements[a.id]) return { done: true, current: a.required, pct: 100 };
@@ -598,9 +643,12 @@ const { data: { session } } = await supabase.auth.getSession();
             <div style="font-size:11px;color:rgba(255,255,255,0.5);">achievements</div>
           </div>
         </div>
-        ${renderGroup('Newbie',   '🌱', '#00ff88', newbie,   true)}
-        ${renderGroup('Beginner', '📈', '#2d5ae3', beginner, false)}
-        ${renderGroup('Secrets',  '🔮', '#aa44ff', secrets,  false)}
+       ${renderGroup('Newbie',    '🌱', '#00ff88', newbie,   true)}
+${renderGroup('Beginner',  '📈', '#2d5ae3', beginner, false)}
+${renderGroup('Climbing',  '⛰️', '#ff8800', climbing, false)}
+${renderGroup('Difficult', '💀', '#ff4444', difficult, false)}
+${renderGroup('Elite',     '👑', '#ffcc00', elite,    false)}
+${renderGroup('Secrets',   '🔮', '#aa44ff', secrets,  false)}
       `;
     }
 
