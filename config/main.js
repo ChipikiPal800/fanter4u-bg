@@ -136,6 +136,30 @@ function updateStarDisplay(gameName, userRating) {
       ratingText.innerHTML = globalRatings[gameName].average.toFixed(1);
     }
   }
+  function updateStarDisplays() {
+  if (typeof globalRatings === 'undefined' || typeof userVotes === 'undefined') return;
+  
+  document.querySelectorAll('.game').forEach(function(gameCard) {
+    var gameName = gameCard.getAttribute('data-game-name');
+    if (!gameName) return;
+    
+    var userRating = userVotes[gameName] || 0;
+    var stars = gameCard.querySelectorAll('.game-star');
+    
+    for (var i = 0; i < stars.length; i++) {
+      if (i < userRating) {
+        stars[i].classList.add('active');
+      } else {
+        stars[i].classList.remove('active');
+      }
+    }
+    
+    var ratingText = gameCard.querySelector('.game-rating-text');
+    if (ratingText && globalRatings[gameName]) {
+      ratingText.textContent = globalRatings[gameName].average.toFixed(1);
+    }
+  });
+}
   
   // Update modal stars if open
   var modalStars = document.querySelectorAll('.modal-star');
