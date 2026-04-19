@@ -84,7 +84,11 @@ function trackPlayedGame(game) { var u = getCurrentUser(), earned = 0.05 * getAc
 function tryDisplayGames() {
   if (window.gamesData?.length && ratingsLoaded) {
     console.log('🎮 Displaying games now!');
-    handleSearchInput();
+    // Force display all games directly instead of calling handleSearchInput
+    var favs = JSON.parse(localStorage.getItem("favourites") || "[]");
+    var favOn = localStorage.getItem("favFilter") === "true";
+    var filtered = window.gamesData.filter(g => (favOn ? favs.includes(g.name) : true));
+    window.displayFilteredGames(filtered);
   }
 }
 
@@ -246,6 +250,14 @@ initAchievementTriggers();
 // ===== START =====
 loadGlobalReviews();
 loadGlobalRatings();
+
+// FALLBACK: force display after 2 seconds if still not showing
+setTimeout(function() {
+  if (window.gamesData?.length && document.getElementById("gamesContainer")?.children.length === 0) {
+    console.log('⚠️ Fallback: forcing game display');
+    tryDisplayGames();
+  }
+}, 2000);
 
 window.crashFanter = function() { console.log('💥'); };
 console.log('💀 Type "crashFanter()" for a surprise...');
