@@ -346,10 +346,12 @@ function createCategoryBar() {
 
 function init() {
   console.log('🚀 Initializing categories system...');
-  storeOriginalOrder();
-  createCategoryBar();
-  addCategoryTags();
-  updateGames();
+  setTimeout(function() {
+    storeOriginalOrder();
+    createCategoryBar();
+    addCategoryTags();
+    updateGames();
+  }, 1000); // Wait 1 second for gsmes to load
 }
 
 if (document.readyState === 'loading') {
