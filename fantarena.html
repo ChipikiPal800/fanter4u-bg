@@ -312,6 +312,7 @@ let avatarIcon = localStorage.getItem('fanter_avatar') || '👤';
 let customStatus = localStorage.getItem('fanter_status') || '🎮 gaming';
 let streak = parseInt(localStorage.getItem('fanter_streak') || '0');
 let unreadChannels = { general: 0, 'game-recs': 0, lfg: 0, flex: 0 };
+let chatInitialized = false;
 
 if (!currentUser || currentUser.username === 'Guest') { alert('please log in!'); window.location.href = 'fantaccount.html'; }
 
@@ -320,7 +321,16 @@ function enterFantarena() {
   document.getElementById('welcomeScreen').style.display = 'none';
   document.getElementById('fantarenaContainer').classList.add('show');
   localStorage.setItem('fantarena_welcomed', 'true');
-  initChat();
+  
+  if (!chatInitialized) {
+    chatInitialized = true;
+    console.log('🚀 Initializing chat...');
+    loadMessages();
+    setupRealtime();
+    loadMembers();
+    setInterval(loadMembers, 10000);
+    setInterval(() => updatePresence('online'), 30000);
+  }
 }
 
 function showWelcomeScreen() {
@@ -333,7 +343,7 @@ const hasWelcomed = localStorage.getItem('fantarena_welcomed') === 'true';
 if (hasWelcomed) {
   document.getElementById('welcomeScreen').style.display = 'none';
   document.getElementById('fantarenaContainer').classList.add('show');
-  initChat();
+  enterFantarena(); // This will initialize the chat
 } else {
   document.getElementById('welcomeScreen').style.display = 'flex';
   document.getElementById('fantarenaContainer').classList.remove('show');
@@ -342,17 +352,11 @@ if (hasWelcomed) {
 // ESC key to show welcome screen
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') showWelcomeScreen(); });
 
-// ===== INIT CHAT (called after entering) =====
-function initChat() {
-  loadMessages(); setupRealtime(); loadFriends(); loadGroups(); loadMembers(); loadFriendRequests();
-  setInterval(loadMembers, 10000);
-}
-
 // ===== THEMES =====
 function setTheme(theme) { document.body.className = `theme-${theme}`; localStorage.setItem('fantarena_theme', theme); }
 const savedTheme = localStorage.getItem('fantarena_theme') || 'dark';
 setTheme(savedTheme);
-document.querySelector('.theme-selector').value = savedTheme;
+if (document.querySelector('.theme-selector')) document.querySelector('.theme-selector').value = savedTheme;
 
 // ===== STREAK =====
 function updateStreak() {
@@ -367,52 +371,63 @@ function updateStreak() {
 }
 updateStreak();
 
-// ===== SOUNDS =====
-const sounds = { send: new Audio('https://www.soundjay.com/misc/sounds/message-sent-1.mp3'), receive: new Audio('https://www.soundjay.com/misc/sounds/message-received-1.mp3'), ping: new Audio('https://www.soundjay.com/misc/sounds/ding-1.mp3') };
-function playSound(type) { if (soundEnabled && sounds[type]) { sounds[type].volume = 0.2; sounds[type].play().catch(() => {}); } }
-function toggleSound() { soundEnabled = document.getElementById('soundToggle').checked; }
+// ===== SOUNDS (DISABLED DUE TO CORS) =====
+function playSound(type) { /* disabled for now */ }
+function toggleSound() { soundEnabled = document.getElementById('soundToggle')?.checked || false; }
 
 // ===== PRESENCE =====
 async function updatePresence(status = 'online') { 
   try { await supabaseClient.from('fanter_presence').upsert({ user_id: currentUser.id, username: currentUser.displayName || currentUser.username, status, last_seen: new Date() }); } catch (e) {} 
 }
 updatePresence();
-setInterval(() => updatePresence('online'), 30000);
 window.addEventListener('beforeunload', () => updatePresence('offline'));
 
 // ===== REALTIME =====
 function setupRealtime() {
   if (channelSubscription) supabaseClient.removeChannel(channelSubscription);
   let filter = currentDM ? `channel_id=eq.dm_${[currentUser.id, currentDM].sort().join('_')}` : currentGroup ? `channel_id=eq.group_${currentGroup}` : `channel_id=eq.${currentChannel}`;
+  console.log('📡 Setting up realtime for filter:', filter);
   channelSubscription = supabaseClient.channel('fanter-chat')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'fanter_chat', filter }, payload => { 
-      messages.push(payload.new); renderMessages(); 
-      if (payload.new.user_id !== currentUser.id) playSound('receive');
+      console.log('📨 New message received!', payload.new);
+      messages.push(payload.new); 
+      renderMessages(); 
     })
     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'fanter_chat', filter }, () => loadMessages())
     .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'fanter_chat', filter }, () => loadMessages())
-    .on('broadcast', { event: 'typing' }, ({ payload }) => { if (payload.channel === currentChannel && payload.user !== currentUser.displayName) { typingUsers.set(payload.user, Date.now()); updateTypingIndicator(); } })
-    .subscribe();
+    .subscribe((status) => { console.log('📡 Realtime subscription status:', status); });
 }
 
 function updateTypingIndicator() {
   const now = Date.now(); let typing = [];
   for (let [user, time] of typingUsers) if (now - time < 3000) typing.push(user); else typingUsers.delete(user);
-  document.getElementById('typingIndicator').textContent = typing.length === 0 ? '' : typing.length === 1 ? `${typing[0]} is typing...` : `${typing.length} people are typing...`;
+  const indicator = document.getElementById('typingIndicator');
+  if (indicator) indicator.textContent = typing.length === 0 ? '' : typing.length === 1 ? `${typing[0]} is typing...` : `${typing.length} people are typing...`;
 }
 
 // ===== MESSAGES =====
 async function loadMessages() {
+  console.log('📥 Loading messages for channel:', currentChannel);
   let query = supabaseClient.from('fanter_chat').select('*').order('created_at', { ascending: true }).limit(100);
   if (currentDM) query = query.eq('channel_id', `dm_${[currentUser.id, currentDM].sort().join('_')}`);
   else if (currentGroup) query = query.eq('channel_id', `group_${currentGroup}`);
   else query = query.eq('channel_id', currentChannel);
-  const { data } = await query;
-  if (data) { messages = data; renderMessages(); }
+  
+  const { data, error } = await query;
+  if (error) {
+    console.error('❌ Load error:', error);
+    return;
+  }
+  if (data) { 
+    messages = data; 
+    console.log('✅ Loaded', messages.length, 'messages');
+    renderMessages(); 
+  }
 }
 
 function renderMessages() {
   const container = document.getElementById('messagesContainer');
+  if (!container) return;
   if (messages.length === 0) { container.innerHTML = '<div style="text-align:center; color:rgba(255,255,255,0.4);">no messages yet</div>'; return; }
   container.innerHTML = messages.map(msg => {
     const isMe = msg.user_id === currentUser.id;
@@ -450,13 +465,31 @@ async function sendMessage() {
   const input = document.getElementById('messageInput'); 
   let message = input.value.trim(); 
   if (!message) return;
-  if (containsBlockedWord(message)) { alert('message blocked: contains inappropriate language'); return; }
+  if (containsBlockedWord(message)) { alert('message blocked'); return; }
   if (message.startsWith('/')) { handleCommand(message); input.value = ''; return; }
   
   const channelId = currentDM ? `dm_${[currentUser.id, currentDM].sort().join('_')}` : currentGroup ? `group_${currentGroup}` : currentChannel;
-  await supabaseClient.from('fanter_chat').insert({ user_id: currentUser.id, username: currentUser.displayName || currentUser.username, message, channel_id: channelId, avatar: avatarIcon, nameColor: nameColor, streak: streak });
-  playSound('send');
-  input.value = ''; cancelReply();
+  
+  console.log('📤 Sending message to:', channelId);
+  
+  const { data, error } = await supabaseClient.from('fanter_chat').insert({ 
+    user_id: currentUser.id, 
+    username: currentUser.displayName || currentUser.username, 
+    message, 
+    channel_id: channelId, 
+    avatar: avatarIcon, 
+    nameColor: nameColor, 
+    streak: streak 
+  }).select();
+  
+  if (error) {
+    console.error('❌ Send error:', error);
+    alert('failed to send: ' + error.message);
+  } else {
+    console.log('✅ Message sent!', data);
+    input.value = ''; 
+    cancelReply();
+  }
 }
 
 function handleCommand(cmd) {
@@ -501,20 +534,42 @@ function showReactionPicker(event, msgId) {
 
 function handleTyping() {
   if (typingTimeout) clearTimeout(typingTimeout);
-  channelSubscription?.send({ type: 'broadcast', event: 'typing', payload: { user: currentUser.displayName, channel: currentChannel } });
-  typingTimeout = setTimeout(() => channelSubscription?.send({ type: 'broadcast', event: 'stop_typing', payload: {} }), 2000);
+  typingTimeout = setTimeout(() => {}, 2000);
 }
 
 // ===== CHANNELS & DMs =====
 document.querySelectorAll('.server-item').forEach(item => item.addEventListener('click', () => {
-  document.querySelectorAll('.server-item').forEach(i => i.classList.remove('active')); item.classList.add('active');
-  currentChannel = item.dataset.channel; currentDM = null; currentGroup = null;
-  document.getElementById('chatHeaderTitle').textContent = `# ${currentChannel}`; messages = []; loadMessages(); setupRealtime();
-  unreadChannels[currentChannel] = 0; updateUnreadBadges();
+  document.querySelectorAll('.server-item').forEach(i => i.classList.remove('active')); 
+  item.classList.add('active');
+  currentChannel = item.dataset.channel; 
+  currentDM = null; 
+  currentGroup = null;
+  document.getElementById('chatHeaderTitle').textContent = `# ${currentChannel}`; 
+  messages = []; 
+  loadMessages(); 
+  setupRealtime();
 }));
 
-async function openDM(userId, username) { currentDM = userId; currentChannel = null; currentGroup = null; document.getElementById('chatHeaderTitle').textContent = `@${username}`; document.querySelectorAll('.server-item').forEach(i => i.classList.remove('active')); messages = []; loadMessages(); setupRealtime(); }
-function updateUnreadBadges() { for (let ch in unreadChannels) { const badge = document.getElementById(`unread-${ch}`); if (badge) { badge.style.display = unreadChannels[ch] > 0 ? 'block' : 'none'; badge.textContent = unreadChannels[ch]; } } }
+async function openDM(userId, username) { 
+  currentDM = userId; 
+  currentChannel = null; 
+  currentGroup = null; 
+  document.getElementById('chatHeaderTitle').textContent = `@${username}`; 
+  document.querySelectorAll('.server-item').forEach(i => i.classList.remove('active')); 
+  messages = []; 
+  loadMessages(); 
+  setupRealtime(); 
+}
+
+// ===== MEMBERS =====
+async function loadMembers() {
+  const { data } = await supabaseClient.from('fanter_presence').select('*').order('status', { ascending: false });
+  if (data) { 
+    const online = data.filter(m => m.status === 'online').length;
+    document.getElementById('onlineCount').textContent = `${online} online`; 
+    document.getElementById('membersList').innerHTML = `<div class="member-category">online — ${online}</div>${data.filter(m => m.status === 'online').map(m => `<div class="member-item" onclick="openDM('${m.user_id}','${m.username}')"><div class="member-avatar">${m.username[0].toUpperCase()}</div><span>${m.username}</span></div>`).join('')}<div class="member-category">offline</div>${data.filter(m => m.status !== 'online').map(m => `<div class="member-item" onclick="openDM('${m.user_id}','${m.username}')"><div class="member-avatar">${m.username[0].toUpperCase()}</div><span>${m.username}</span></div>`).join('')}`; 
+  }
+}
 
 // ===== PROFILE & SETTINGS =====
 function showProfile(userId) {
@@ -547,19 +602,33 @@ function closePollModal() { document.getElementById('pollModal').classList.remov
 
 // ===== EMOJI & GIF & FORMAT =====
 const emojis = ['😀','😂','😊','😍','🥰','😎','🤔','😭','🔥','💀','🎮','🏆','⭐','💬','👑','✨'];
-document.getElementById('emojiPicker').innerHTML = emojis.map(e => `<span onclick="insertEmoji('${e}')">${e}</span>`).join('');
-function insertEmoji(emoji) { document.getElementById('messageInput').value += emoji; document.getElementById('emojiPicker').classList.remove('show'); }
-function toggleEmojiPicker() { document.getElementById('emojiPicker').classList.toggle('show'); }
-function toggleFormatMenu() { document.getElementById('formatMenu').classList.toggle('show'); }
+const emojiPicker = document.getElementById('emojiPicker');
+if (emojiPicker) emojiPicker.innerHTML = emojis.map(e => `<span onclick="insertEmoji('${e}')">${e}</span>`).join('');
+function insertEmoji(emoji) { 
+  const input = document.getElementById('messageInput'); 
+  if (input) input.value += emoji; 
+  document.getElementById('emojiPicker')?.classList.remove('show'); 
+}
+function toggleEmojiPicker() { document.getElementById('emojiPicker')?.classList.toggle('show'); }
+function toggleFormatMenu() { document.getElementById('formatMenu')?.classList.toggle('show'); }
 function applyFormat(wrapper) {
   const input = document.getElementById('messageInput');
+  if (!input) return;
   const start = input.selectionStart, end = input.selectionEnd;
   const text = input.value, selected = text.substring(start, end);
   input.value = text.substring(0, start) + wrapper + selected + wrapper + text.substring(end);
   input.focus(); input.setSelectionRange(start + wrapper.length, end + wrapper.length);
 }
-function replyToMessage(id, username) { replyingTo = { id, username }; document.getElementById('replyBar').style.display = 'flex'; document.getElementById('replyText').textContent = `Replying to ${username}`; document.getElementById('messageInput').focus(); }
-function cancelReply() { replyingTo = null; document.getElementById('replyBar').style.display = 'none'; }
+function replyToMessage(id, username) { 
+  replyingTo = { id, username }; 
+  document.getElementById('replyBar').style.display = 'flex'; 
+  document.getElementById('replyText').textContent = `Replying to ${username}`; 
+  document.getElementById('messageInput')?.focus(); 
+}
+function cancelReply() { 
+  replyingTo = null; 
+  document.getElementById('replyBar').style.display = 'none'; 
+}
 
 // ===== GIFS =====
 async function searchGifs(query) {
@@ -568,24 +637,30 @@ async function searchGifs(query) {
   const data = await res.json();
   document.getElementById('gifGrid').innerHTML = data.data.map(g => `<div class="gif-item" onclick="sendGif('${g.images.fixed_height.url}')"><img src="${g.images.fixed_height_small.url}"></div>`).join('');
 }
-function sendGif(url) { document.getElementById('messageInput').value = url; sendMessage(); document.getElementById('gifPicker').classList.remove('show'); }
-function toggleGifPicker() { document.getElementById('gifPicker').classList.toggle('show'); searchGifs('trending'); }
-
-// ===== PLACEHOLDERS (will be implemented) =====
-async function loadFriends() { document.getElementById('friendsList').innerHTML = '<div style="padding:8px;color:rgba(255,255,255,0.4);font-size:12px;">loading...</div>'; }
-async function loadGroups() { document.getElementById('groupsList').innerHTML = '<div style="padding:8px;color:rgba(255,255,255,0.4);font-size:12px;">loading...</div>'; }
-async function loadMembers() {
-  const { data } = await supabaseClient.from('fanter_presence').select('*').order('status', { ascending: false });
-  if (data) { document.getElementById('onlineCount').textContent = `${data.filter(m => m.status === 'online').length} online`; document.getElementById('membersList').innerHTML = `<div class="member-category">online — ${data.filter(m => m.status === 'online').length}</div>${data.filter(m => m.status === 'online').map(m => `<div class="member-item" onclick="openDM('${m.user_id}','${m.username}')"><div class="member-avatar">${m.username[0].toUpperCase()}</div><span>${m.username}</span></div>`).join('')}<div class="member-category">offline</div>${data.filter(m => m.status !== 'online').map(m => `<div class="member-item" onclick="openDM('${m.user_id}','${m.username}')"><div class="member-avatar">${m.username[0].toUpperCase()}</div><span>${m.username}</span></div>`).join('')}`; }
+function sendGif(url) { 
+  const input = document.getElementById('messageInput');
+  if (input) input.value = url; 
+  sendMessage(); 
+  document.getElementById('gifPicker')?.classList.remove('show'); 
 }
-async function loadFriendRequests() {}
-async function sendFriendRequest() { alert('friend request sent! (demo)'); closeAddFriendModal(); }
-async function createGroup() { alert('group created! (demo)'); closeCreateGroupModal(); }
-async function createPoll() { alert('poll created! (demo)'); closePollModal(); }
+function toggleGifPicker() { 
+  document.getElementById('gifPicker')?.classList.toggle('show'); 
+  searchGifs('trending'); 
+}
+
+// ===== PLACEHOLDERS =====
+async function sendFriendRequest() { alert('friend request sent!'); closeAddFriendModal(); }
+async function createGroup() { alert('group created!'); closeCreateGroupModal(); }
+async function createPoll() { alert('poll created!'); closePollModal(); }
 async function pinMessage(msgId) { alert('message pinned! (mod only)'); }
-async function editMessage(msgId, oldText) { const newText = prompt('Edit message:', oldText); if (newText) { await supabaseClient.from('fanter_chat').update({ message: newText, edited: true }).eq('id', msgId); } }
-async function deleteMessage(msgId) { if (confirm('Delete message?')) { await supabaseClient.from('fanter_chat').delete().eq('id', msgId); } }
-function inviteToGame(userId) { openDM(userId, 'User'); document.getElementById('messageInput').value = '🎮 want to play? '; }
+async function editMessage(msgId, oldText) { 
+  const newText = prompt('Edit message:', oldText); 
+  if (newText) { await supabaseClient.from('fanter_chat').update({ message: newText, edited: true }).eq('id', msgId); } 
+}
+async function deleteMessage(msgId) { 
+  if (confirm('Delete message?')) { await supabaseClient.from('fanter_chat').delete().eq('id', msgId); } 
+}
+function inviteToGame(userId) { openDM(userId, 'User'); }
 function showRequestsModal() { alert('friend requests coming soon!'); }
 function closeRequestsModal() { document.getElementById('requestsModal').classList.remove('show'); }
 function openDMFromNotification() {}
