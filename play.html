@@ -591,5 +591,17 @@
       }
     }
   </script>
+  <script>
+  (function() {
+    var currentUser = JSON.parse(localStorage.getItem('fanter_currentUser') || 'null');
+    var accountNameSpan = document.getElementById('accountName');
+    if (accountNameSpan) {
+      accountNameSpan.textContent = currentUser && currentUser.username !== 'Guest' 
+        ? (currentUser.displayName || currentUser.username) 
+        : 'Guest';
+    }
+  })();
+</script>
+  
 </body>
 </html>

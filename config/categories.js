@@ -1,11 +1,11 @@
-// ===== DEBUGGED CATEGORIES - SORTING FIXED =====
+// ===== FIXED CATEGORIES - WITH HORROR =====
 
 let currentCategory = 'all';
 let currentSort = 'default';
 let categoryOpen = false;
 let originalGamesArray = [];
 
-// Category data
+// Category data - NOW INCLUDES HORROR
 const CATEGORIES = {
   'all': { icon: '🎮', name: 'All Games', color: '#ffffff' },
   'action': { icon: '⚔️', name: 'Action', color: '#ff4444' },
@@ -17,7 +17,7 @@ const CATEGORIES = {
   'strategy': { icon: '♟️', name: 'Strategy', color: '#88ff44' },
   'multiplayer': { icon: '👥', name: 'Multiplayer', color: '#ffaa44' },
   'arcade': { icon: '🕹️', name: 'Arcade', color: '#ff44aa' },
-  'horror': { icon: '👻', name: 'Horror', color: '#aa44ff' },
+  'horror': { icon: '👻', name: 'Horror', color: '#aa44ff' },  // ← ADDED HORROR
   'simulation': { icon: '🏭', name: 'Simulation', color: '#44ffcc' },
   'sandbox': { icon: '🎨', name: 'Sandbox', color: '#ff8844' },
   'other': { icon: '🎮', name: 'Other', color: '#aaaaaa' }
@@ -49,13 +49,11 @@ function addCategoryTags() {
   games.forEach(game => {
     if (game.getAttribute('data-tagged')) return;
     
-    const gameName = game.querySelector('p')?.textContent;
+    const gameName = game.querySelector('.game-name')?.textContent || game.querySelector('p')?.textContent;
     if (gameName && window.gamesData) {
       const gameData = window.gamesData.find(g => g.name === gameName);
       const category = gameData?.category || 'other';
       const catInfo = CATEGORIES[category] || CATEGORIES.other;
-      
-      console.log(`  🎮 ${gameName} → ${catInfo.name}`);
       
       const tag = document.createElement('div');
       tag.className = 'game-category';
@@ -71,9 +69,9 @@ function addCategoryTags() {
       `;
       tag.innerHTML = `${catInfo.icon} ${catInfo.name}`;
       
-      const pTag = game.querySelector('p');
-      if (pTag) {
-        pTag.insertAdjacentElement('afterend', tag);
+      const nameEl = game.querySelector('.game-name') || game.querySelector('p');
+      if (nameEl) {
+        nameEl.insertAdjacentElement('afterend', tag);
       } else {
         game.appendChild(tag);
       }
@@ -86,10 +84,7 @@ function addCategoryTags() {
 
 // Filter games by category
 function filterGamesByCategory() {
-  const container = document.getElementById('gamesContainer');
-  if (!container) return;
-  
-  const games = Array.from(container.children);
+  const games = document.querySelectorAll('.game');
   let visibleCount = 0;
   
   games.forEach(game => {
@@ -116,50 +111,36 @@ function sortVisibleGames() {
   const hiddenGames = games.filter(game => game.style.display === 'none');
   
   if (currentSort === 'default') {
-    // Restore original order for visible games
-    const originalVisible = originalGamesArray.filter(game => 
-      visibleGames.includes(game)
-    );
+    const originalVisible = originalGamesArray.filter(game => visibleGames.includes(game));
     originalVisible.forEach(game => container.appendChild(game));
     hiddenGames.forEach(game => container.appendChild(game));
     console.log('📋 Applied default sort');
     return;
   }
   
-  // Sort visible games
   visibleGames.sort((a, b) => {
-    const aName = a.querySelector('p')?.textContent || '';
-    const bName = b.querySelector('p')?.textContent || '';
+    const aName = a.querySelector('.game-name')?.textContent || a.querySelector('p')?.textContent || '';
+    const bName = b.querySelector('.game-name')?.textContent || b.querySelector('p')?.textContent || '';
     
-    if (currentSort === 'name-asc') {
-      return aName.localeCompare(bName);
-    }
-    if (currentSort === 'name-desc') {
-      return bName.localeCompare(aName);
-    }
+    if (currentSort === 'name-asc') return aName.localeCompare(bName);
+    if (currentSort === 'name-desc') return bName.localeCompare(aName);
     
     const aRatingEl = a.querySelector('.rating-average');
     const bRatingEl = b.querySelector('.rating-average');
     const aRating = aRatingEl ? parseFloat(aRatingEl.textContent?.match(/★ ([\d.]+)/)?.[1] || 0) : 0;
     const bRating = bRatingEl ? parseFloat(bRatingEl.textContent?.match(/★ ([\d.]+)/)?.[1] || 0) : 0;
     
-    if (currentSort === 'rating-desc') {
-      return bRating - aRating;
-    }
-    if (currentSort === 'rating-asc') {
-      return aRating - bRating;
-    }
+    if (currentSort === 'rating-desc') return bRating - aRating;
+    if (currentSort === 'rating-asc') return aRating - bRating;
     return 0;
   });
   
-  // Reorder DOM
   visibleGames.forEach(game => container.appendChild(game));
   hiddenGames.forEach(game => container.appendChild(game));
   
   console.log(`📊 Applied sort: ${currentSort}`);
 }
 
-// Update everything
 function updateGames() {
   storeOriginalOrder();
   filterGamesByCategory();
@@ -168,35 +149,30 @@ function updateGames() {
 }
 
 function updateCountDisplay() {
-  const container = document.getElementById('gamesContainer');
-  if (!container) return;
-  
-  const games = Array.from(container.children);
-  const visibleCount = games.filter(game => game.style.display !== 'none').length;
+  const games = document.querySelectorAll('.game');
+  const visibleCount = Array.from(games).filter(game => game.style.display !== 'none').length;
   const totalGames = games.length;
   const categoryName = currentCategory === 'all' ? 'All Games' : (CATEGORIES[currentCategory]?.name || currentCategory);
   
   let countEl = document.getElementById('games-count');
   if (!countEl) {
-    countEl = document.createElement('div');
-    countEl.id = 'games-count';
-    countEl.style.cssText = 'text-align:center;font-size:12px;color:rgba(255,255,255,0.5);margin:10px auto;font-family:monospace;';
-    container.parentNode.insertBefore(countEl, container.nextSibling);
+    const container = document.getElementById('gamesContainer');
+    if (container) {
+      countEl = document.createElement('div');
+      countEl.id = 'games-count';
+      countEl.style.cssText = 'text-align:center;font-size:12px;color:rgba(255,255,255,0.5);margin:10px auto;font-family:monospace;';
+      container.parentNode.insertBefore(countEl, container.nextSibling);
+    }
   }
-  countEl.textContent = `${categoryName}: ${visibleCount} of ${totalGames} games`;
+  if (countEl) countEl.textContent = `${categoryName}: ${visibleCount} of ${totalGames} games`;
 }
 
-// Create the category bar
+// Create category bar
 function createCategoryBar() {
   if (document.getElementById('category-bar')) return;
   
   const searchContainer = document.querySelector('.center');
-  if (!searchContainer) {
-    console.log('⏳ Waiting for .center element...');
-    return;
-  }
-  
-  console.log('🎨 Creating category bar...');
+  if (!searchContainer) return;
   
   const bar = document.createElement('div');
   bar.id = 'category-bar';
@@ -211,7 +187,6 @@ function createCategoryBar() {
     position: relative;
   `;
   
-  // Category button
   const catBtn = document.createElement('button');
   catBtn.id = 'main-category-btn';
   catBtn.style.cssText = `
@@ -221,21 +196,13 @@ function createCategoryBar() {
     padding: 10px 24px;
     color: white;
     font-size: 15px;
-    font-family: 'Ubuntu', sans-serif;
     cursor: pointer;
-    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     gap: 10px;
-    backdrop-filter: blur(5px);
   `;
-  catBtn.innerHTML = `
-    <span style="font-size: 18px;">🐈</span>
-    <span style="font-weight: 500;">egories</span>
-    <span id="category-arrow-icon" style="font-size: 12px; transition: transform 0.3s ease;">▼</span>
-  `;
+  catBtn.innerHTML = `🐈 egories <span id="category-arrow-icon" style="font-size: 12px; transition: transform 0.3s ease;">▼</span>`;
   
-  // Dropdown menu
   const dropdown = document.createElement('div');
   dropdown.id = 'category-dropdown-menu';
   dropdown.style.cssText = `
@@ -254,17 +221,14 @@ function createCategoryBar() {
     overflow: hidden;
     transition: all 0.35s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     z-index: 1000;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
     pointer-events: none;
   `;
   
-  // Add category options
   const categories = ['all', 'action', 'puzzle', 'racing', 'sports', 'adventure', 'platformer', 'strategy', 'multiplayer', 'arcade', 'horror', 'simulation', 'sandbox'];
   
   categories.forEach(cat => {
     const info = CATEGORIES[cat];
     const option = document.createElement('div');
-    option.className = 'dropdown-cat-option';
     option.style.cssText = `
       padding: 12px 20px;
       cursor: pointer;
@@ -274,7 +238,6 @@ function createCategoryBar() {
       gap: 12px;
       color: rgba(255,255,255,0.8);
       font-size: 14px;
-      font-family: 'Ubuntu', sans-serif;
       border-bottom: 1px solid rgba(255,255,255,0.05);
     `;
     option.innerHTML = `<span style="font-size: 16px;">${info.icon}</span> <span>${info.name}</span>`;
@@ -309,7 +272,6 @@ function createCategoryBar() {
     border: 1px solid rgba(45, 90, 227, 0.4);
     border-radius: 40px;
     padding: 5px;
-    backdrop-filter: blur(5px);
   `;
   
   const sorts = [
@@ -330,23 +292,15 @@ function createCategoryBar() {
       padding: 8px 14px;
       color: white;
       font-size: 12px;
-      font-family: 'Ubuntu', sans-serif;
       cursor: pointer;
       transition: all 0.15s ease;
     `;
-    btn.onmouseenter = () => {
-      btn.style.background = 'rgba(45,90,227,0.3)';
-    };
-    btn.onmouseleave = () => {
-      btn.style.background = currentSort === s.value ? 'rgba(45,90,227,0.5)' : 'transparent';
-    };
+    btn.onmouseenter = () => { btn.style.background = 'rgba(45,90,227,0.3)'; };
+    btn.onmouseleave = () => { btn.style.background = currentSort === s.value ? 'rgba(45,90,227,0.5)' : 'transparent'; };
     btn.onclick = () => {
       currentSort = s.value;
       updateGames();
-      // Update button styles
-      document.querySelectorAll('.sort-custom-btn').forEach(b => {
-        b.style.background = 'transparent';
-      });
+      document.querySelectorAll('.sort-custom-btn').forEach(b => { b.style.background = 'transparent'; });
       btn.style.background = 'rgba(45,90,227,0.5)';
     };
     btn.classList.add('sort-custom-btn');
@@ -359,7 +313,6 @@ function createCategoryBar() {
   
   searchContainer.parentNode.insertBefore(bar, searchContainer.nextSibling);
   
-  // Dropdown functions
   function openDropdown() {
     dropdown.style.maxHeight = '400px';
     dropdown.style.opacity = '1';
@@ -382,39 +335,43 @@ function createCategoryBar() {
   
   catBtn.onclick = (e) => {
     e.stopPropagation();
-    if (categoryOpen) {
-      closeDropdown();
-    } else {
-      openDropdown();
-    }
+    if (categoryOpen) closeDropdown();
+    else openDropdown();
   };
   
   document.addEventListener('click', (e) => {
-    if (!bar.contains(e.target) && categoryOpen) {
-      closeDropdown();
-    }
+    if (!bar.contains(e.target) && categoryOpen) closeDropdown();
   });
 }
 
-// Initialize
 function init() {
-  console.log('🚀 Initializing categories system...');
-  storeOriginalOrder();
-  createCategoryBar();
-  addCategoryTags();
-  updateGames();
+  console.log('🚀 Categories ready, waiting for games...');
+  // Wait for games to actually be in the DOM
+  var attempts = 0;
+  var checkInterval = setInterval(function() {
+    var container = document.getElementById('gamesContainer');
+    if (container && container.children.length > 0) {
+      clearInterval(checkInterval);
+      console.log('✅ Games found, initializing categories...');
+      storeOriginalOrder();
+      createCategoryBar();
+      addCategoryTags();
+      updateGames();
+    }
+    attempts++;
+    if (attempts > 50) {
+      clearInterval(checkInterval);
+      console.log('⚠️ Categories timed out waiting for games');
+    }
+  }, 200);
 }
 
-// Wait for DOM and gamesData
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(init, 500);
-  });
+  document.addEventListener('DOMContentLoaded', () => { setTimeout(init, 500); });
 } else {
   setTimeout(init, 500);
 }
 
-// Watch for gamesData to load
 let attempts = 0;
 const waitForGames = setInterval(() => {
   attempts++;
@@ -430,4 +387,4 @@ const waitForGames = setInterval(() => {
   }
 }, 200);
 
-console.log('✅ Categories script loaded - check console for debug info');
+console.log('✅ Categories script loaded - horror category added!');
