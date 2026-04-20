@@ -202,6 +202,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 .modal-buttons{display:flex;gap:8px;justify-content:flex-end}
 .btn-cancel{padding:8px 16px;border-radius:50px;border:1px solid var(--blue-border);background:transparent;color:var(--muted);cursor:pointer}
 .toast{position:fixed;bottom:20px;right:20px;background:var(--surface);border:1px solid var(--blue-border);border-radius:10px;padding:10px 16px;font-size:12px;animation:toastIn var(--t-med) var(--ease-spring);z-index:20000}
+  /* MODERATOR PANEL */
+.moderator-panel{position:fixed;bottom:90px;right:90px;z-index:1000;display:flex;flex-direction:column;align-items:flex-end}
+.moderator-panel-btn{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#00a8ff,#0090dd);border:none;cursor:pointer;font-size:22px;box-shadow:0 4px 15px rgba(0,168,255,0.3);transition:all var(--t-fast) var(--ease-spring);display:flex;align-items:center;justify-content:center}
+.moderator-panel-btn:hover{transform:scale(1.08)}
+.moderator-panel-content{background:var(--surface);border:1px solid #00a8ff;border-radius:16px;width:380px;max-height:65vh;overflow-y:auto;margin-bottom:10px;box-shadow:0 10px 40px rgba(0,0,0,0.4);display:none}
+.moderator-panel-content.open{display:block}
+.moderator-panel-header{padding:12px 16px;border-bottom:1px solid var(--blue-border);font-weight:700;color:#00a8ff;display:flex;justify-content:space-between}
+.moderator-panel-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer}
+    
 </style>
 </head>
 <body>
@@ -284,7 +293,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
   </div>
 </div>
 
-<!-- MOD PANEL -->
+<!-- OWNER PANEL -->
 <div class="mod-panel" id="modPanel">
   <button class="mod-panel-btn" id="modPanelBtn">🛡️</button>
   <div class="mod-panel-content" id="modPanelContent">
@@ -308,7 +317,69 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
     <div class="mod-section"><div class="mod-section-title">📋 COMMANDS</div><div id="commandList"></div></div>
   </div>
 </div>
-
+  <!-- MODERATOR PANEL (separate) -->
+<div class="moderator-panel" id="moderatorPanel">
+  <button class="moderator-panel-btn" id="moderatorPanelBtn">🛡️</button>
+  <div class="moderator-panel-content" id="moderatorPanelContent">
+    <div class="moderator-panel-header">
+      <span>🛡️ MODERATOR PANEL</span>
+      <button class="moderator-panel-close" id="moderatorPanelClose">✕</button>
+    </div>
+    <div class="mod-section">
+      <div class="mod-section-title">⚠️ WARNINGS</div>
+      <div class="mod-row">
+        <select id="warnUserSelect" class="mod-select"></select>
+        <input type="text" id="warnReason" placeholder="Reason" class="mod-input" style="flex:2">
+        <button class="btn-danger-action" id="warnBtn">⚠️ Warn</button>
+      </div>
+      <div id="warningList" style="font-size:11px;margin-top:8px;max-height:100px;overflow-y:auto"></div>
+    </div>
+    <div class="mod-section">
+      <div class="mod-section-title">⏱️ TIMEOUTS</div>
+      <div class="mod-row">
+        <select id="timeoutUserSelect" class="mod-select"></select>
+        <input type="number" id="timeoutMinutes" placeholder="Minutes" class="mod-input" style="width:80px">
+        <button class="btn-danger-action" id="timeoutBtn">Timeout</button>
+      </div>
+      <div class="mod-row">
+        <select id="untimeoutUserSelect" class="mod-select"></select>
+        <button class="btn-mod-action" id="untimeoutBtn">Remove Timeout</button>
+      </div>
+    </div>
+    <div class="mod-section">
+      <div class="mod-section-title">👢 KICK / BAN</div>
+      <div class="mod-row">
+        <select id="kickUserSelect" class="mod-select"></select>
+        <button class="btn-danger-action" id="kickBtn">👢 Kick</button>
+      </div>
+      <div class="mod-row">
+        <select id="banUserSelect" class="mod-select"></select>
+        <button class="btn-danger-action" id="banBtn">🔨 Ban</button>
+        <button class="btn-mod-action" id="unbanBtn">🔓 Unban</button>
+      </div>
+    </div>
+    <div class="mod-section">
+      <div class="mod-section-title">📝 MESSAGE MODERATION</div>
+      <div class="mod-row">
+        <input type="text" id="purgeCount" placeholder="Messages to delete (1-100)" class="mod-input">
+        <button class="btn-danger-action" id="purgeBtn">🗑️ Purge</button>
+      </div>
+      <div class="mod-row">
+        <input type="text" id="slowModeSec" placeholder="Slow mode (seconds)" class="mod-input">
+        <button class="btn-mod-action" id="channelSlowModeBtn">Set Slow Mode</button>
+      </div>
+    </div>
+    <div class="mod-section">
+      <div class="mod-section-title">📋 MOD LOGS</div>
+      <div class="mod-row">
+        <button class="btn-mod-action" id="viewModLogsBtn">View Logs</button>
+        <button class="btn-danger-action" id="clearModLogsBtn">Clear Logs</button>
+      </div>
+      <div id="modLogsList" style="font-size:10px;margin-top:8px;max-height:120px;overflow-y:auto"></div>
+    </div>
+  </div>
+</div>
+    
 <!-- GROUP HOST PANEL -->
 <div class="group-host-panel" id="groupHostPanel">
   <button class="group-host-panel-btn" id="groupHostPanelBtn" style="display:none">👑</button>
@@ -832,6 +903,7 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('quickUserSelect').innerHTML = userOptions;
       document.getElementById('modUserSelect').innerHTML = userOptions;
     } catch(e) {}
+      updateModDropdowns();
   }
 
   async function updatePresence() {
@@ -1244,10 +1316,210 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(loadMembers, 10000);
     setInterval(updatePresence, 30000);
     setTimeout(() => updateChannelPill(), 100);
+      updateModeratorPanelVisibility();
   }
-
+  // ============================================================
+  // MODERATOR PANEL (separate from owner)
+  // ============================================================
+  const moderatorPanelBtn = document.getElementById('moderatorPanelBtn');
+  const moderatorPanelContent = document.getElementById('moderatorPanelContent');
+  const moderatorPanelClose = document.getElementById('moderatorPanelClose');
+  
+  moderatorPanelBtn.onclick = () => { moderatorPanelContent.classList.toggle('open'); };
+  moderatorPanelClose.onclick = () => { moderatorPanelContent.classList.remove('open'); };
+  
+  // Warning system
+  let userWarnings = safeJSON('userWarnings', {});
+  let modLogs = safeJSON('modLogs', []);
+  
+  function saveWarnings() { localStorage.setItem('userWarnings', JSON.stringify(userWarnings)); }
+  function saveModLogs() { localStorage.setItem('modLogs', JSON.stringify(modLogs)); }
+  
+  function addModLog(action, target, reason = '') {
+    modLogs.unshift({ action, target, reason, mod: currentUser.displayName || currentUser.username, time: new Date().toISOString() });
+    modLogs = modLogs.slice(0, 50);
+    saveModLogs();
+    updateModLogsDisplay();
+  }
+  
+  function updateModLogsDisplay() {
+    const container = document.getElementById('modLogsList');
+    if (container) {
+      container.innerHTML = modLogs.slice(0, 10).map(log => 
+        `<div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:10px">
+          <span style="color:var(--gold)">${log.action}</span> ${log.target} — ${log.reason || 'no reason'}
+          <span style="color:gray;float:right">${new Date(log.time).toLocaleTimeString()}</span>
+        </div>`
+      ).join('') || '<div style="color:gray;padding:4px">no logs yet</div>';
+    }
+  }
+  
+  async function warnUser(username, reason) {
+    if (!hasModPermissions(currentUser.displayName || currentUser.username)) return;
+    if (!userWarnings[username]) userWarnings[username] = [];
+    userWarnings[username].push({ reason, by: currentUser.displayName, time: Date.now() });
+    saveWarnings();
+    addModLog('WARN', username, reason);
+    toast(`⚠️ Warned ${username}: ${reason}`);
+    
+    // Auto-timeout after 3 warnings
+    if (userWarnings[username].length >= 3) {
+      await timeoutUser(username, 60);
+      toast(`🔨 ${username} auto-timeout (3 warnings)`);
+    }
+    updateWarningList();
+  }
+  
+  function updateWarningList() {
+    const container = document.getElementById('warningList');
+    if (container) {
+      const warnings = Object.entries(userWarnings).slice(0, 10);
+      container.innerHTML = warnings.map(([user, warns]) => 
+        `<div style="padding:3px 0;font-size:10px"><span style="color:#ff8888">⚠️ ${user}</span> (${warns.length} warns)</div>`
+      ).join('') || '<div style="color:gray">no warnings</div>';
+    }
+  }
+  
+  async function timeoutUser(username, minutes) {
+    if (!hasModPermissions(currentUser.displayName || currentUser.username)) return;
+    const timeouts = safeJSON('userTimeouts', {});
+    timeouts[username] = Date.now() + (minutes * 60 * 1000);
+    localStorage.setItem('userTimeouts', JSON.stringify(timeouts));
+    addModLog('TIMEOUT', username, `${minutes} minutes`);
+    toast(`⏱️ Timed out ${username} for ${minutes} minutes`);
+    
+    // Send system message
+    await insertSystemMessage(`⏱️ ${username} was timed out for ${minutes} minutes by ${currentUser.displayName}`);
+  }
+  
+  async function untimeoutUser(username) {
+    if (!hasModPermissions(currentUser.displayName || currentUser.username)) return;
+    const timeouts = safeJSON('userTimeouts', {});
+    delete timeouts[username];
+    localStorage.setItem('userTimeouts', JSON.stringify(timeouts));
+    addModLog('UNTIMEOUT', username, '');
+    toast(`✅ Removed timeout for ${username}`);
+    await insertSystemMessage(`✅ ${username} was untimed out by ${currentUser.displayName}`);
+  }
+  
+  async function kickUser(username) {
+    if (!hasModPermissions(currentUser.displayName || currentUser.username)) return;
+    addModLog('KICK', username, '');
+    toast(`👢 Kicked ${username}`);
+    await insertSystemMessage(`👢 ${username} was kicked by ${currentUser.displayName}`);
+  }
+  
+  async function banUser(username) {
+    if (!isOwner(currentUser.displayName || currentUser.username)) {
+      toast('❌ Only owners can ban users');
+      return;
+    }
+    addModLog('BAN', username, '');
+    toast(`🔨 Banned ${username}`);
+    await insertSystemMessage(`🔨 ${username} was permanently banned by ${currentUser.displayName}`);
+  }
+  
+  async function unbanUser(username) {
+    if (!isOwner(currentUser.displayName || currentUser.username)) return;
+    addModLog('UNBAN', username, '');
+    toast(`🔓 Unbanned ${username}`);
+    await insertSystemMessage(`🔓 ${username} was unbanned by ${currentUser.displayName}`);
+  }
+  
+  async function purgeMessages(count) {
+    if (!hasModPermissions(currentUser.displayName || currentUser.username)) return;
+    const { data } = await sb.from('fanter_chat').select('id').eq('channel_id', currentChannel).limit(count);
+    if (data && data.length) {
+      const ids = data.map(m => m.id);
+      await sb.from('fanter_chat').delete().in('id', ids);
+      addModLog('PURGE', `${count} messages`, `in #${currentChannel}`);
+      toast(`🗑️ Purged ${count} messages`);
+      await insertSystemMessage(`🗑️ ${count} messages were purged by ${currentUser.displayName}`);
+      loadMessages();
+    }
+  }
+  
+  async function setChannelSlowMode(seconds) {
+    if (!hasModPermissions(currentUser.displayName || currentUser.username)) return;
+    globalSlowMode = seconds;
+    addModLog('SLOWMODE', `${seconds}s`, `in #${currentChannel}`);
+    toast(`🐢 Slow mode set to ${seconds} seconds`);
+    await insertSystemMessage(`🐢 Slow mode set to ${seconds}s in #${currentChannel} by ${currentUser.displayName}`);
+  }
+  
+  async function insertSystemMessage(text) {
+    await sb.from('fanter_chat').insert({
+      channel_id: currentChannel,
+      user_id: 'system',
+      username: '⚙️ SYSTEM',
+      message: text,
+      nameColor: '#888888',
+    });
+  }
+  
+  // Bind moderator panel buttons
+  document.getElementById('warnBtn').onclick = () => {
+    const user = document.getElementById('warnUserSelect').value;
+    const reason = document.getElementById('warnReason').value;
+    if (user && reason) warnUser(user, reason);
+    document.getElementById('warnReason').value = '';
+  };
+  document.getElementById('timeoutBtn').onclick = () => {
+    const user = document.getElementById('timeoutUserSelect').value;
+    const minutes = parseInt(document.getElementById('timeoutMinutes').value);
+    if (user && minutes) timeoutUser(user, minutes);
+  };
+  document.getElementById('untimeoutBtn').onclick = () => {
+    const user = document.getElementById('untimeoutUserSelect').value;
+    if (user) untimeoutUser(user);
+  };
+  document.getElementById('kickBtn').onclick = () => {
+    const user = document.getElementById('kickUserSelect').value;
+    if (user) kickUser(user);
+  };
+  document.getElementById('banBtn').onclick = () => {
+    const user = document.getElementById('banUserSelect').value;
+    if (user) banUser(user);
+  };
+  document.getElementById('unbanBtn').onclick = () => {
+    const user = document.getElementById('banUserSelect').value;
+    if (user) unbanUser(user);
+  };
+  document.getElementById('purgeBtn').onclick = () => {
+    const count = parseInt(document.getElementById('purgeCount').value);
+    if (count && count > 0 && count <= 100) purgeMessages(count);
+  };
+  document.getElementById('channelSlowModeBtn').onclick = () => {
+    const sec = parseInt(document.getElementById('slowModeSec').value);
+    if (sec >= 0) setChannelSlowMode(sec);
+  };
+  document.getElementById('viewModLogsBtn').onclick = () => updateModLogsDisplay();
+  document.getElementById('clearModLogsBtn').onclick = () => {
+    if (confirm('Clear all mod logs?')) { modLogs = []; saveModLogs(); updateModLogsDisplay(); toast('Logs cleared'); }
+  };
+  
+  function updateModDropdowns() {
+    const userOptions = allUsersList.map(u => `<option value="${esc(u.username)}">${esc(u.display_name || u.username)}</option>`).join('');
+    document.getElementById('warnUserSelect').innerHTML = userOptions;
+    document.getElementById('timeoutUserSelect').innerHTML = userOptions;
+    document.getElementById('untimeoutUserSelect').innerHTML = userOptions;
+    document.getElementById('kickUserSelect').innerHTML = userOptions;
+    document.getElementById('banUserSelect').innerHTML = userOptions;
+  }
+  
+  function updateModeratorPanelVisibility() {
+    const isMod = hasModPermissions(currentUser.displayName || currentUser.username);
+    moderatorPanelBtn.style.display = isMod ? 'flex' : 'none';
+    if (isMod) {
+      updateModDropdowns();
+      updateWarningList();
+      updateModLogsDisplay();
+    }
+  }
   console.log('✅ Fantarena ready!');
 });
+  
 </script>
+   
 </body>
 </html>
