@@ -29,11 +29,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 @keyframes floatIn{0%{opacity:0;transform:translateY(30px)}100%{opacity:1;transform:translateY(0)}}
 @keyframes msgIn{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:translateY(0)}}
 @keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
-@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 @keyframes confettiFall{0%{transform:translateY(-100px) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(360deg);opacity:0}}
 @keyframes firework{0%{transform:scale(0);opacity:1}100%{transform:scale(20);opacity:0}}
 @keyframes announcementGlow{0%,100%{box-shadow:0 0 20px rgba(255,204,0,0.3)}50%{box-shadow:0 0 60px rgba(255,204,0,0.8)}}
 @keyframes pillSlide{0%{transform:translateY(-20px);opacity:0}100%{transform:translateY(0);opacity:1}}
+@keyframes flame{0%{text-shadow:0 0 2px #ff4400,0 0 4px #ff6600,0 0 6px #ff8800}50%{text-shadow:0 0 4px #ff6600,0 0 8px #ff8800,0 0 12px #ffaa00}100%{text-shadow:0 0 2px #ff4400,0 0 4px #ff6600,0 0 6px #ff8800}}
+@keyframes purpleGlow{0%{text-shadow:0 0 2px #9f5ae3,0 0 4px #bf7ae3}50%{text-shadow:0 0 4px #bf7ae3,0 0 8px #df9aff}100%{text-shadow:0 0 2px #9f5ae3,0 0 4px #bf7ae3}}
+@keyframes greenGlow{0%{text-shadow:0 0 2px #00e87a,0 0 4px #33ff99}50%{text-shadow:0 0 4px #33ff99,0 0 8px #66ffbb}100%{text-shadow:0 0 2px #00e87a,0 0 4px #33ff99}}
 
 /* WELCOME */
 .welcome-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:9999;background:var(--bg);transition:opacity var(--t-slow) var(--ease)}
@@ -51,7 +53,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 
 /* SIDEBAR WITH PILL */
 .sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--blue-border);display:flex;flex-direction:column;overflow:hidden;position:relative}
-.channel-pill{position:absolute;left:0;width:3px;background:linear-gradient(180deg,var(--gold),rgba(255,204,0,0.6));border-radius:0 3px 3px 0;box-shadow:2px 0 12px rgba(255,204,0,0.45);transition:top var(--t-med) var(--ease-out);z-index:10;opacity:0;animation:pillSlide 0.3s ease}
+.channel-pill{position:absolute;left:0;width:5px;background:linear-gradient(180deg,var(--gold),rgba(255,204,0,0.8));border-radius:0 5px 5px 0;box-shadow:0 0 12px rgba(255,204,0,0.6);transition:top var(--t-med) var(--ease-out);z-index:10;opacity:0;animation:pillSlide 0.3s ease}
 .channel-pill.visible{opacity:1}
 .sidebar-header{padding:18px 16px;font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--gold);border-bottom:1px solid var(--blue-border)}
 .sidebar-scroll{flex:1;overflow-y:auto;padding-bottom:8px}
@@ -68,6 +70,34 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 .sidebar-footer{padding:10px;border-top:1px solid var(--blue-border);display:flex;flex-direction:column;gap:5px}
 .footer-btn{width:100%;padding:9px 14px;border-radius:10px;border:none;background:rgba(255,255,255,0.05);color:var(--text);font-size:13px;cursor:pointer;text-align:left;transition:all var(--t-fast) var(--ease)}
 .footer-btn:hover{background:rgba(255,255,255,0.1);transform:translateX(2px)}
+
+/* MOD PANEL BUTTON (FIXED - NOT CLIPPING) */
+.mod-panel{position:fixed;bottom:20px;right:20px;z-index:1000;display:flex;flex-direction:column;align-items:flex-end}
+.mod-panel-btn{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#ffaa00);border:none;cursor:pointer;font-size:24px;box-shadow:0 4px 20px rgba(255,204,0,0.4);transition:all var(--t-fast) var(--ease-spring);display:flex;align-items:center;justify-content:center}
+.mod-panel-btn:hover{transform:scale(1.1)}
+.mod-panel-content{background:var(--surface);border:1px solid var(--gold-border);border-radius:20px;width:420px;max-height:70vh;overflow-y:auto;margin-bottom:15px;box-shadow:0 20px 50px rgba(0,0,0,0.5);display:none}
+.mod-panel-content.open{display:block}
+.mod-panel-header{padding:16px 20px;border-bottom:1px solid var(--blue-border);font-family:'Syne',sans-serif;font-weight:700;color:var(--gold);display:flex;justify-content:space-between;align-items:center}
+.mod-panel-close{background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;transition:transform var(--t-fast) var(--ease)}
+.mod-panel-close:hover{transform:rotate(90deg);color:var(--gold)}
+.mod-section{padding:12px 16px;border-bottom:1px solid var(--blue-border)}
+.mod-section-title{font-size:11px;font-weight:600;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.mod-row{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.mod-input{flex:1;padding:8px 12px;border-radius:10px;border:1px solid var(--blue-border);background:rgba(0,0,0,0.3);color:var(--text);min-width:80px}
+.mod-select{flex:1;padding:8px 12px;border-radius:10px;border:1px solid var(--blue-border);background:rgba(0,0,0,0.3);color:var(--text)}
+.btn-mod-action{background:rgba(255,204,0,0.15);color:var(--gold);border:1px solid var(--gold-border);padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:600;transition:all var(--t-fast) var(--ease)}
+.btn-mod-action:hover{background:rgba(255,204,0,0.3);transform:translateY(-2px)}
+.btn-danger-action{background:rgba(255,68,68,0.15);color:var(--red);border:1px solid rgba(255,68,68,0.3);padding:8px 12px;border-radius:10px;cursor:pointer;transition:all var(--t-fast) var(--ease)}
+.btn-danger-action:hover{background:rgba(255,68,68,0.3);transform:translateY(-2px)}
+
+/* GROUP HOST PANEL */
+.group-host-panel{position:fixed;bottom:20px;left:20px;z-index:1000;display:flex;flex-direction:column;align-items:flex-start}
+.group-host-panel-btn{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--purple),#7a3ac0);border:none;cursor:pointer;font-size:24px;box-shadow:0 4px 20px rgba(159,90,227,0.4);transition:all var(--t-fast) var(--ease-spring);display:flex;align-items:center;justify-content:center}
+.group-host-panel-btn:hover{transform:scale(1.1)}
+.group-host-panel-content{background:var(--surface);border:1px solid var(--purple);border-radius:20px;width:380px;max-height:70vh;overflow-y:auto;margin-bottom:15px;box-shadow:0 20px 50px rgba(0,0,0,0.5);display:none}
+.group-host-panel-content.open{display:block}
+.group-host-header{padding:16px 20px;border-bottom:1px solid var(--blue-border);font-family:'Syne',sans-serif;font-weight:700;color:var(--purple);display:flex;justify-content:space-between}
+.group-host-close{background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer}
 
 /* CHAT AREA */
 .chat-area{flex:1;display:flex;flex-direction:column}
@@ -86,16 +116,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 .msg-avatar:hover{transform:scale(1.12)}
 .msg-body{flex:1}
 .msg-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
-.msg-name{font-weight:600;font-size:14px;cursor:pointer}
-.msg-name[style*="color: #ff4444"]{text-shadow:0 0 5px #ff4444,0 0 10px rgba(255,68,68,0.5)}
-.msg-name[style*="color: #9f5ae3"]{text-shadow:0 0 5px #9f5ae3,0 0 10px rgba(159,90,227,0.5)}
-.msg-name[style*="color: #00e87a"]{text-shadow:0 0 5px #00e87a,0 0 10px rgba(0,232,122,0.5)}
+.msg-name{font-weight:600;font-size:14px;cursor:pointer;transition:text-shadow 0.2s}
+.msg-name.fire{animation:flame 1.5s ease-in-out infinite}
+.msg-name.purple{animation:purpleGlow 1.5s ease-in-out infinite}
+.msg-name.green{animation:greenGlow 1.5s ease-in-out infinite}
 .msg-lv{background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);border-radius:6px;padding:1px 6px;font-size:10px}
 .mod-badge{background:var(--gold);color:#1a1200;border-radius:4px;padding:2px 6px;font-size:9px;margin-left:6px}
 .owner-badge{background:#ff4444;color:white;border-radius:4px;padding:2px 6px;font-size:9px;margin-left:6px}
 .msg-time{font-size:10px;color:var(--muted)}
 .msg-text{margin-top:3px;font-size:14px;line-height:1.55;word-break:break-word}
-.msg-text img{max-width:220px;border-radius:10px}
+.msg-text img{max-width:220px;border-radius:10px;cursor:pointer}
 .msg-actions{position:absolute;right:10px;top:50%;transform:translateY(-50%);display:flex;gap:3px;opacity:0;transition:opacity var(--t-fast) var(--ease);background:var(--surface);border:1px solid var(--blue-border);border-radius:10px;padding:3px 5px}
 .msg-action-btn{background:none;border:none;cursor:pointer;font-size:14px;padding:3px 5px;border-radius:6px;color:var(--muted);transition:all var(--t-fast) var(--ease)}
 .msg-action-btn:hover{background:var(--blue-dim);transform:scale(1.2)}
@@ -151,41 +181,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 .member-activity{font-size:10px;color:var(--muted)}
 .section-sep{font-size:10px;letter-spacing:0.8px;text-transform:uppercase;color:var(--muted);margin:10px 8px 4px}
 
-/* MOD PANEL */
-.mod-panel{position:fixed;bottom:20px;right:20px;z-index:1000;transform:translateX(420px);transition:transform var(--t-slow) var(--ease-out)}
-.mod-panel.open{transform:translateX(0)}
-.mod-panel-btn{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#ffaa00);border:none;cursor:pointer;font-size:24px;box-shadow:0 4px 20px rgba(255,204,0,0.4);transition:all var(--t-fast) var(--ease-spring);margin-left:auto;display:flex;align-items:center;justify-content:center}
-.mod-panel-btn:hover{transform:scale(1.1)}
-.mod-panel-content{background:var(--surface);border:1px solid var(--gold-border);border-radius:20px;width:420px;max-height:85vh;overflow-y:auto;margin-bottom:15px;box-shadow:0 20px 50px rgba(0,0,0,0.5)}
-.mod-panel-header{padding:16px 20px;border-bottom:1px solid var(--blue-border);font-family:'Syne',sans-serif;font-weight:700;color:var(--gold);display:flex;justify-content:space-between;align-items:center}
-.mod-panel-close{background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;transition:transform var(--t-fast) var(--ease)}
-.mod-panel-close:hover{transform:rotate(90deg);color:var(--gold)}
-.mod-section{padding:12px 16px;border-bottom:1px solid var(--blue-border)}
-.mod-section-title{font-size:11px;font-weight:600;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
-.mod-row{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap}
-.mod-input{flex:1;padding:8px 12px;border-radius:10px;border:1px solid var(--blue-border);background:rgba(0,0,0,0.3);color:var(--text);min-width:80px}
-.mod-select{flex:1;padding:8px 12px;border-radius:10px;border:1px solid var(--blue-border);background:rgba(0,0,0,0.3);color:var(--text)}
-.mod-select option{background:var(--surface)}
-.btn-mod-action{background:rgba(255,204,0,0.15);color:var(--gold);border:1px solid var(--gold-border);padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:600;transition:all var(--t-fast) var(--ease)}
-.btn-mod-action:hover{background:rgba(255,204,0,0.3);transform:translateY(-2px)}
-.btn-danger-action{background:rgba(255,68,68,0.15);color:var(--red);border:1px solid rgba(255,68,68,0.3);padding:8px 12px;border-radius:10px;cursor:pointer;transition:all var(--t-fast) var(--ease)}
-.btn-danger-action:hover{background:rgba(255,68,68,0.3);transform:translateY(-2px)}
-.command-item{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface2);border-radius:12px;margin-bottom:6px}
-.command-text{font-family:monospace;font-size:11px;background:rgba(0,0,0,0.3);padding:4px 8px;border-radius:6px;color:var(--gold)}
-.command-desc{flex:1;font-size:12px}
-.command-copy{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:6px;transition:all var(--t-fast) var(--ease)}
-.command-copy:hover{background:var(--blue-dim);color:var(--gold)}
-
-/* GROUP HOST PANEL */
-.group-host-panel{position:fixed;bottom:20px;left:20px;z-index:1000;transform:translateX(-420px);transition:transform var(--t-slow) var(--ease-out)}
-.group-host-panel.open{transform:translateX(0)}
-.group-host-panel-btn{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--purple),#7a3ac0);border:none;cursor:pointer;font-size:24px;box-shadow:0 4px 20px rgba(159,90,227,0.4);transition:all var(--t-fast) var(--ease-spring);display:flex;align-items:center;justify-content:center}
-.group-host-panel-btn:hover{transform:scale(1.1)}
-.group-host-panel-content{background:var(--surface);border:1px solid var(--purple);border-radius:20px;width:380px;max-height:80vh;overflow-y:auto;margin-bottom:15px;box-shadow:0 20px 50px rgba(0,0,0,0.5)}
-.group-host-header{padding:16px 20px;border-bottom:1px solid var(--blue-border);font-family:'Syne',sans-serif;font-weight:700;color:var(--purple);display:flex;justify-content:space-between}
-.group-host-close{background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer}
-.group-host-close:hover{transform:rotate(90deg);color:var(--purple)}
-
 /* ANNOUNCEMENT OVERLAY */
 .announcement-overlay{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.9);background:linear-gradient(135deg,var(--surface),rgba(20,30,50,0.98));border:2px solid var(--gold);border-radius:30px;padding:40px 60px;text-align:center;z-index:20000;opacity:0;pointer-events:none;transition:all 0.3s var(--ease-spring);max-width:90vw}
 .announcement-overlay.show{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:all;animation:announcementGlow 2s infinite}
@@ -193,7 +188,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 .announcement-message{font-size:18px;color:var(--text);margin-bottom:20px}
 .announcement-close{background:var(--gold);border:none;border-radius:30px;padding:8px 25px;color:#1a1200;font-weight:700;cursor:pointer}
 
-/* PROFILE CARD - FIXED */
+/* ACHIEVEMENTS MODAL */
+.achievements-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.9);background:var(--surface);border:2px solid var(--gold);border-radius:24px;padding:25px;width:500px;max-width:90vw;max-height:80vh;overflow-y:auto;z-index:20001;opacity:0;pointer-events:none;transition:all 0.3s var(--ease-spring)}
+.achievements-modal.show{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:all}
+.achievements-header{font-size:20px;font-weight:700;color:var(--gold);margin-bottom:15px;display:flex;justify-content:space-between}
+.achievements-close{background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer}
+.achievements-list{display:flex;flex-direction:column;gap:10px}
+.achievement-item{display:flex;align-items:center;gap:12px;padding:10px;background:var(--surface2);border-radius:12px;border-left:3px solid var(--gold)}
+.achievement-icon{font-size:24px}
+.achievement-info{flex:1}
+.achievement-name{font-weight:600;font-size:13px}
+.achievement-desc{font-size:10px;color:var(--muted)}
+.achievement-status{font-size:11px;color:var(--gold)}
+.achievement-locked{opacity:0.5;filter:grayscale(0.5)}
+
+/* PROFILE CARD */
 .profile-card{width:380px;padding:0;overflow:hidden;background:var(--surface);border-radius:24px}
 .profile-banner{height:100px;background:linear-gradient(135deg,var(--blue),var(--purple));position:relative}
 .profile-avatar-big{position:absolute;bottom:-40px;left:20px;width:80px;height:80px;border:4px solid var(--surface);background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:700;overflow:hidden;cursor:pointer}
@@ -213,8 +222,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 .profile-stat{text-align:center}
 .stat-val{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--gold)}
 .stat-lbl{font-size:10px;color:var(--muted)}
-.badges-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
-.badge{background:var(--gold-dim);border:1px solid var(--gold-border);border-radius:20px;padding:4px 10px;font-size:11px}
 .profile-actions{display:flex;gap:10px;margin-top:10px}
 .profile-actions button{flex:1;padding:8px;border-radius:30px;border:none;font-weight:600;cursor:pointer;transition:all var(--t-fast) var(--ease)}
 .profile-actions button:hover{transform:translateY(-2px)}
@@ -222,19 +229,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 .btn-mod{background:rgba(255,204,0,0.15);border:1px solid var(--gold-border);color:var(--gold)}
 .btn-danger{background:rgba(255,68,68,0.15);border:1px solid rgba(255,68,68,0.3);color:#ff8888}
 .profile-close-btn{background:rgba(255,255,255,0.1);color:white}
-
-/* ACHIEVEMENTS MODAL */
-.achievements-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.9);background:var(--surface);border:2px solid var(--gold);border-radius:24px;padding:25px;width:500px;max-width:90vw;max-height:80vh;overflow-y:auto;z-index:20001;opacity:0;pointer-events:none;transition:all 0.3s var(--ease-spring)}
-.achievements-modal.show{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:all}
-.achievements-header{font-size:20px;font-weight:700;color:var(--gold);margin-bottom:15px;display:flex;justify-content:space-between}
-.achievements-close{background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer}
-.achievements-list{display:flex;flex-direction:column;gap:10px}
-.achievement-item{display:flex;align-items:center;gap:12px;padding:10px;background:var(--surface2);border-radius:12px;border-left:3px solid var(--gold)}
-.achievement-icon{font-size:24px}
-.achievement-info{flex:1}
-.achievement-name{font-weight:600;font-size:13px}
-.achievement-desc{font-size:10px;color:var(--muted)}
-.achievement-status{font-size:11px;color:var(--gold)}
 
 /* OVERLAYS */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:10000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity var(--t-med) var(--ease);backdrop-filter:blur(6px)}
@@ -333,9 +327,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
   </div>
 </div>
 
-<!-- MOD PANEL (Owner/Mod) -->
+<!-- MOD PANEL -->
 <div class="mod-panel" id="modPanel">
-  <div class="mod-panel-content">
+  <button class="mod-panel-btn" id="modPanelBtn">🛡️</button>
+  <div class="mod-panel-content" id="modPanelContent">
     <div class="mod-panel-header">
       <span>🛡️ MOD CONTROL PANEL</span>
       <button class="mod-panel-close" id="modPanelClose">✕</button>
@@ -407,12 +402,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
       <div id="commandList"></div>
     </div>
   </div>
-  <button class="mod-panel-btn" id="modPanelBtn">🛡️</button>
 </div>
 
 <!-- GROUP HOST PANEL -->
 <div class="group-host-panel" id="groupHostPanel">
-  <div class="group-host-panel-content">
+  <button class="group-host-panel-btn" id="groupHostPanelBtn" style="display:none">👑</button>
+  <div class="group-host-panel-content" id="groupHostPanelContent">
     <div class="group-host-header">
       <span>👑 GROUP HOST CONTROLS</span>
       <button class="group-host-close" id="groupHostClose">✕</button>
@@ -450,7 +445,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
       </div>
     </div>
   </div>
-  <button class="group-host-panel-btn" id="groupHostPanelBtn">👑</button>
 </div>
 
 <!-- ANNOUNCEMENT OVERLAY -->
@@ -491,7 +485,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
         <div class="profile-stat"><div class="stat-val" id="profileLevel">1</div><div class="stat-lbl">level</div></div>
         <div class="profile-stat"><div class="stat-val" id="profileXP">0</div><div class="stat-lbl">xp</div></div>
       </div>
-      <div class="badges-row" id="profileBadges"></div>
       <div class="profile-actions">
         <button class="btn-primary" id="dmFromProfileBtn">💬 Message</button>
         <button class="profile-close-btn" id="closeProfileBtn">Close</button>
@@ -626,6 +619,7 @@ document.addEventListener('DOMContentLoaded', function() {
   let allUsersList = [];
   let groupSlowMode = 0;
   let groupLastMessageTime = {};
+  let friendsList = [];
 
   function safeJSON(key, fallback) {
     try { return JSON.parse(localStorage.getItem(key)) || fallback; }
@@ -653,7 +647,6 @@ document.addEventListener('DOMContentLoaded', function() {
     localStorage.setItem('fanter_currentUser', JSON.stringify(currentUser));
     document.getElementById('coinCount').textContent = currentUser.coins;
   }
-  function updateCoinDisplay() { document.getElementById('coinCount').textContent = coins(); }
 
   // ============================================================
   // LEVEL SYSTEM
@@ -673,45 +666,49 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // ============================================================
-  // ACHIEVEMENTS
+  // ACHIEVEMENTS (all achievements including secrets)
   // ============================================================
-  const ACHIEVEMENTS = [
-    { name: 'First Message', desc: 'Send your first message', icon: '🎮', check: () => messageCounts[currentUser.id] >= 1 },
-    { name: 'Chatterbox', desc: 'Send 100 messages', icon: '💬', check: () => messageCounts[currentUser.id] >= 100 },
-    { name: 'Level 10', desc: 'Reach level 10', icon: '🔟', check: () => getLevel(userXP[currentUser.id] || 0) >= 10 },
-    { name: 'Level 20', desc: 'Reach level 20', icon: '💎', check: () => getLevel(userXP[currentUser.id] || 0) >= 20 },
-    { name: 'High Roller', desc: 'Win 100 coins in a single bet', icon: '🎰', check: () => false },
-    { name: 'Social Butterfly', desc: 'Make 5 friends', icon: '🦋', check: () => false },
-    { name: 'Group Host', desc: 'Create a group', icon: '👑', check: () => false },
+  const ALL_ACHIEVEMENTS = [
+    { name: 'First Message', desc: 'Send your first message', icon: '🎮', secret: false, check: () => messageCounts[currentUser.id] >= 1 },
+    { name: 'Chatterbox', desc: 'Send 100 messages', icon: '💬', secret: false, check: () => messageCounts[currentUser.id] >= 100 },
+    { name: 'Veteran', desc: 'Send 500 messages', icon: '🎖️', secret: false, check: () => messageCounts[currentUser.id] >= 500 },
+    { name: 'Level 10', desc: 'Reach level 10', icon: '🔟', secret: false, check: () => getLevel(userXP[currentUser.id] || 0) >= 10 },
+    { name: 'Level 20', desc: 'Reach level 20', icon: '💎', secret: false, check: () => getLevel(userXP[currentUser.id] || 0) >= 20 },
+    { name: 'High Roller', desc: 'Win 100 coins in a single bet', icon: '🎰', secret: false, check: () => false },
+    { name: 'Social Butterfly', desc: 'Make 5 friends', icon: '🦋', secret: false, check: () => false },
+    { name: 'Group Host', desc: 'Create a group', icon: '👑', secret: false, check: () => false },
+    { name: 'Secret: Konami Code', desc: '↑↑↓↓←→←→BA', icon: '🎮', secret: true, check: () => false },
+    { name: 'Secret: Alt+F4', desc: 'Leave within 10 seconds', icon: '💀', secret: true, check: () => false },
+    { name: 'Secret: OG Fanter', desc: 'Early access member', icon: '🦖', secret: true, check: () => false },
+    { name: 'Secret: The Chosen One', desc: 'Find all secret names', icon: '👑', secret: true, check: () => false },
+    { name: 'Secret: Mentally Insane', desc: 'Idle for 60 minutes', icon: '🤪', secret: true, check: () => false },
+    { name: 'Secret: System Failure', desc: 'Trigger crash screen', icon: '💻', secret: true, check: () => false },
+    { name: 'Secret: The Owner\'s Gift', desc: 'Given by abcatlmfao', icon: '🎁', secret: true, check: () => false },
   ];
-  
-  function getUserAchievements(userId) {
-    const achievements = [];
-    for (const ach of ACHIEVEMENTS) {
-      if (ach.check && ach.check()) achievements.push(ach);
-    }
-    return achievements;
+
+  function getUserAchievements() {
+    return ALL_ACHIEVEMENTS.map(ach => ({
+      ...ach,
+      unlocked: ach.check ? ach.check() : false
+    }));
   }
-  
+
   function showAchievementsModal() {
-    const achievements = getUserAchievements(currentUser.id);
+    const achievements = getUserAchievements();
     const container = document.getElementById('achievementsList');
     container.innerHTML = achievements.map(ach => `
-      <div class="achievement-item">
+      <div class="achievement-item ${ach.unlocked ? '' : 'achievement-locked'}">
         <div class="achievement-icon">${ach.icon}</div>
         <div class="achievement-info">
           <div class="achievement-name">${ach.name}</div>
           <div class="achievement-desc">${ach.desc}</div>
         </div>
-        <div class="achievement-status">✅</div>
+        <div class="achievement-status">${ach.unlocked ? '✅' : '🔒'}</div>
       </div>
     `).join('');
-    if (achievements.length === 0) {
-      container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">no achievements yet. keep chatting!</div>';
-    }
     document.getElementById('achievementsModal').classList.add('show');
   }
-  
+
   document.getElementById('showAchievementsBtn').onclick = showAchievementsModal;
   document.getElementById('achievementsClose').onclick = () => document.getElementById('achievementsModal').classList.remove('show');
 
@@ -856,7 +853,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       });
     }
-    document.getElementById('groupHostPanel').classList.add('open');
+    document.getElementById('groupHostPanelContent').classList.add('open');
   }
   
   async function groupAddMember(userId) {
@@ -887,10 +884,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const isMod = isModerator(msg.username);
     const isOwnr = isOwner(msg.username);
     const nameColorStyle = msg.nameColor || '#ffcc00';
+    let nameColorClass = '';
     let nameColorAttr = `style="color:${nameColorStyle}"`;
-    if (nameColorStyle === '#ff4444') nameColorAttr = `style="color:#ff4444;text-shadow:0 0 5px #ff4444,0 0 10px rgba(255,68,68,0.5)"`;
-    else if (nameColorStyle === '#9f5ae3') nameColorAttr = `style="color:#9f5ae3;text-shadow:0 0 5px #9f5ae3,0 0 10px rgba(159,90,227,0.5)"`;
-    else if (nameColorStyle === '#00e87a') nameColorAttr = `style="color:#00e87a;text-shadow:0 0 5px #00e87a,0 0 10px rgba(0,232,122,0.5)"`;
+    if (nameColorStyle === '#ff4444') {
+      nameColorClass = 'fire';
+      nameColorAttr = `style="color:#ff4444"`;
+    } else if (nameColorStyle === '#9f5ae3') {
+      nameColorClass = 'purple';
+      nameColorAttr = `style="color:#9f5ae3"`;
+    } else if (nameColorStyle === '#00e87a') {
+      nameColorClass = 'green';
+      nameColorAttr = `style="color:#00e87a"`;
+    }
+    
+    // Check if message contains a GIF URL
+    let messageContent = esc(msg.message);
+    const gifMatch = msg.message.match(/\[GIF\]\s*(https?:\/\/[^\s]+)/i);
+    if (gifMatch) {
+      messageContent = `<img src="${gifMatch[1]}" alt="GIF" onclick="window.open('${gifMatch[1]}')">`;
+    } else if (msg.message.match(/\.(gif|jpg|jpeg|png|webp)(\?.*)?$/i)) {
+      messageContent = `<img src="${esc(msg.message)}" alt="image" onclick="window.open('${esc(msg.message)}')">`;
+    }
+    
     return `
       <div class="message" id="msg-${msg.id}">
         <div class="msg-avatar" onclick="showProfile('${esc(msg.user_id)}')">
@@ -898,13 +913,13 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
         <div class="msg-body">
           <div class="msg-meta">
-            <span class="msg-name" onclick="showProfile('${esc(msg.user_id)}')" ${nameColorAttr}>${esc(msg.username)}</span>
+            <span class="msg-name ${nameColorClass}" onclick="showProfile('${esc(msg.user_id)}')" ${nameColorAttr}>${esc(msg.username)}</span>
             <span class="msg-lv">Lv${lv}</span>
             ${isMod ? '<span class="mod-badge">🛡️ MOD</span>' : ''}
             ${isOwnr ? '<span class="owner-badge">👑 OWNER</span>' : ''}
             <span class="msg-time">${new Date(msg.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span>
           </div>
-          <div class="msg-text">${esc(msg.message)}${msg.edited ? '<span style="font-size:10px;color:var(--muted);margin-left:5px">(edited)</span>' : ''}</div>
+          <div class="msg-text">${messageContent}${msg.edited ? '<span style="font-size:10px;color:var(--muted);margin-left:5px">(edited)</span>' : ''}</div>
           <div class="msg-reactions" id="reactions-${msg.id}"></div>
         </div>
         <div class="msg-actions">
@@ -1096,8 +1111,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // ============================================================
   // GROUPS
   // ============================================================
-  let friendsList = [];
-  
   async function loadGroups() {
     try {
       const { data } = await sb.from('fanter_groups').select('*');
@@ -1129,8 +1142,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const groupHostBtn = document.getElementById('groupHostPanelBtn');
     if (isHost) {
       groupHostBtn.style.display = 'flex';
-      // Store current group for panel
-      window.currentHostGroup = { id: groupId, name: groupName, isHost: true };
+      window.currentHostGroup = { id: groupId, name: groupName, members: currentGroupData.members, isHost: true };
     } else {
       groupHostBtn.style.display = 'none';
     }
@@ -1389,7 +1401,7 @@ document.addEventListener('DOMContentLoaded', function() {
       setupRealtime();
       // Hide group host panel button
       document.getElementById('groupHostPanelBtn').style.display = 'none';
-      document.getElementById('groupHostPanel').classList.remove('open');
+      document.getElementById('groupHostPanelContent').classList.remove('open');
     };
   });
 
@@ -1552,18 +1564,36 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Avatar upload
   async function uploadAvatar(file) {
+    if (!file) return;
     const fileName = `${currentUser.id}_${Date.now()}.${file.name.split('.').pop()}`;
-    const { error } = await sb.storage.from('avatars').upload(fileName, file);
-    if (error) { toast('Upload failed', 'red'); return; }
-    const { data: urlData } = sb.storage.from('avatars').getPublicUrl(fileName);
-    userAvatars[currentUser.id] = urlData.publicUrl;
-    save();
-    await sb.from('fanter_presence').update({ profile_pic: urlData.publicUrl }).eq('user_id', currentUser.id);
-    toast('✅ Profile picture updated!', 'gold');
-    loadMembers();
+    try {
+      const { error } = await sb.storage.from('avatars').upload(fileName, file);
+      if (error) {
+        console.error('Upload error:', error);
+        toast('Upload failed: ' + error.message, 'red');
+        return;
+      }
+      const { data: urlData } = sb.storage.from('avatars').getPublicUrl(fileName);
+      userAvatars[currentUser.id] = urlData.publicUrl;
+      save();
+      await sb.from('fanter_presence').update({ profile_pic: urlData.publicUrl }).eq('user_id', currentUser.id);
+      toast('✅ Profile picture updated!', 'gold');
+      loadMembers();
+      // Update profile card if open
+      const profileOverlay = document.getElementById('profileOverlay');
+      if (profileOverlay.classList.contains('active')) {
+        const avatarEl = document.getElementById('profileAvatar');
+        if (avatarEl) avatarEl.innerHTML = `<img src="${urlData.publicUrl}">`;
+      }
+    } catch(e) {
+      console.error('Upload exception:', e);
+      toast('Upload failed', 'red');
+    }
   }
   document.getElementById('avatarUpload').onchange = async (e) => {
-    if (e.target.files && e.target.files[0]) await uploadAvatar(e.target.files[0]);
+    if (e.target.files && e.target.files[0]) {
+      await uploadAvatar(e.target.files[0]);
+    }
   };
 
   // Typing indicator
@@ -1592,11 +1622,16 @@ document.addEventListener('DOMContentLoaded', function() {
   // ============================================================
   // MOD PANEL
   // ============================================================
-  const modPanel = document.getElementById('modPanel');
   const modPanelBtn = document.getElementById('modPanelBtn');
+  const modPanelContent = document.getElementById('modPanelContent');
   const modPanelClose = document.getElementById('modPanelClose');
-  modPanelBtn.onclick = () => modPanel.classList.toggle('open');
-  modPanelClose.onclick = () => modPanel.classList.remove('open');
+  
+  modPanelBtn.onclick = () => {
+    modPanelContent.classList.toggle('open');
+  };
+  modPanelClose.onclick = () => {
+    modPanelContent.classList.remove('open');
+  };
 
   function updateModPanelVisibility() {
     const isMod = hasModPermissions(currentUser.displayName || currentUser.username);
@@ -1680,17 +1715,17 @@ document.addEventListener('DOMContentLoaded', function() {
   // ============================================================
   // GROUP HOST PANEL
   // ============================================================
-  const groupHostPanel = document.getElementById('groupHostPanel');
   const groupHostPanelBtn = document.getElementById('groupHostPanelBtn');
+  const groupHostPanelContent = document.getElementById('groupHostPanelContent');
   const groupHostClose = document.getElementById('groupHostClose');
   
   groupHostPanelBtn.onclick = () => {
     if (window.currentHostGroup) {
       showGroupHostPanel(window.currentHostGroup.id, window.currentHostGroup);
-      groupHostPanel.classList.add('open');
+      groupHostPanelContent.classList.add('open');
     }
   };
-  groupHostClose.onclick = () => groupHostPanel.classList.remove('open');
+  groupHostClose.onclick = () => groupHostPanelContent.classList.remove('open');
   
   document.getElementById('groupAddMemberBtn').onclick = () => {
     const userId = document.getElementById('groupAddMemberSelect').value;
