@@ -63,7 +63,7 @@
     .server-item { padding: 10px 15px; margin: 2px 8px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,0.7); font-size: 14px; transition: all 0.2s; position: relative; }
     .server-item:hover { background: rgba(45,90,227,0.2); color: white; }
     .server-item.active { background: rgba(45,90,227,0.3); color: #ffcc00; }
-    .server-item.active::before { content: ''; position: absolute; left: -8px; top: 0; bottom: 0; width: 3px; background: #ffcc00; border-radius: 3px; transition: transform 0.2s ease; }
+    .server-item.active::before { content: ''; position: absolute; left: -8px; top: 0; bottom: 0; width: 3px; background: #ffcc00; border-radius: 3px; }
     .unread-badge { background: #ff4444; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-left: auto; animation: pulse 1s infinite; }
     @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
     
@@ -152,8 +152,8 @@
     .profile-card-username { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 10px; }
     .profile-card-activity { font-size: 14px; background: rgba(45,90,227,0.2); padding: 5px 12px; border-radius: 20px; margin-bottom: 10px; }
     .profile-card-bio { font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 20px; max-width: 280px; }
-    .profile-card-buttons { display: flex; gap: 10px; width: 100%; }
-    .profile-card-buttons button { flex: 1; padding: 10px; border-radius: 30px; border: none; cursor: pointer; font-weight: 600; }
+    .profile-card-buttons { display: flex; gap: 10px; width: 100%; flex-wrap: wrap; }
+    .profile-card-buttons button { flex: 1; padding: 10px; border-radius: 30px; border: none; cursor: pointer; font-weight: 600; min-width: 80px; }
     .dm-btn { background: linear-gradient(135deg, #2d5ae3, #1a3a8a); color: white; }
     .coin-btn { background: rgba(255,204,0,0.2); border: 1px solid #ffcc00; color: #ffcc00; }
     .close-profile-btn { background: rgba(255,255,255,0.1); color: white; }
@@ -163,7 +163,7 @@
     .settings-panel.show { display: block; }
     .setting-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
     
-    /* DROP ZONE FOR IMAGES */
+    /* DROP ZONE */
     .drag-over { border: 2px dashed #ffcc00; background: rgba(255,204,0,0.1); }
     
     /* NOTIFICATION */
@@ -197,8 +197,8 @@
       <h3>👥 quick start</h3>
       <p>• click any username to see their profile<br>• react to messages with emojis<br>• drag & drop images to send<br>• use /commands for fun stuff<br>• right-click to copy message link</p>
     </div>
-    <button class="enter-btn" onclick="enterFantarena()">🏟️ enter fantarena</button>
-    <button class="skip-welcome" onclick="forceEnterFantarena()">skip — i've seen this</button>
+    <button class="enter-btn" id="enterBtn">🏟️ enter fantarena</button>
+    <button class="skip-welcome" id="skipBtn">skip — i've seen this</button>
     <p style="margin-top: 15px; opacity: 0.5; font-size: 12px;">press ESC anytime to see this again</p>
   </div>
 </div>
@@ -208,7 +208,7 @@
   <div class="sidebar">
     <div class="sidebar-header">
       <h2>🏟️ FANTARENA</h2>
-      <select class="theme-selector" onchange="setTheme(this.value)">
+      <select class="theme-selector" id="themeSelector">
         <option value="dark">🌙</option><option value="light">☀️</option><option value="amoled">⬛</option>
         <option value="cyberpunk">💜</option><option value="sunset">🌅</option><option value="ocean">🌊</option><option value="forest">🌲</option>
       </select>
@@ -236,7 +236,7 @@
     <div class="groups-section">
       <div class="section-header">
         <span>👥 GROUPS</span>
-        <button class="add-btn" onclick="showCreateGroupModal()">+</button>
+        <button class="add-btn" id="createGroupBtn">+</button>
       </div>
       <div id="groupsList"></div>
     </div>
@@ -245,7 +245,7 @@
     <div class="friends-section">
       <div class="section-header">
         <span>⭐ FANTER FRIENDS</span>
-        <button class="add-btn" onclick="showAddFriendModal()">+</button>
+        <button class="add-btn" id="addFriendBtn">+</button>
       </div>
       <div id="friendsList"></div>
     </div>
@@ -253,8 +253,8 @@
     <!-- BOTTOM BUTTONS -->
     <div style="margin-top: auto; padding: 15px;">
       <button onclick="window.location.href='index.html'" class="send-btn" style="width:100%; padding:8px; background:rgba(255,255,255,0.1); margin-bottom:8px;">← back to fanter</button>
-      <button onclick="openSettings()" class="send-btn" style="width:100%; padding:8px;">⚙️ settings</button>
-      <button onclick="showWelcomeScreen()" class="send-btn" style="width:100%; margin-top:8px; padding:8px; background:rgba(255,255,255,0.1);">❓ help</button>
+      <button id="settingsBtn" class="send-btn" style="width:100%; padding:8px;">⚙️ settings</button>
+      <button id="helpBtn" class="send-btn" style="width:100%; margin-top:8px; padding:8px; background:rgba(255,255,255,0.1);">❓ help</button>
     </div>
   </div>
   
@@ -266,36 +266,36 @@
     </div>
     <div class="channel-topic" id="channelTopicBar">
       <span>📌</span>
-      <span id="channelTopicText" onclick="editChannelTopic()">welcome to the general chat!</span>
+      <span id="channelTopicText" style="cursor:pointer;">welcome to the general chat!</span>
     </div>
     <div class="messages-container" id="messagesContainer">
       <div style="text-align:center; color:rgba(255,255,255,0.4);">loading messages...</div>
     </div>
     <div class="typing-indicator" id="typingIndicator"></div>
     <div class="message-input-container">
-      <div class="reply-bar" id="replyBar" style="display:none;"><span id="replyText"></span><button onclick="cancelReply()">✕</button></div>
+      <div class="reply-bar" id="replyBar" style="display:none;"><span id="replyText"></span><button id="cancelReplyBtn">✕</button></div>
       <div class="draft-indicator" id="draftIndicator" style="display:none;">💾 draft saved</div>
       <div class="input-row">
         <div style="position:relative;">
-          <button class="format-btn" onclick="toggleFormatMenu()">Aa</button>
+          <button class="format-btn" id="formatBtn">Aa</button>
           <div class="format-menu" id="formatMenu">
-            <div class="format-option" onclick="applyFormat('**');"><b>B</b></div>
-            <div class="format-option" onclick="applyFormat('*');"><i>I</i></div>
-            <div class="format-option" onclick="applyFormat('~~');"><s>S</s></div>
-            <div class="format-option" onclick="applyFormat('`');">&lt;/&gt;</div>
+            <div class="format-option" data-format="**"><b>B</b></div>
+            <div class="format-option" data-format="*"><i>I</i></div>
+            <div class="format-option" data-format="~~"><s>S</s></div>
+            <div class="format-option" data-format="`">&lt;/&gt;</div>
           </div>
         </div>
-        <button class="emoji-btn" onclick="toggleEmojiPicker()">😊</button>
-        <button class="gif-btn" onclick="toggleGifPicker()">GIF</button>
-        <button class="image-btn" onclick="document.getElementById('imageUpload').click()">🖼️</button>
-        <input type="file" id="imageUpload" accept="image/*" style="display:none;" onchange="uploadImage(event)">
-        <input type="text" id="messageInput" placeholder="send a message... (try /help)" onkeypress="if(event.key==='Enter'){sendMessage();}" oninput="saveDraft()">
-        <button class="send-btn" onclick="sendMessage()">send</button>
+        <button class="emoji-btn" id="emojiBtn">😊</button>
+        <button class="gif-btn" id="gifBtn">GIF</button>
+        <button class="image-btn" id="imageBtn">🖼️</button>
+        <input type="file" id="imageUpload" accept="image/*" style="display:none;">
+        <input type="text" id="messageInput" placeholder="send a message... (try /help)">
+        <button class="send-btn" id="sendBtn">send</button>
       </div>
     </div>
     <div class="emoji-picker" id="emojiPicker"></div>
     <div class="gif-picker" id="gifPicker">
-      <input type="text" class="gif-search" id="gifSearch" placeholder="search gifs..." oninput="searchGifs(this.value)">
+      <input type="text" class="gif-search" id="gifSearch" placeholder="search gifs...">
       <div class="gif-grid" id="gifGrid"></div>
     </div>
   </div>
@@ -303,7 +303,7 @@
   <div class="members-sidebar">
     <div class="members-header"><span>👥 MEMBERS</span><span id="onlineCount">0 online</span></div>
     <div id="membersList"></div>
-    <button class="send-btn" onclick="openOwnProfileModal()" style="width:100%; margin-top:15px; padding:8px;">✏️ edit my profile</button>
+    <button id="editProfileBtn" class="send-btn" style="width:100%; margin-top:15px; padding:8px;">✏️ edit my profile</button>
   </div>
 </div>
 
@@ -315,853 +315,868 @@
   <div class="profile-card-activity" id="profileCardActivity">🎮 chilling</div>
   <div class="profile-card-bio" id="profileCardBio">Just a gamer</div>
   <div class="profile-card-buttons">
-    <button class="dm-btn" id="profileCardDMBtn" onclick="sendDMFromProfile()">💬 message</button>
-    <button class="coin-btn" id="profileCardCoinBtn" onclick="giveCoinsToUser()">💰 give coins</button>
-    <button class="close-profile-btn" onclick="closeProfileCard()">close</button>
+    <button class="dm-btn" id="profileCardDMBtn">💬 message</button>
+    <button class="coin-btn" id="profileCardCoinBtn">💰 give coins</button>
+    <button class="close-profile-btn" id="closeProfileCardBtn">close</button>
   </div>
 </div>
 
 <!-- EDIT PROFILE MODAL -->
 <div class="settings-panel" id="settingsPanel">
   <h3>✏️ edit profile</h3>
-  <div class="setting-item"><span>🎨 name color</span><input type="color" id="nameColorPicker" value="#ffcc00" onchange="setNameColor(this.value)"></div>
-  <div class="setting-item"><span>🎮 custom activity</span><input type="text" id="activityInput" placeholder="🎮 gaming" onchange="setCustomActivity(this.value)"></div>
-  <div class="setting-item"><span>📝 bio</span><input type="text" id="bioInput" placeholder="Just a gamer" onchange="setBio(this.value)"></div>
-  <div class="setting-item"><span>🖼️ profile picture</span><input type="file" id="profilePicUpload" accept="image/*" onchange="uploadProfilePic(event)"></div>
-  <div class="setting-item"><span>🔔 desktop notifs</span><button class="send-btn" onclick="requestNotificationPermission()" style="padding:5px 10px;">enable</button></div>
-  <button class="send-btn" onclick="closeSettings()" style="width:100%; margin-top:15px;">save & close</button>
+  <div class="setting-item"><span>🎨 name color</span><input type="color" id="nameColorPicker" value="#ffcc00"></div>
+  <div class="setting-item"><span>🎮 custom activity</span><input type="text" id="activityInput" placeholder="🎮 gaming"></div>
+  <div class="setting-item"><span>📝 bio</span><input type="text" id="bioInput" placeholder="Just a gamer"></div>
+  <div class="setting-item"><span>🖼️ profile picture</span><input type="file" id="profilePicUpload" accept="image/*"></div>
+  <div class="setting-item"><span>🔔 desktop notifs</span><button id="enableNotifsBtn" class="send-btn" style="padding:5px 10px;">enable</button></div>
+  <button id="closeSettingsBtn" class="send-btn" style="width:100%; margin-top:15px;">save & close</button>
 </div>
 
 <!-- MODALS -->
-<div class="modal-overlay" id="addFriendModal" onclick="if(event.target===this)closeAddFriendModal()"><div class="modal"><h3>➕ add fanter friend</h3><input type="text" id="friendUsernameInput" placeholder="username"><div class="modal-buttons"><button class="send-btn" onclick="sendFriendRequest()">send</button><button class="send-btn" onclick="closeAddFriendModal()" style="background:rgba(255,255,255,0.1);">cancel</button></div></div></div>
-<div class="modal-overlay" id="createGroupModal"><div class="modal"><h3>👥 create group</h3><input type="text" id="groupNameInput" placeholder="group name"><div class="modal-buttons"><button class="send-btn" onclick="createGroup()">create</button><button class="send-btn" onclick="closeCreateGroupModal()" style="background:rgba(255,255,255,0.1);">cancel</button></div></div></div>
-<div class="modal-overlay" id="topicModal"><div class="modal"><h3>📌 set channel topic</h3><input type="text" id="topicInput" placeholder="new topic"><div class="modal-buttons"><button class="send-btn" onclick="setChannelTopic()">save</button><button class="send-btn" onclick="closeTopicModal()">cancel</button></div></div></div>
-<div class="modal-overlay" id="giveCoinsModal"><div class="modal"><h3>💰 give coins</h3><input type="number" id="coinAmountInput" placeholder="amount" min="1"><div class="modal-buttons"><button class="send-btn" onclick="confirmGiveCoins()">give</button><button class="send-btn" onclick="closeGiveCoinsModal()">cancel</button></div></div></div>
+<div class="modal-overlay" id="addFriendModal" onclick="if(event.target===this)closeAddFriendModal()"><div class="modal"><h3>➕ add fanter friend</h3><input type="text" id="friendUsernameInput" placeholder="username"><div class="modal-buttons"><button id="sendFriendReqBtn" class="send-btn">send</button><button id="closeAddFriendModalBtn" class="send-btn" style="background:rgba(255,255,255,0.1);">cancel</button></div></div></div>
+<div class="modal-overlay" id="createGroupModal"><div class="modal"><h3>👥 create group</h3><input type="text" id="groupNameInput" placeholder="group name"><div class="modal-buttons"><button id="createGroupConfirmBtn" class="send-btn">create</button><button id="closeCreateGroupModalBtn" class="send-btn" style="background:rgba(255,255,255,0.1);">cancel</button></div></div></div>
+<div class="modal-overlay" id="topicModal"><div class="modal"><h3>📌 set channel topic</h3><input type="text" id="topicInput" placeholder="new topic"><div class="modal-buttons"><button id="setTopicBtn" class="send-btn">save</button><button id="closeTopicModalBtn" class="send-btn" style="background:rgba(255,255,255,0.1);">cancel</button></div></div></div>
+<div class="modal-overlay" id="giveCoinsModal"><div class="modal"><h3>💰 give coins</h3><input type="number" id="coinAmountInput" placeholder="amount" min="1"><div class="modal-buttons"><button id="confirmGiveCoinsBtn" class="send-btn">give</button><button id="closeGiveCoinsModalBtn" class="send-btn" style="background:rgba(255,255,255,0.1);">cancel</button></div></div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// ===== CONFIG =====
-const SUPABASE_URL = "https://luxutkabqgitoteosctr.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eHV0a2FicWdpdG90ZW9zY3RyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2Mjc5NjAsImV4cCI6MjA5MjIwMzk2MH0.7GjvQMZaujg0YFmTBr2wotGWCIUoBWCBplGocMo6TDM";
-const GIPHY_API_KEY = "9a6B8zN3vLSqn6mqk9P1s9jGmJIVqXUz";
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-// ===== MOD SYSTEM =====
-const MOD_USERNAMES = ['abcatlmfao1', 'Creamy_peanut'];
-function isMod(username) { return MOD_USERNAMES.includes(username); }
-
-// ===== STATE =====
-let currentUser = JSON.parse(localStorage.getItem('fanter_currentUser') || 'null');
-let currentChannel = 'general';
-let currentDM = null;
-let currentGroup = null;
-let messages = [];
-let friends = [];
-let groups = [];
-let dmConversations = [];
-let typingTimeout = null;
-let replyingTo = null;
-let channelSubscription = null;
-let nameColor = localStorage.getItem('fanter_nameColor') || '#ffcc00';
-let profilePic = localStorage.getItem('fanter_profilePic') || null;
-let customActivity = localStorage.getItem('fanter_activity') || '🎮 chilling on fanter';
-let userBio = localStorage.getItem('fanter_bio') || 'Just a gamer';
-let selectedProfileUser = null;
-let unreadChannels = JSON.parse(localStorage.getItem('unreadChannels') || '{}');
-let slowModeSeconds = 0;
-let lastMessageTime = 0;
-let currentDraft = '';
-let channelTopics = JSON.parse(localStorage.getItem('channelTopics') || '{"general":"welcome to the general chat!","game-recs":"share your favorite games here","lfg":"find people to play with","flex":"show off your achievements"}');
-
-if (!currentUser || currentUser.username === 'Guest') {
-  alert('please log in on the main site first!');
-  window.location.href = 'index.html';
-}
-
-// ===== WELCOME SCREEN =====
-function enterFantarena() {
-  document.getElementById('welcomeScreen').style.display = 'none';
-  document.getElementById('fantarenaContainer').classList.add('show');
-  localStorage.setItem('fantarena_welcomed', 'true');
-  initChat();
-}
-function forceEnterFantarena() {
-  localStorage.setItem('fantarena_welcomed', 'true');
-  enterFantarena();
-}
-function showWelcomeScreen() {
-  document.getElementById('welcomeScreen').style.display = 'flex';
-  document.getElementById('fantarenaContainer').classList.remove('show');
-}
-const hasWelcomed = localStorage.getItem('fantarena_welcomed') === 'true';
-if (hasWelcomed) {
-  document.getElementById('welcomeScreen').style.display = 'none';
-  document.getElementById('fantarenaContainer').classList.add('show');
-  initChat();
-} else {
-  document.getElementById('welcomeScreen').style.display = 'flex';
-}
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') showWelcomeScreen(); });
-
-// ===== INITIALIZATION =====
-async function initChat() {
-  console.log('🚀 Initializing Fantarena...');
-  await loadUserProfile();
-  await loadFriends();
-  await loadGroups();
-  await loadDMConversations();
-  await loadMessages();
-  setupRealtime();
-  loadMembers();
-  updateChannelIndicator();
-  updateChannelTopicDisplay();
-  loadDraft();
-  setInterval(loadMembers, 10000);
-  setInterval(() => updatePresence('online'), 30000);
-  if (Notification.permission === 'default') {
-    setTimeout(() => { if (confirm('🔔 enable desktop notifications for messages?')) requestNotificationPermission(); }, 3000);
+// ===== WAIT FOR DOM TO LOAD =====
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🚀 DOM loaded, initializing...');
+  
+  // ===== CONFIG =====
+  const SUPABASE_URL = "https://luxutkabqgitoteosctr.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eHV0a2FicWdpdG90ZW9zY3RyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2Mjc5NjAsImV4cCI6MjA5MjIwMzk2MH0.7GjvQMZaujg0YFmTBr2wotGWCIUoBWCBplGocMo6TDM";
+  const GIPHY_API_KEY = "9a6B8zN3vLSqn6mqk9P1s9jGmJIVqXUz";
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  
+  // ===== MOD SYSTEM =====
+  const MOD_USERNAMES = ['abcatlmfao1', 'Creamy_peanut'];
+  function isMod(username) { return MOD_USERNAMES.includes(username); }
+  
+  // ===== STATE =====
+  let currentUser = JSON.parse(localStorage.getItem('fanter_currentUser') || 'null');
+  let currentChannel = 'general';
+  let currentDM = null;
+  let currentGroup = null;
+  let messages = [];
+  let friends = [];
+  let groups = [];
+  let dmConversations = [];
+  let typingTimeout = null;
+  let replyingTo = null;
+  let channelSubscription = null;
+  let nameColor = localStorage.getItem('fanter_nameColor') || '#ffcc00';
+  let profilePic = localStorage.getItem('fanter_profilePic') || null;
+  let customActivity = localStorage.getItem('fanter_activity') || '🎮 chilling on fanter';
+  let userBio = localStorage.getItem('fanter_bio') || 'Just a gamer';
+  let selectedProfileUser = null;
+  let unreadChannels = JSON.parse(localStorage.getItem('unreadChannels') || '{}');
+  let slowModeSeconds = 0;
+  let lastMessageTime = 0;
+  let channelTopics = JSON.parse(localStorage.getItem('channelTopics') || '{"general":"welcome to the general chat!","game-recs":"share your favorite games here","lfg":"find people to play with","flex":"show off your achievements"}');
+  
+  if (!currentUser || currentUser.username === 'Guest') {
+    alert('please log in on the main site first!');
+    window.location.href = 'index.html';
+    return;
   }
-}
-
-async function loadUserProfile() {
-  try {
-    const { data } = await supabase.from('fanter_presence').select('*').eq('user_id', currentUser.id).single();
-    if (data) {
-      if (data.profile_pic) profilePic = data.profile_pic;
-      if (data.custom_activity) customActivity = data.custom_activity;
-      if (data.bio) userBio = data.bio;
-      localStorage.setItem('fanter_profilePic', profilePic);
-      localStorage.setItem('fanter_activity', customActivity);
-      localStorage.setItem('fanter_bio', userBio);
-    } else {
-      await supabase.from('fanter_presence').insert({
+  
+  // ===== DOM ELEMENTS =====
+  const welcomeScreen = document.getElementById('welcomeScreen');
+  const fantarenaContainer = document.getElementById('fantarenaContainer');
+  const enterBtn = document.getElementById('enterBtn');
+  const skipBtn = document.getElementById('skipBtn');
+  const themeSelector = document.getElementById('themeSelector');
+  const messageInput = document.getElementById('messageInput');
+  const sendBtn = document.getElementById('sendBtn');
+  const messagesContainer = document.getElementById('messagesContainer');
+  const chatHeaderTitle = document.getElementById('chatHeaderTitle');
+  const channelTopicText = document.getElementById('channelTopicText');
+  const friendsList = document.getElementById('friendsList');
+  const groupsList = document.getElementById('groupsList');
+  const dmList = document.getElementById('dmList');
+  const membersList = document.getElementById('membersList');
+  const onlineCount = document.getElementById('onlineCount');
+  const emojiPicker = document.getElementById('emojiPicker');
+  const gifPicker = document.getElementById('gifPicker');
+  const formatMenu = document.getElementById('formatMenu');
+  const formatBtn = document.getElementById('formatBtn');
+  const emojiBtn = document.getElementById('emojiBtn');
+  const gifBtn = document.getElementById('gifBtn');
+  const imageBtn = document.getElementById('imageBtn');
+  const imageUpload = document.getElementById('imageUpload');
+  const replyBar = document.getElementById('replyBar');
+  const replyText = document.getElementById('replyText');
+  const cancelReplyBtn = document.getElementById('cancelReplyBtn');
+  const draftIndicator = document.getElementById('draftIndicator');
+  const settingsPanel = document.getElementById('settingsPanel');
+  const profileCardModal = document.getElementById('profileCardModal');
+  const addFriendModal = document.getElementById('addFriendModal');
+  const createGroupModal = document.getElementById('createGroupModal');
+  const topicModal = document.getElementById('topicModal');
+  const giveCoinsModal = document.getElementById('giveCoinsModal');
+  
+  // ===== WELCOME SCREEN FUNCTIONS =====
+  function enterFantarena() {
+    welcomeScreen.style.display = 'none';
+    fantarenaContainer.classList.add('show');
+    localStorage.setItem('fantarena_welcomed', 'true');
+    initChat();
+  }
+  
+  function showWelcomeScreen() {
+    welcomeScreen.style.display = 'flex';
+    fantarenaContainer.classList.remove('show');
+  }
+  
+  enterBtn.onclick = enterFantarena;
+  skipBtn.onclick = () => {
+    localStorage.setItem('fantarena_welcomed', 'true');
+    enterFantarena();
+  };
+  
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') showWelcomeScreen(); });
+  
+  const hasWelcomed = localStorage.getItem('fantarena_welcomed') === 'true';
+  if (hasWelcomed) {
+    welcomeScreen.style.display = 'none';
+    fantarenaContainer.classList.add('show');
+    initChat();
+  } else {
+    welcomeScreen.style.display = 'flex';
+  }
+  
+  // ===== INITIALIZATION =====
+  async function initChat() {
+    console.log('🚀 Initializing Fantarena...');
+    await loadUserProfile();
+    await loadFriends();
+    await loadGroups();
+    await loadDMConversations();
+    await loadMessages();
+    setupRealtime();
+    loadMembers();
+    updateChannelIndicator();
+    updateChannelTopicDisplay();
+    loadDraft();
+    setInterval(loadMembers, 10000);
+    setInterval(() => updatePresence('online'), 30000);
+    if (Notification.permission === 'default') {
+      setTimeout(() => { if (confirm('🔔 enable desktop notifications for messages?')) requestNotificationPermission(); }, 3000);
+    }
+  }
+  
+  async function loadUserProfile() {
+    try {
+      const { data } = await supabaseClient.from('fanter_presence').select('*').eq('user_id', currentUser.id).single();
+      if (data) {
+        if (data.profile_pic) profilePic = data.profile_pic;
+        if (data.custom_activity) customActivity = data.custom_activity;
+        if (data.bio) userBio = data.bio;
+        localStorage.setItem('fanter_profilePic', profilePic);
+        localStorage.setItem('fanter_activity', customActivity);
+        localStorage.setItem('fanter_bio', userBio);
+      } else {
+        await supabaseClient.from('fanter_presence').insert({
+          user_id: currentUser.id,
+          username: currentUser.displayName || currentUser.username,
+          display_name: currentUser.displayName || currentUser.username,
+          custom_activity: customActivity,
+          bio: userBio,
+          profile_pic: profilePic
+        });
+      }
+    } catch (e) { console.error('Profile load error:', e); }
+    updatePresence('online');
+  }
+  
+  async function updatePresence(status) {
+    try {
+      await supabaseClient.from('fanter_presence').upsert({
         user_id: currentUser.id,
         username: currentUser.displayName || currentUser.username,
         display_name: currentUser.displayName || currentUser.username,
+        status: status,
         custom_activity: customActivity,
         bio: userBio,
+        profile_pic: profilePic,
+        last_seen: new Date()
+      });
+    } catch (e) { console.error('Presence error:', e); }
+  }
+  
+  // ===== THEMES =====
+  function setTheme(theme) {
+    document.body.className = `theme-${theme}`;
+    localStorage.setItem('fantarena_theme', theme);
+  }
+  const savedTheme = localStorage.getItem('fantarena_theme') || 'dark';
+  setTheme(savedTheme);
+  themeSelector.value = savedTheme;
+  themeSelector.onchange = (e) => setTheme(e.target.value);
+  
+  // ===== SLIDING CHANNEL INDICATOR =====
+  function updateChannelIndicator() {
+    const activeItem = document.querySelector('.server-item.active');
+    if (!activeItem) return;
+    const indicator = document.getElementById('channelIndicator');
+    const offsetTop = activeItem.offsetTop;
+    const height = activeItem.offsetHeight;
+    indicator.style.top = offsetTop + 'px';
+    indicator.style.height = height + 'px';
+  }
+  
+  // ===== CHANNEL SWITCHING =====
+  document.querySelectorAll('.server-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.server-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+      updateChannelIndicator();
+      
+      currentChannel = item.dataset.channel;
+      currentDM = null;
+      currentGroup = null;
+      
+      chatHeaderTitle.textContent = item.dataset.display || `# ${currentChannel}`;
+      
+      if (unreadChannels[currentChannel]) {
+        delete unreadChannels[currentChannel];
+        localStorage.setItem('unreadChannels', JSON.stringify(unreadChannels));
+        item.querySelector('.unread-badge').style.display = 'none';
+      }
+      
+      messages = [];
+      loadMessages();
+      setupRealtime();
+      updateChannelTopicDisplay();
+      loadDraft();
+    });
+  });
+  
+  // ===== CHANNEL TOPICS =====
+  function updateChannelTopicDisplay() {
+    const topic = channelTopics[currentChannel] || 'no topic set';
+    channelTopicText.textContent = topic;
+  }
+  
+  function editChannelTopic() {
+    if (!isMod(currentUser.displayName || currentUser.username)) {
+      alert('only mods can change channel topics');
+      return;
+    }
+    document.getElementById('topicInput').value = channelTopics[currentChannel] || '';
+    topicModal.classList.add('show');
+  }
+  
+  channelTopicText.onclick = editChannelTopic;
+  
+  document.getElementById('setTopicBtn').onclick = () => {
+    const newTopic = document.getElementById('topicInput').value.trim();
+    if (newTopic) {
+      channelTopics[currentChannel] = newTopic;
+      localStorage.setItem('channelTopics', JSON.stringify(channelTopics));
+      updateChannelTopicDisplay();
+    }
+    topicModal.classList.remove('show');
+  };
+  document.getElementById('closeTopicModalBtn').onclick = () => topicModal.classList.remove('show');
+  
+  // ===== DRAFTS =====
+  function saveDraft() {
+    const draftKey = currentDM ? `draft_dm_${currentDM}` : currentGroup ? `draft_group_${currentGroup}` : `draft_${currentChannel}`;
+    if (messageInput.value.trim()) {
+      localStorage.setItem(draftKey, messageInput.value);
+      draftIndicator.style.display = 'block';
+      setTimeout(() => draftIndicator.style.display = 'none', 2000);
+    } else {
+      localStorage.removeItem(draftKey);
+    }
+  }
+  
+  function loadDraft() {
+    const draftKey = currentDM ? `draft_dm_${currentDM}` : currentGroup ? `draft_group_${currentGroup}` : `draft_${currentChannel}`;
+    const draft = localStorage.getItem(draftKey);
+    if (draft) messageInput.value = draft;
+  }
+  
+  messageInput.addEventListener('input', saveDraft);
+  
+  // ===== NOTIFICATIONS =====
+  function requestNotificationPermission() {
+    if (Notification.permission === 'granted') {
+      alert('notifications already enabled!');
+    } else if (Notification.permission !== 'denied') {
+      Notification.requestPermission().then(perm => {
+        if (perm === 'granted') alert('✅ notifications enabled!');
+      });
+    }
+  }
+  
+  function showNotification(title, body, channel) {
+    if (Notification.permission === 'granted' && !document.hasFocus() && channel !== currentChannel) {
+      new Notification(title, { body: body, icon: 'https://chipikipal800.github.io/fanter.os/favicon.ico' });
+    }
+    if (channel !== currentChannel) {
+      unreadChannels[channel] = true;
+      localStorage.setItem('unreadChannels', JSON.stringify(unreadChannels));
+      const channelItem = document.querySelector(`.server-item[data-channel="${channel}"]`);
+      if (channelItem) channelItem.querySelector('.unread-badge').style.display = 'inline-block';
+    }
+  }
+  
+  document.getElementById('enableNotifsBtn').onclick = requestNotificationPermission;
+  
+  // ===== DMs =====
+  async function loadDMConversations() {
+    try {
+      const { data } = await supabaseClient.from('fanter_dm_conversations')
+        .select('*')
+        .or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`)
+        .order('last_message_time', { ascending: false });
+      dmConversations = data || [];
+      renderDMList();
+    } catch (e) { console.error('DM conv error:', e); }
+  }
+  
+  function renderDMList() {
+    if (dmConversations.length === 0) {
+      dmList.innerHTML = '<div style="padding:8px 15px; color:rgba(255,255,255,0.3); font-size:12px;">no DMs yet</div>';
+      return;
+    }
+    dmList.innerHTML = dmConversations.map(conv => {
+      const otherId = conv.user1_id === currentUser.id ? conv.user2_id : conv.user1_id;
+      return `<div class="dm-item" onclick="window.openDM('${otherId}')">
+        <div class="dm-avatar">👤</div>
+        <div class="dm-info">
+          <div class="dm-name">${otherId.slice(0,8)}...</div>
+          <div class="friend-status">${(conv.last_message || 'start a conversation').slice(0,30)}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  
+  window.openDM = async function(userId) {
+    currentDM = userId;
+    currentChannel = null;
+    currentGroup = null;
+    document.querySelectorAll('.server-item').forEach(i => i.classList.remove('active'));
+    chatHeaderTitle.textContent = `@${userId.slice(0,8)}...`;
+    messages = [];
+    await loadMessages();
+    setupRealtime();
+    loadDraft();
+  };
+  
+  // ===== GIVE COINS =====
+  let giveCoinsTarget = null;
+  function giveCoinsToUser() {
+    if (!selectedProfileUser) return;
+    giveCoinsTarget = selectedProfileUser;
+    document.getElementById('coinAmountInput').value = '';
+    giveCoinsModal.classList.add('show');
+  }
+  
+  document.getElementById('confirmGiveCoinsBtn').onclick = () => {
+    const amount = parseInt(document.getElementById('coinAmountInput').value);
+    if (!amount || amount <= 0) return alert('enter a valid amount');
+    
+    let user = JSON.parse(localStorage.getItem('fanter_currentUser') || 'null');
+    if ((user.coins || 0) < amount) return alert(`❌ you only have ${user.coins || 0} coins!`);
+    
+    user.coins = (user.coins || 0) - amount;
+    localStorage.setItem('fanter_currentUser', JSON.stringify(user));
+    
+    let users = JSON.parse(localStorage.getItem('fanter_users') || '[]');
+    const targetIndex = users.findIndex(u => u.id === giveCoinsTarget.user_id);
+    if (targetIndex !== -1) {
+      users[targetIndex].coins = (users[targetIndex].coins || 0) + amount;
+      localStorage.setItem('fanter_users', JSON.stringify(users));
+    }
+    
+    alert(`✅ gave ${amount} 🪙 to ${giveCoinsTarget.display_name || giveCoinsTarget.username}!`);
+    giveCoinsModal.classList.remove('show');
+    if (typeof updateHeaderCoins === 'function') updateHeaderCoins();
+  };
+  document.getElementById('closeGiveCoinsModalBtn').onclick = () => giveCoinsModal.classList.remove('show');
+  
+  // ===== GROUPS =====
+  async function loadGroups() {
+    try {
+      const { data } = await supabaseClient.from('fanter_groups').select('*');
+      groups = (data || []).filter(g => g.members.includes(currentUser.id));
+      if (groups.length === 0) {
+        groupsList.innerHTML = '<div style="padding:8px 15px; color:rgba(255,255,255,0.3); font-size:12px;">no groups yet</div>';
+        return;
+      }
+      groupsList.innerHTML = groups.map(g => `
+        <div class="group-item" onclick="window.openGroup('${g.id}', '${g.name}')">
+          <span>👥</span>
+          <span>${g.name}</span>
+          ${g.owner_id === currentUser.id ? '<span class="host-badge">HOST</span>' : ''}
+        </div>
+      `).join('');
+    } catch (e) { console.error('Groups error:', e); }
+  }
+  
+  window.openGroup = async function(groupId, groupName) {
+    currentGroup = groupId;
+    currentDM = null;
+    currentChannel = null;
+    document.querySelectorAll('.server-item').forEach(i => i.classList.remove('active'));
+    chatHeaderTitle.textContent = `👥 ${groupName}`;
+    messages = [];
+    await loadMessages();
+    setupRealtime();
+    loadDraft();
+  };
+  
+  document.getElementById('createGroupConfirmBtn').onclick = async () => {
+    const name = document.getElementById('groupNameInput').value.trim();
+    if (!name) return alert('enter a group name');
+    try {
+      await supabaseClient.from('fanter_groups').insert({
+        name: name,
+        owner_id: currentUser.id,
+        members: [currentUser.id],
+        settings: { theme: null, slowMode: 0, memberLimit: 10 }
+      });
+      createGroupModal.classList.remove('show');
+      await loadGroups();
+      alert(`✅ group "${name}" created!`);
+    } catch (e) { console.error('Create group error:', e); alert('failed to create group'); }
+  };
+  
+  // ===== FRIENDS =====
+  async function loadFriends() {
+    try {
+      const { data } = await supabaseClient.from('fanter_friends').select('friend_id').eq('user_id', currentUser.id);
+      if (data?.length) {
+        const { data: friendsData } = await supabaseClient.from('fanter_presence').select('*').in('user_id', data.map(f => f.friend_id));
+        friends = friendsData || [];
+      } else {
+        friends = [];
+      }
+      if (friends.length === 0) {
+        friendsList.innerHTML = '<div style="padding:8px 15px; color:rgba(255,255,255,0.3); font-size:12px;">no friends yet</div>';
+        return;
+      }
+      friendsList.innerHTML = friends.map(f => `
+        <div class="friend-item" onclick="window.showProfileCard('${f.user_id}')">
+          <div class="friend-avatar">${f.profile_pic ? `<img src="${f.profile_pic}">` : (f.username?.[0]?.toUpperCase() || '👤')}</div>
+          <div class="friend-info">
+            <div class="friend-name">${f.display_name || f.username}</div>
+            <div class="friend-status"><span class="status-dot ${f.status||'offline'}"></span>${f.custom_activity || f.status || 'offline'}</div>
+          </div>
+        </div>
+      `).join('');
+    } catch (e) { console.error('Friends error:', e); }
+  }
+  
+  document.getElementById('sendFriendReqBtn').onclick = async () => {
+    const username = document.getElementById('friendUsernameInput').value.trim();
+    if (!username) return alert('enter a username');
+    try {
+      const { data: users } = await supabaseClient.from('fanter_presence').select('user_id,username').ilike('username', `%${username}%`);
+      if (!users?.length) return alert('user not found');
+      await supabaseClient.from('fanter_friend_requests').insert({
+        sender_id: currentUser.id,
+        receiver_id: users[0].user_id,
+        status: 'pending'
+      });
+      alert(`✅ request sent to ${users[0].username}!`);
+      addFriendModal.classList.remove('show');
+    } catch (e) { console.error('Friend request error:', e); alert('failed to send request'); }
+  };
+  
+  // ===== MESSAGES =====
+  async function loadMessages() {
+    try {
+      let query = supabaseClient.from('fanter_chat').select('*').order('created_at', { ascending: true }).limit(200);
+      if (currentDM) {
+        const channelId = `dm_${[currentUser.id, currentDM].sort().join('_')}`;
+        query = query.eq('channel_id', channelId);
+      } else if (currentGroup) {
+        query = query.eq('channel_id', `group_${currentGroup}`);
+      } else {
+        query = query.eq('channel_id', currentChannel);
+      }
+      const { data, error } = await query;
+      if (error) throw error;
+      messages = data || [];
+      renderMessages();
+    } catch (e) { console.error('Load messages error:', e); }
+  }
+  
+  function formatMessage(text) {
+    if (!text) return '';
+    let formatted = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+                       .replace(/\*(.*?)\*/g, '<i>$1</i>')
+                       .replace(/~~(.*?)~~/g, '<s>$1</s>')
+                       .replace(/`(.*?)`/g, '<code>$1</code>');
+    if (text.startsWith('http') && (text.match(/\.(jpg|jpeg|png|gif|webp)/i) || text.includes('giphy.com'))) {
+      formatted = `<img src="${text}" alt="image" onclick="window.open('${text}')">`;
+    }
+    return formatted;
+  }
+  
+  function renderMessages() {
+    if (messages.length === 0) {
+      messagesContainer.innerHTML = '<div style="text-align:center; color:rgba(255,255,255,0.4);">no messages yet</div>';
+      return;
+    }
+    messagesContainer.innerHTML = messages.map(msg => {
+      const isMe = msg.user_id === currentUser.id;
+      const reactions = msg.reactions ? JSON.parse(msg.reactions) : {};
+      const userPic = msg.profile_pic;
+      const isEdited = msg.edited;
+      return `<div class="message" data-message-id="${msg.id}" data-channel="${msg.channel_id}">
+        <div class="message-avatar" onclick="window.showProfileCard('${msg.user_id}')">${userPic ? `<img src="${userPic}">` : (msg.username?.[0]?.toUpperCase() || '👤')}</div>
+        <div class="message-content">
+          <div class="message-header">
+            <span class="message-name" style="color:${msg.nameColor || '#ffcc00'}">${msg.username} ${isMod(msg.username) ? '<span class="mod-badge">MOD</span>' : ''}</span>
+            <span class="message-time" onclick="window.copyMessageLink('${msg.id}')" title="click to copy link">${new Date(msg.created_at).toLocaleTimeString()}</span>
+            ${isEdited ? '<span class="message-edited">(edited)</span>' : ''}
+          </div>
+          <div class="message-text">${formatMessage(msg.message)}</div>
+          <div class="message-reactions" id="reactions-${msg.id}">
+            ${Object.entries(reactions).map(([emoji, users]) => `<span class="reaction" onclick="window.toggleReaction('${msg.id}', '${emoji}')">${emoji}<span class="reaction-count">${users.length}</span></span>`).join('')}
+            <span class="reaction" onclick="window.showReactionPicker('${msg.id}')">➕</span>
+          </div>
+          <div class="message-actions">
+            <button class="message-action-btn" onclick="window.replyToMessage('${msg.id}', '${msg.username}')">↩️</button>
+            ${isMe ? `<button class="message-action-btn" onclick="window.editMessage('${msg.id}', \`${msg.message?.replace(/`/g,'\\`').replace(/'/g,"\\'") || ''}\`)">✏️</button>` : ''}
+            ${isMe ? `<button class="message-action-btn" onclick="window.deleteMessage('${msg.id}')">🗑️</button>` : ''}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
+  
+  async function sendMessage() {
+    let message = messageInput.value.trim();
+    if (!message) return;
+    
+    // Slash commands
+    if (message.startsWith('/')) {
+      handleSlashCommand(message);
+      messageInput.value = '';
+      return;
+    }
+    
+    // Slow mode
+    if (slowModeSeconds > 0 && !currentDM && !currentGroup) {
+      const now = Date.now();
+      if (now - lastMessageTime < slowModeSeconds * 1000) {
+        alert(`slow mode: wait ${slowModeSeconds}s`);
+        return;
+      }
+      lastMessageTime = now;
+    }
+    
+    const channelId = currentDM ? `dm_${[currentUser.id, currentDM].sort().join('_')}` : currentGroup ? `group_${currentGroup}` : currentChannel;
+    
+    try {
+      const { error } = await supabaseClient.from('fanter_chat').insert({
+        user_id: currentUser.id,
+        username: currentUser.displayName || currentUser.username,
+        message: message,
+        channel_id: channelId,
+        nameColor: nameColor,
         profile_pic: profilePic
       });
+      
+      if (error) throw error;
+      
+      messageInput.value = '';
+      cancelReply();
+      localStorage.removeItem(currentDM ? `draft_dm_${currentDM}` : currentGroup ? `draft_group_${currentGroup}` : `draft_${currentChannel}`);
+      
+      if (currentDM) {
+        await supabaseClient.from('fanter_dm_conversations').upsert({
+          user1_id: [currentUser.id, currentDM].sort()[0],
+          user2_id: [currentUser.id, currentDM].sort()[1],
+          last_message: message,
+          last_message_time: new Date()
+        });
+        loadDMConversations();
+      }
+    } catch (e) { console.error('Send error:', e); alert('failed to send message'); }
+  }
+  
+  function handleSlashCommand(cmd) {
+    const parts = cmd.slice(1).split(' ');
+    const command = parts[0].toLowerCase();
+    
+    switch(command) {
+      case 'help':
+        alert('/roll - roll a dice\n/8ball <question> - ask the magic 8ball\n/flip - flip a coin');
+        break;
+      case 'roll':
+        const roll = Math.floor(Math.random() * 100) + 1;
+        messageInput.value = `🎲 rolled ${roll}`;
+        sendMessage();
+        break;
+      case '8ball':
+        const responses = ['yes', 'no', 'maybe', 'definitely', 'ask again later', 'absolutely', 'never', 'probably'];
+        const answer = responses[Math.floor(Math.random() * responses.length)];
+        messageInput.value = `🎱 ${answer}`;
+        sendMessage();
+        break;
+      case 'flip':
+        const flip = Math.random() > 0.5 ? 'heads' : 'tails';
+        messageInput.value = `🪙 flipped ${flip}`;
+        sendMessage();
+        break;
+      default:
+        alert(`unknown command: /${command}. try /help`);
     }
-  } catch (e) { console.error('Profile load error:', e); }
-  updatePresence('online');
-}
-
-async function updatePresence(status) {
-  try {
-    await supabase.from('fanter_presence').upsert({
-      user_id: currentUser.id,
-      username: currentUser.displayName || currentUser.username,
-      display_name: currentUser.displayName || currentUser.username,
-      status: status,
-      custom_activity: customActivity,
-      bio: userBio,
-      profile_pic: profilePic,
-      last_seen: new Date()
-    });
-  } catch (e) { console.error('Presence error:', e); }
-}
-
-// ===== THEMES =====
-function setTheme(theme) {
-  document.body.className = `theme-${theme}`;
-  localStorage.setItem('fantarena_theme', theme);
-}
-const savedTheme = localStorage.getItem('fantarena_theme') || 'dark';
-setTheme(savedTheme);
-if (document.querySelector('.theme-selector')) document.querySelector('.theme-selector').value = savedTheme;
-
-// ===== SLIDING CHANNEL INDICATOR =====
-function updateChannelIndicator() {
-  const activeItem = document.querySelector('.server-item.active');
-  if (!activeItem) return;
-  const indicator = document.getElementById('channelIndicator');
-  const offsetTop = activeItem.offsetTop;
-  const height = activeItem.offsetHeight;
-  indicator.style.top = offsetTop + 'px';
-  indicator.style.height = height + 'px';
-}
-
-// ===== CHANNEL SWITCHING =====
-document.querySelectorAll('.server-item').forEach(item => {
-  item.addEventListener('click', () => {
-    document.querySelectorAll('.server-item').forEach(i => i.classList.remove('active'));
-    item.classList.add('active');
-    updateChannelIndicator();
-    
-    const oldChannel = currentChannel;
-    currentChannel = item.dataset.channel;
-    currentDM = null;
-    currentGroup = null;
-    
-    const displayName = item.dataset.display || `# ${currentChannel}`;
-    document.getElementById('chatHeaderTitle').textContent = displayName;
-    
-    // Mark as read
-    if (unreadChannels[currentChannel]) {
-      delete unreadChannels[currentChannel];
-      localStorage.setItem('unreadChannels', JSON.stringify(unreadChannels));
-      item.querySelector('.unread-badge').style.display = 'none';
-    }
-    
-    messages = [];
-    loadMessages();
-    setupRealtime();
-    updateChannelTopicDisplay();
-    loadDraft();
-  });
-});
-
-// ===== CHANNEL TOPICS =====
-function updateChannelTopicDisplay() {
-  const topic = channelTopics[currentChannel] || 'no topic set';
-  document.getElementById('channelTopicText').textContent = topic;
-}
-function editChannelTopic() {
-  if (!isMod(currentUser.displayName || currentUser.username) && currentUser.username !== 'Guest') {
-    alert('only mods can change channel topics');
-    return;
-  }
-  document.getElementById('topicInput').value = channelTopics[currentChannel] || '';
-  document.getElementById('topicModal').classList.add('show');
-}
-function setChannelTopic() {
-  const newTopic = document.getElementById('topicInput').value.trim();
-  if (newTopic) {
-    channelTopics[currentChannel] = newTopic;
-    localStorage.setItem('channelTopics', JSON.stringify(channelTopics));
-    updateChannelTopicDisplay();
-  }
-  closeTopicModal();
-}
-function closeTopicModal() { document.getElementById('topicModal').classList.remove('show'); }
-
-// ===== DRAFTS =====
-function saveDraft() {
-  const input = document.getElementById('messageInput');
-  const draftKey = currentDM ? `draft_dm_${currentDM}` : currentGroup ? `draft_group_${currentGroup}` : `draft_${currentChannel}`;
-  if (input.value.trim()) {
-    localStorage.setItem(draftKey, input.value);
-    document.getElementById('draftIndicator').style.display = 'block';
-    setTimeout(() => document.getElementById('draftIndicator').style.display = 'none', 2000);
-  } else {
-    localStorage.removeItem(draftKey);
-  }
-}
-function loadDraft() {
-  const draftKey = currentDM ? `draft_dm_${currentDM}` : currentGroup ? `draft_group_${currentGroup}` : `draft_${currentChannel}`;
-  const draft = localStorage.getItem(draftKey);
-  if (draft) {
-    document.getElementById('messageInput').value = draft;
-  }
-}
-
-// ===== NOTIFICATIONS =====
-function requestNotificationPermission() {
-  if (Notification.permission === 'granted') {
-    alert('notifications already enabled!');
-  } else if (Notification.permission !== 'denied') {
-    Notification.requestPermission().then(perm => {
-      if (perm === 'granted') alert('✅ notifications enabled!');
-    });
-  }
-}
-function showNotification(title, body, channel) {
-  if (Notification.permission === 'granted' && !document.hasFocus() && channel !== currentChannel) {
-    new Notification(title, { body: body, icon: 'https://chipikipal800.github.io/fanter.os/favicon.ico' });
-  }
-  if (channel !== currentChannel) {
-    unreadChannels[channel] = true;
-    localStorage.setItem('unreadChannels', JSON.stringify(unreadChannels));
-    const channelItem = document.querySelector(`.server-item[data-channel="${channel}"]`);
-    if (channelItem) channelItem.querySelector('.unread-badge').style.display = 'inline-block';
-  }
-}
-
-// ===== DMs =====
-async function loadDMConversations() {
-  try {
-    const { data } = await supabase.from('fanter_dm_conversations')
-      .select('*')
-      .or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`)
-      .order('last_message_time', { ascending: false });
-    dmConversations = data || [];
-    renderDMList();
-  } catch (e) { console.error('DM conv error:', e); }
-}
-
-function renderDMList() {
-  const container = document.getElementById('dmList');
-  if (!container) return;
-  if (dmConversations.length === 0) {
-    container.innerHTML = '<div style="padding:8px 15px; color:rgba(255,255,255,0.3); font-size:12px;">no DMs yet</div>';
-    return;
-  }
-  container.innerHTML = dmConversations.map(conv => {
-    const otherId = conv.user1_id === currentUser.id ? conv.user2_id : conv.user1_id;
-    return `<div class="dm-item" onclick="openDM('${otherId}')">
-      <div class="dm-avatar">👤</div>
-      <div class="dm-info">
-        <div class="dm-name">${otherId.slice(0,8)}...</div>
-        <div class="friend-status">${(conv.last_message || 'start a conversation').slice(0,30)}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-async function openDM(userId) {
-  currentDM = userId;
-  currentChannel = null;
-  currentGroup = null;
-  document.querySelectorAll('.server-item').forEach(i => i.classList.remove('active'));
-  document.getElementById('chatHeaderTitle').textContent = `@${userId.slice(0,8)}...`;
-  messages = [];
-  await loadMessages();
-  setupRealtime();
-  loadDraft();
-}
-
-async function sendDMFromProfile() {
-  if (selectedProfileUser) {
-    const userId = selectedProfileUser.user_id;
-    closeProfileCard();
-    await openDM(userId);
-  }
-}
-
-// ===== GIVE COINS =====
-let giveCoinsTarget = null;
-function giveCoinsToUser() {
-  if (!selectedProfileUser) return;
-  giveCoinsTarget = selectedProfileUser;
-  document.getElementById('coinAmountInput').value = '';
-  document.getElementById('giveCoinsModal').classList.add('show');
-}
-function closeGiveCoinsModal() { document.getElementById('giveCoinsModal').classList.remove('show'); }
-function confirmGiveCoins() {
-  const amount = parseInt(document.getElementById('coinAmountInput').value);
-  if (!amount || amount <= 0) return alert('enter a valid amount');
-  
-  let user = JSON.parse(localStorage.getItem('fanter_currentUser') || 'null');
-  if ((user.coins || 0) < amount) return alert(`❌ you only have ${user.coins || 0} coins!`);
-  
-  user.coins = (user.coins || 0) - amount;
-  localStorage.setItem('fanter_currentUser', JSON.stringify(user));
-  
-  let users = JSON.parse(localStorage.getItem('fanter_users') || '[]');
-  const targetIndex = users.findIndex(u => u.id === giveCoinsTarget.user_id);
-  if (targetIndex !== -1) {
-    users[targetIndex].coins = (users[targetIndex].coins || 0) + amount;
-    localStorage.setItem('fanter_users', JSON.stringify(users));
   }
   
-  alert(`✅ gave ${amount} 🪙 to ${giveCoinsTarget.display_name || giveCoinsTarget.username}!`);
-  closeGiveCoinsModal();
-  if (typeof updateHeaderCoins === 'function') updateHeaderCoins();
-}
-
-// ===== GROUPS =====
-async function loadGroups() {
-  try {
-    const { data } = await supabase.from('fanter_groups').select('*');
-    groups = (data || []).filter(g => g.members.includes(currentUser.id));
-    const container = document.getElementById('groupsList');
-    if (!container) return;
-    if (groups.length === 0) {
-      container.innerHTML = '<div style="padding:8px 15px; color:rgba(255,255,255,0.3); font-size:12px;">no groups yet</div>';
-      return;
-    }
-    container.innerHTML = groups.map(g => `
-      <div class="group-item" onclick="openGroup('${g.id}', '${g.name}')">
-        <span>👥</span>
-        <span>${g.name}</span>
-        ${g.owner_id === currentUser.id ? '<span class="host-badge">HOST</span>' : ''}
-      </div>
-    `).join('');
-  } catch (e) { console.error('Groups error:', e); }
-}
-
-async function openGroup(groupId, groupName) {
-  currentGroup = groupId;
-  currentDM = null;
-  currentChannel = null;
-  document.querySelectorAll('.server-item').forEach(i => i.classList.remove('active'));
-  document.getElementById('chatHeaderTitle').textContent = `👥 ${groupName}`;
-  messages = [];
-  await loadMessages();
-  setupRealtime();
-  loadDraft();
-}
-
-async function createGroup() {
-  const name = document.getElementById('groupNameInput').value.trim();
-  if (!name) return alert('enter a group name');
-  try {
-    await supabase.from('fanter_groups').insert({
-      name: name,
-      owner_id: currentUser.id,
-      members: [currentUser.id],
-      settings: { theme: null, slowMode: 0, memberLimit: 10 }
-    });
-    closeCreateGroupModal();
-    await loadGroups();
-    alert(`✅ group "${name}" created!`);
-  } catch (e) { console.error('Create group error:', e); alert('failed to create group'); }
-}
-
-// ===== FRIENDS =====
-async function loadFriends() {
-  try {
-    const { data } = await supabase.from('fanter_friends').select('friend_id').eq('user_id', currentUser.id);
-    if (data?.length) {
-      const { data: friendsData } = await supabase.from('fanter_presence').select('*').in('user_id', data.map(f => f.friend_id));
-      friends = friendsData || [];
+  window.toggleReaction = async function(messageId, emoji) {
+    const msg = messages.find(m => m.id == messageId);
+    if (!msg) return;
+    let reactions = msg.reactions ? JSON.parse(msg.reactions) : {};
+    if (!reactions[emoji]) reactions[emoji] = [];
+    const userIdStr = currentUser.id;
+    const index = reactions[emoji].indexOf(userIdStr);
+    if (index === -1) {
+      reactions[emoji].push(userIdStr);
     } else {
-      friends = [];
+      reactions[emoji].splice(index, 1);
+      if (reactions[emoji].length === 0) delete reactions[emoji];
     }
-    const container = document.getElementById('friendsList');
-    if (!container) return;
-    if (friends.length === 0) {
-      container.innerHTML = '<div style="padding:8px 15px; color:rgba(255,255,255,0.3); font-size:12px;">no friends yet</div>';
-      return;
-    }
-    container.innerHTML = friends.map(f => `
-      <div class="friend-item" onclick="showProfileCard('${f.user_id}')">
-        <div class="friend-avatar">${f.profile_pic ? `<img src="${f.profile_pic}">` : (f.username?.[0]?.toUpperCase() || '👤')}</div>
-        <div class="friend-info">
-          <div class="friend-name">${f.display_name || f.username}</div>
-          <div class="friend-status"><span class="status-dot ${f.status||'offline'}"></span>${f.custom_activity || f.status || 'offline'}</div>
-        </div>
-      </div>
-    `).join('');
-  } catch (e) { console.error('Friends error:', e); }
-}
-
-async function sendFriendRequest() {
-  const username = document.getElementById('friendUsernameInput').value.trim();
-  if (!username) return alert('enter a username');
-  try {
-    const { data: users } = await supabase.from('fanter_presence').select('user_id,username').ilike('username', `%${username}%`);
-    if (!users?.length) return alert('user not found');
-    await supabase.from('fanter_friend_requests').insert({
-      sender_id: currentUser.id,
-      receiver_id: users[0].user_id,
-      status: 'pending'
+    await supabaseClient.from('fanter_chat').update({ reactions: JSON.stringify(reactions) }).eq('id', messageId);
+    await loadMessages();
+  };
+  
+  window.showReactionPicker = function(messageId) {
+    const emojis = ['👍','❤️','😂','😮','😢','🔥','💀','🎮','🏆','⭐','👑'];
+    const picker = document.createElement('div');
+    picker.style.cssText = 'position:fixed;background:rgba(20,30,50,0.98);border:1px solid #ffcc00;border-radius:12px;padding:8px;display:flex;gap:8px;z-index:1000;';
+    emojis.forEach(emoji => {
+      const btn = document.createElement('span');
+      btn.textContent = emoji;
+      btn.style.cssText = 'font-size:24px;cursor:pointer;padding:5px;';
+      btn.onclick = () => { window.toggleReaction(messageId, emoji); picker.remove(); };
+      picker.appendChild(btn);
     });
-    alert(`✅ request sent to ${users[0].username}!`);
-    closeAddFriendModal();
-  } catch (e) { console.error('Friend request error:', e); alert('failed to send request'); }
-}
-
-// ===== MESSAGES WITH REACTIONS =====
-async function loadMessages() {
-  try {
-    let query = supabase.from('fanter_chat').select('*').order('created_at', { ascending: true }).limit(200);
-    if (currentDM) {
-      const channelId = `dm_${[currentUser.id, currentDM].sort().join('_')}`;
-      query = query.eq('channel_id', channelId);
-    } else if (currentGroup) {
-      query = query.eq('channel_id', `group_${currentGroup}`);
-    } else {
-      query = query.eq('channel_id', currentChannel);
+    document.body.appendChild(picker);
+    picker.style.left = (event.clientX - 100) + 'px';
+    picker.style.top = (event.clientY - 50) + 'px';
+    setTimeout(() => { document.addEventListener('click', () => picker.remove(), { once: true }); }, 100);
+  };
+  
+  window.copyMessageLink = function(messageId) {
+    navigator.clipboard.writeText(`${window.location.href}?msg=${messageId}`);
+    alert('✅ message link copied!');
+  };
+  
+  window.editMessage = async function(msgId, oldText) {
+    const newText = prompt('Edit message:', oldText);
+    if (newText && newText !== oldText) {
+      await supabaseClient.from('fanter_chat').update({ message: newText, edited: true }).eq('id', msgId);
+      await loadMessages();
     }
-    const { data, error } = await query;
-    if (error) throw error;
-    messages = data || [];
-    renderMessages();
-  } catch (e) { console.error('Load messages error:', e); }
-}
-
-function renderMessages() {
-  const container = document.getElementById('messagesContainer');
-  if (!container) return;
-  if (messages.length === 0) {
-    container.innerHTML = '<div style="text-align:center; color:rgba(255,255,255,0.4);">no messages yet</div>';
-    return;
-  }
-  container.innerHTML = messages.map(msg => {
-    const isMe = msg.user_id === currentUser.id;
-    const reactions = msg.reactions ? JSON.parse(msg.reactions) : {};
-    const userPic = msg.profile_pic;
-    const isEdited = msg.edited;
-    return `<div class="message" data-message-id="${msg.id}" data-channel="${msg.channel_id}">
-      <div class="message-avatar" onclick="showProfileCard('${msg.user_id}')">${userPic ? `<img src="${userPic}">` : (msg.username?.[0]?.toUpperCase() || '👤')}</div>
-      <div class="message-content">
-        <div class="message-header">
-          <span class="message-name" style="color:${msg.nameColor || '#ffcc00'}">${msg.username} ${isMod(msg.username) ? '<span class="mod-badge">MOD</span>' : ''}</span>
-          <span class="message-time" onclick="copyMessageLink('${msg.id}')" title="click to copy link">${new Date(msg.created_at).toLocaleTimeString()}</span>
-          ${isEdited ? '<span class="message-edited">(edited)</span>' : ''}
-        </div>
-        <div class="message-text">${formatMessage(msg.message)}</div>
-        <div class="message-reactions" id="reactions-${msg.id}">
-          ${Object.entries(reactions).map(([emoji, users]) => `<span class="reaction" onclick="toggleReaction('${msg.id}', '${emoji}')">${emoji}<span class="reaction-count">${users.length}</span></span>`).join('')}
-          <span class="reaction" onclick="showReactionPicker('${msg.id}')">➕</span>
-        </div>
-        <div class="message-actions">
-          <button class="message-action-btn" onclick="replyToMessage('${msg.id}', '${msg.username}')">↩️</button>
-          ${isMe ? `<button class="message-action-btn" onclick="editMessage('${msg.id}', \`${msg.message?.replace(/`/g,'\\`').replace(/'/g,"\\'") || ''}\`)">✏️</button>` : ''}
-          ${isMe ? `<button class="message-action-btn" onclick="deleteMessage('${msg.id}')">🗑️</button>` : ''}
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-  container.scrollTop = container.scrollHeight;
-}
-
-function formatMessage(text) {
-  if (!text) return '';
-  let formatted = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-                     .replace(/\*(.*?)\*/g, '<i>$1</i>')
-                     .replace(/~~(.*?)~~/g, '<s>$1</s>')
-                     .replace(/`(.*?)`/g, '<code>$1</code>');
-  if (text.startsWith('http') && (text.match(/\.(jpg|jpeg|png|gif|webp)/i) || text.includes('giphy.com'))) {
-    formatted = `<img src="${text}" alt="image" onclick="window.open('${text}')">`;
-  }
-  return formatted;
-}
-
-async function sendMessage() {
-  const input = document.getElementById('messageInput');
-  let message = input.value.trim();
-  if (!message) return;
+  };
   
-  // Slash commands
-  if (message.startsWith('/')) {
-    handleSlashCommand(message);
-    input.value = '';
-    return;
-  }
-  
-  // Slow mode
-  if (slowModeSeconds > 0 && !currentDM && !currentGroup) {
-    const now = Date.now();
-    if (now - lastMessageTime < slowModeSeconds * 1000) {
-      alert(`slow mode: wait ${slowModeSeconds}s`);
-      return;
+  window.deleteMessage = async function(msgId) {
+    if (confirm('Delete message?')) {
+      await supabaseClient.from('fanter_chat').delete().eq('id', msgId);
+      await loadMessages();
     }
-    lastMessageTime = now;
+  };
+  
+  window.replyToMessage = function(id, username) {
+    replyingTo = { id, username };
+    replyBar.style.display = 'flex';
+    replyText.textContent = `Replying to ${username}`;
+    messageInput.focus();
+  };
+  
+  function cancelReply() {
+    replyingTo = null;
+    replyBar.style.display = 'none';
   }
   
-  const channelId = currentDM ? `dm_${[currentUser.id, currentDM].sort().join('_')}` : currentGroup ? `group_${currentGroup}` : currentChannel;
+  cancelReplyBtn.onclick = cancelReply;
+  sendBtn.onclick = sendMessage;
+  messageInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
   
-  try {
-    const { error } = await supabase.from('fanter_chat').insert({
-      user_id: currentUser.id,
-      username: currentUser.displayName || currentUser.username,
-      message: message,
-      channel_id: channelId,
-      nameColor: nameColor,
-      profile_pic: profilePic
-    });
-    
-    if (error) throw error;
-    
-    input.value = '';
-    cancelReply();
-    localStorage.removeItem(currentDM ? `draft_dm_${currentDM}` : currentGroup ? `draft_group_${currentGroup}` : `draft_${currentChannel}`);
-    
-    if (currentDM) {
-      await supabase.from('fanter_dm_conversations').upsert({
-        user1_id: [currentUser.id, currentDM].sort()[0],
-        user2_id: [currentUser.id, currentDM].sort()[1],
-        last_message: message,
-        last_message_time: new Date()
-      });
-      loadDMConversations();
+  // ===== IMAGE UPLOADS =====
+  function uploadImage(file) {
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        messageInput.value = e.target.result;
+        sendMessage();
+      };
+      reader.readAsDataURL(file);
     }
-  } catch (e) { console.error('Send error:', e); alert('failed to send message'); }
-}
-
-async function toggleReaction(messageId, emoji) {
-  const msg = messages.find(m => m.id == messageId);
-  if (!msg) return;
-  let reactions = msg.reactions ? JSON.parse(msg.reactions) : {};
-  if (!reactions[emoji]) reactions[emoji] = [];
-  const userIdStr = currentUser.id;
-  const index = reactions[emoji].indexOf(userIdStr);
-  if (index === -1) {
-    reactions[emoji].push(userIdStr);
-  } else {
-    reactions[emoji].splice(index, 1);
-    if (reactions[emoji].length === 0) delete reactions[emoji];
   }
-  await supabase.from('fanter_chat').update({ reactions: JSON.stringify(reactions) }).eq('id', messageId);
-  await loadMessages();
-}
-
-function showReactionPicker(messageId) {
-  const emojis = ['👍','❤️','😂','😮','😢','🔥','💀','🎮','🏆','⭐','👑','💀','👻','🐉'];
-  const picker = document.createElement('div');
-  picker.style.cssText = 'position:fixed;background:rgba(20,30,50,0.98);border:1px solid #ffcc00;border-radius:12px;padding:8px;display:flex;gap:8px;z-index:1000;';
-  emojis.forEach(emoji => {
-    const btn = document.createElement('span');
-    btn.textContent = emoji;
-    btn.style.cssText = 'font-size:24px;cursor:pointer;padding:5px;';
-    btn.onclick = () => { toggleReaction(messageId, emoji); picker.remove(); };
-    picker.appendChild(btn);
+  
+  imageBtn.onclick = () => imageUpload.click();
+  imageUpload.onchange = (e) => {
+    if (e.target.files[0]) uploadImage(e.target.files[0]);
+  };
+  
+  // Drag & drop
+  const chatMain = document.querySelector('.chat-main');
+  chatMain.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    chatMain.classList.add('drag-over');
   });
-  document.body.appendChild(picker);
-  picker.style.left = (event.clientX - 100) + 'px';
-  picker.style.top = (event.clientY - 50) + 'px';
-  setTimeout(() => { document.addEventListener('click', () => picker.remove(), { once: true }); }, 100);
-}
-
-function copyMessageLink(messageId) {
-  navigator.clipboard.writeText(`${window.location.href}?msg=${messageId}`);
-  alert('✅ message link copied!');
-}
-
-async function editMessage(msgId, oldText) {
-  const newText = prompt('Edit message:', oldText);
-  if (newText && newText !== oldText) {
-    await supabase.from('fanter_chat').update({ message: newText, edited: true }).eq('id', msgId);
-    await loadMessages();
-  }
-}
-
-async function deleteMessage(msgId) {
-  if (confirm('Delete message?')) {
-    await supabase.from('fanter_chat').delete().eq('id', msgId);
-    await loadMessages();
-  }
-}
-
-function replyToMessage(id, username) {
-  replyingTo = { id, username };
-  document.getElementById('replyBar').style.display = 'flex';
-  document.getElementById('replyText').textContent = `Replying to ${username}`;
-  document.getElementById('messageInput').focus();
-}
-
-function cancelReply() {
-  replyingTo = null;
-  document.getElementById('replyBar').style.display = 'none';
-}
-
-// ===== SLASH COMMANDS =====
-function handleSlashCommand(cmd) {
-  const parts = cmd.slice(1).split(' ');
-  const command = parts[0].toLowerCase();
-  const args = parts.slice(1);
+  chatMain.addEventListener('dragleave', () => {
+    chatMain.classList.remove('drag-over');
+  });
+  chatMain.addEventListener('drop', (e) => {
+    e.preventDefault();
+    chatMain.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) uploadImage(file);
+  });
   
-  switch(command) {
-    case 'help':
-      alert('/roll - roll a dice\n/8ball <question> - ask the magic 8ball\n/flip - flip a coin\n/give <@user> <amount> - give coins (coming soon)');
-      break;
-    case 'roll':
-      const roll = Math.floor(Math.random() * 100) + 1;
-      document.getElementById('messageInput').value = `🎲 rolled ${roll}`;
-      sendMessage();
-      break;
-    case '8ball':
-      const responses = ['yes', 'no', 'maybe', 'definitely', 'ask again later', 'absolutely', 'never', 'probably'];
-      const answer = responses[Math.floor(Math.random() * responses.length)];
-      document.getElementById('messageInput').value = `🎱 ${answer}`;
-      sendMessage();
-      break;
-    case 'flip':
-      const flip = Math.random() > 0.5 ? 'heads' : 'tails';
-      document.getElementById('messageInput').value = `🪙 flipped ${flip}`;
-      sendMessage();
-      break;
-    default:
-      alert(`unknown command: /${command}. try /help`);
+  // ===== REALTIME =====
+  function setupRealtime() {
+    if (channelSubscription) supabaseClient.removeChannel(channelSubscription);
+    
+    let filter = currentDM ? `channel_id=eq.dm_${[currentUser.id, currentDM].sort().join('_')}` : currentGroup ? `channel_id=eq.group_${currentGroup}` : `channel_id=eq.${currentChannel}`;
+    
+    channelSubscription = supabaseClient.channel('fantarena-live')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'fanter_chat', filter: filter }, payload => {
+        messages.push(payload.new);
+        renderMessages();
+        showNotification(payload.new.username, payload.new.message, payload.new.channel_id);
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'fanter_chat', filter: filter }, () => loadMessages())
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'fanter_chat', filter: filter }, () => loadMessages())
+      .subscribe();
   }
-}
-
-// ===== IMAGE UPLOADS =====
-function uploadImage(event) {
-  const file = event.target.files[0];
-  if (file && file.type.startsWith('image/')) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      document.getElementById('messageInput').value = e.target.result;
-      sendMessage();
-    };
-    reader.readAsDataURL(file);
-  }
-}
-
-// Setup drag & drop
-const chatMain = document.querySelector('.chat-main');
-chatMain.addEventListener('dragover', (e) => {
-  e.preventDefault();
-  chatMain.classList.add('drag-over');
-});
-chatMain.addEventListener('dragleave', () => {
-  chatMain.classList.remove('drag-over');
-});
-chatMain.addEventListener('drop', (e) => {
-  e.preventDefault();
-  chatMain.classList.remove('drag-over');
-  const file = e.dataTransfer.files[0];
-  if (file && file.type.startsWith('image/')) {
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      document.getElementById('messageInput').value = ev.target.result;
-      sendMessage();
-    };
-    reader.readAsDataURL(file);
-  }
-});
-
-// ===== REALTIME =====
-function setupRealtime() {
-  if (channelSubscription) supabase.removeChannel(channelSubscription);
   
-  let filter = currentDM ? `channel_id=eq.dm_${[currentUser.id, currentDM].sort().join('_')}` : currentGroup ? `channel_id=eq.group_${currentGroup}` : `channel_id=eq.${currentChannel}`;
+  // ===== PROFILE CARD =====
+  window.showProfileCard = async function(userId) {
+    try {
+      const { data } = await supabaseClient.from('fanter_presence').select('*').eq('user_id', userId).single();
+      if (!data) return;
+      selectedProfileUser = data;
+      document.getElementById('profileCardAvatar').innerHTML = data.profile_pic ? `<img src="${data.profile_pic}">` : (data.username?.[0]?.toUpperCase() || '👤');
+      document.getElementById('profileCardName').textContent = data.display_name || data.username;
+      document.getElementById('profileCardUsername').textContent = `@${data.username}`;
+      document.getElementById('profileCardActivity').textContent = data.custom_activity || '🎮 gaming';
+      document.getElementById('profileCardBio').textContent = data.bio || 'Just a gamer';
+      profileCardModal.classList.add('show');
+    } catch (e) { console.error('Profile card error:', e); }
+  };
   
-  channelSubscription = supabase.channel('fantarena-live')
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'fanter_chat', filter: filter }, payload => {
-      messages.push(payload.new);
-      renderMessages();
-      showNotification(payload.new.username, payload.new.message, payload.new.channel_id);
-    })
-    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'fanter_chat', filter: filter }, () => loadMessages())
-    .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'fanter_chat', filter: filter }, () => loadMessages())
-    .subscribe();
-}
-
-// ===== PROFILE CARD =====
-async function showProfileCard(userId) {
-  try {
-    const { data } = await supabase.from('fanter_presence').select('*').eq('user_id', userId).single();
-    if (!data) return;
-    selectedProfileUser = data;
-    document.getElementById('profileCardAvatar').innerHTML = data.profile_pic ? `<img src="${data.profile_pic}">` : (data.username?.[0]?.toUpperCase() || '👤');
-    document.getElementById('profileCardName').textContent = data.display_name || data.username;
-    document.getElementById('profileCardUsername').textContent = `@${data.username}`;
-    document.getElementById('profileCardActivity').textContent = data.custom_activity || '🎮 gaming';
-    document.getElementById('profileCardBio').textContent = data.bio || 'Just a gamer';
-    document.getElementById('profileCardModal').classList.add('show');
-  } catch (e) { console.error('Profile card error:', e); }
-}
-
-function closeProfileCard() {
-  document.getElementById('profileCardModal').classList.remove('show');
-  selectedProfileUser = null;
-}
-
-function openOwnProfileModal() {
-  document.getElementById('settingsPanel').classList.add('show');
-}
-
-// ===== SETTINGS =====
-function openSettings() { document.getElementById('settingsPanel').classList.add('show'); }
-function closeSettings() { document.getElementById('settingsPanel').classList.remove('show'); }
-function setNameColor(color) { nameColor = color; localStorage.setItem('fanter_nameColor', color); }
-function setCustomActivity(activity) { customActivity = activity; localStorage.setItem('fanter_activity', activity); updatePresence('online'); }
-function setBio(bio) { userBio = bio; localStorage.setItem('fanter_bio', bio); updatePresence('online'); }
-function uploadProfilePic(event) {
-  const file = event.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      profilePic = e.target.result;
-      localStorage.setItem('fanter_profilePic', profilePic);
-      updatePresence('online');
-      alert('✅ profile picture updated!');
-    };
-    reader.readAsDataURL(file);
+  function closeProfileCard() {
+    profileCardModal.classList.remove('show');
+    selectedProfileUser = null;
   }
-}
-
-// ===== MEMBERS LIST =====
-async function loadMembers() {
-  try {
-    const { data } = await supabase.from('fanter_presence').select('*').order('status', { ascending: false });
-    if (data) {
-      const online = data.filter(m => m.status === 'online').length;
-      document.getElementById('onlineCount').textContent = `${online} online`;
-      document.getElementById('membersList').innerHTML = `
-        <div class="member-category">online — ${online}</div>
-        ${data.filter(m => m.status === 'online').map(m => `<div class="member-item" onclick="showProfileCard('${m.user_id}')"><div class="member-avatar">${m.profile_pic ? `<img src="${m.profile_pic}">` : (m.username?.[0]?.toUpperCase() || '👤')}</div><span>${m.display_name || m.username}</span></div>`).join('')}
-        <div class="member-category">offline</div>
-        ${data.filter(m => m.status !== 'online').map(m => `<div class="member-item" onclick="showProfileCard('${m.user_id}')"><div class="member-avatar">${m.profile_pic ? `<img src="${m.profile_pic}">` : (m.username?.[0]?.toUpperCase() || '👤')}</div><span>${m.display_name || m.username}</span></div>`).join('')}
-      `;
+  
+  document.getElementById('profileCardDMBtn').onclick = () => {
+    if (selectedProfileUser) {
+      closeProfileCard();
+      window.openDM(selectedProfileUser.user_id);
     }
-  } catch (e) { console.error('Members error:', e); }
-}
-
-// ===== EMOJI, GIF, FORMAT =====
-const emojis = ['😀','😂','😊','😍','🥰','😎','🤔','😭','🔥','💀','🎮','🏆','⭐','💬','👑','✨','❤️','💀','👻','🐉','🍕','⚡','🌀','💜','👍','👎','🙌','🎉'];
-document.getElementById('emojiPicker').innerHTML = emojis.map(e => `<span onclick="insertEmoji('${e}')">${e}</span>`).join('');
-function insertEmoji(emoji) { const input = document.getElementById('messageInput'); if (input) input.value += emoji; document.getElementById('emojiPicker')?.classList.remove('show'); }
-function toggleEmojiPicker() { document.getElementById('emojiPicker')?.classList.toggle('show'); document.getElementById('gifPicker')?.classList.remove('show'); }
-function toggleFormatMenu() { document.getElementById('formatMenu')?.classList.toggle('show'); }
-function applyFormat(wrapper) {
-  const input = document.getElementById('messageInput');
-  if (!input) return;
-  const start = input.selectionStart, end = input.selectionEnd;
-  const text = input.value, selected = text.substring(start, end);
-  input.value = text.substring(0, start) + wrapper + selected + wrapper + text.substring(end);
-  input.focus();
-  input.setSelectionRange(start + wrapper.length, end + wrapper.length);
-  document.getElementById('formatMenu')?.classList.remove('show');
-}
-async function searchGifs(query) {
-  if (!query) query = 'trending';
-  try {
-    const res = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_API_KEY}&q=${query}&limit=12`);
-    const data = await res.json();
-    document.getElementById('gifGrid').innerHTML = data.data.map(g => `<div class="gif-item" onclick="sendGif('${g.images.fixed_height.url}')"><img src="${g.images.fixed_height_small.url}"></div>`).join('');
-  } catch (e) { console.error('GIF error:', e); }
-}
-function sendGif(url) { const input = document.getElementById('messageInput'); if (input) input.value = url; sendMessage(); document.getElementById('gifPicker')?.classList.remove('show'); }
-function toggleGifPicker() { document.getElementById('gifPicker')?.classList.toggle('show'); document.getElementById('emojiPicker')?.classList.remove('show'); searchGifs('trending'); }
-function handleTyping() { if (typingTimeout) clearTimeout(typingTimeout); typingTimeout = setTimeout(() => {}, 2000); }
-
-// ===== MODAL FUNCTIONS =====
-function showAddFriendModal() { document.getElementById('addFriendModal').classList.add('show'); }
-function closeAddFriendModal() { document.getElementById('addFriendModal').classList.remove('show'); }
-function showCreateGroupModal() { document.getElementById('createGroupModal').classList.add('show'); }
-function closeCreateGroupModal() { document.getElementById('createGroupModal').classList.remove('show'); }
-
-// ===== GLOBAL EXPORTS =====
-window.enterFantarena = enterFantarena;
-window.forceEnterFantarena = forceEnterFantarena;
-window.showWelcomeScreen = showWelcomeScreen;
-window.setTheme = setTheme;
-window.sendMessage = sendMessage;
-window.handleTyping = handleTyping;
-window.openSettings = openSettings;
-window.closeSettings = closeSettings;
-window.setNameColor = setNameColor;
-window.setCustomActivity = setCustomActivity;
-window.setBio = setBio;
-window.uploadProfilePic = uploadProfilePic;
-window.showAddFriendModal = showAddFriendModal;
-window.closeAddFriendModal = closeAddFriendModal;
-window.sendFriendRequest = sendFriendRequest;
-window.showCreateGroupModal = showCreateGroupModal;
-window.closeCreateGroupModal = closeCreateGroupModal;
-window.createGroup = createGroup;
-window.editMessage = editMessage;
-window.deleteMessage = deleteMessage;
-window.replyToMessage = replyToMessage;
-window.cancelReply = cancelReply;
-window.toggleEmojiPicker = toggleEmojiPicker;
-window.insertEmoji = insertEmoji;
-window.toggleFormatMenu = toggleFormatMenu;
-window.applyFormat = applyFormat;
-window.toggleGifPicker = toggleGifPicker;
-window.searchGifs = searchGifs;
-window.sendGif = sendGif;
-window.openDM = openDM;
-window.showProfileCard = showProfileCard;
-window.closeProfileCard = closeProfileCard;
-window.sendDMFromProfile = sendDMFromProfile;
-window.giveCoinsToUser = giveCoinsToUser;
-window.confirmGiveCoins = confirmGiveCoins;
-window.closeGiveCoinsModal = closeGiveCoinsModal;
-window.openOwnProfileModal = openOwnProfileModal;
-window.editChannelTopic = editChannelTopic;
-window.setChannelTopic = setChannelTopic;
-window.closeTopicModal = closeTopicModal;
-window.requestNotificationPermission = requestNotificationPermission;
-window.uploadImage = uploadImage;
-
-console.log('🏟️ Fantarena ULTRA v3 loaded! Features: reactions, drafts, topics, notifications, slash commands, give coins, image uploads');
+  };
+  document.getElementById('profileCardCoinBtn').onclick = giveCoinsToUser;
+  document.getElementById('closeProfileCardBtn').onclick = closeProfileCard;
+  
+  // ===== SETTINGS =====
+  function openSettings() { settingsPanel.classList.add('show'); }
+  function closeSettings() { settingsPanel.classList.remove('show'); }
+  
+  document.getElementById('settingsBtn').onclick = openSettings;
+  document.getElementById('editProfileBtn').onclick = openSettings;
+  document.getElementById('closeSettingsBtn').onclick = closeSettings;
+  document.getElementById('nameColorPicker').onchange = (e) => { nameColor = e.target.value; localStorage.setItem('fanter_nameColor', nameColor); };
+  document.getElementById('activityInput').onchange = (e) => { customActivity = e.target.value; localStorage.setItem('fanter_activity', customActivity); updatePresence('online'); };
+  document.getElementById('bioInput').onchange = (e) => { userBio = e.target.value; localStorage.setItem('fanter_bio', userBio); updatePresence('online'); };
+  document.getElementById('profilePicUpload').onchange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        profilePic = ev.target.result;
+        localStorage.setItem('fanter_profilePic', profilePic);
+        updatePresence('online');
+        alert('✅ profile picture updated!');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+  // ===== MEMBERS LIST =====
+  async function loadMembers() {
+    try {
+      const { data } = await supabaseClient.from('fanter_presence').select('*').order('status', { ascending: false });
+      if (data) {
+        const online = data.filter(m => m.status === 'online').length;
+        onlineCount.textContent = `${online} online`;
+        membersList.innerHTML = `
+          <div class="member-category">online — ${online}</div>
+          ${data.filter(m => m.status === 'online').map(m => `<div class="member-item" onclick="window.showProfileCard('${m.user_id}')"><div class="member-avatar">${m.profile_pic ? `<img src="${m.profile_pic}">` : (m.username?.[0]?.toUpperCase() || '👤')}</div><span>${m.display_name || m.username}</span></div>`).join('')}
+          <div class="member-category">offline</div>
+          ${data.filter(m => m.status !== 'online').map(m => `<div class="member-item" onclick="window.showProfileCard('${m.user_id}')"><div class="member-avatar">${m.profile_pic ? `<img src="${m.profile_pic}">` : (m.username?.[0]?.toUpperCase() || '👤')}</div><span>${m.display_name || m.username}</span></div>`).join('')}
+        `;
+      }
+    } catch (e) { console.error('Members error:', e); }
+  }
+  
+  // ===== EMOJI & GIF =====
+  const emojis = ['😀','😂','😊','😍','🥰','😎','🤔','😭','🔥','💀','🎮','🏆','⭐','💬','👑','✨','❤️','👻','🐉','🍕','⚡','🌀','💜','👍','👎','🙌','🎉'];
+  emojiPicker.innerHTML = emojis.map(e => `<span onclick="insertEmoji('${e}')">${e}</span>`).join('');
+  
+  function insertEmoji(emoji) { messageInput.value += emoji; emojiPicker.classList.remove('show'); }
+  function toggleEmojiPicker() { emojiPicker.classList.toggle('show'); gifPicker.classList.remove('show'); }
+  function toggleFormatMenu() { formatMenu.classList.toggle('show'); }
+  function applyFormat(wrapper) {
+    const start = messageInput.selectionStart, end = messageInput.selectionEnd;
+    const text = messageInput.value, selected = text.substring(start, end);
+    messageInput.value = text.substring(0, start) + wrapper + selected + wrapper + text.substring(end);
+    messageInput.focus();
+    messageInput.setSelectionRange(start + wrapper.length, end + wrapper.length);
+    formatMenu.classList.remove('show');
+  }
+  
+  emojiBtn.onclick = toggleEmojiPicker;
+  formatBtn.onclick = toggleFormatMenu;
+  document.querySelectorAll('.format-option').forEach(opt => {
+    opt.onclick = () => applyFormat(opt.dataset.format);
+  });
+  
+  async function searchGifs(query) {
+    if (!query) query = 'trending';
+    try {
+      const res = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_API_KEY}&q=${query}&limit=12`);
+      const data = await res.json();
+      document.getElementById('gifGrid').innerHTML = data.data.map(g => `<div class="gif-item" onclick="sendGif('${g.images.fixed_height.url}')"><img src="${g.images.fixed_height_small.url}"></div>`).join('');
+    } catch (e) { console.error('GIF error:', e); }
+  }
+  
+  function sendGif(url) { messageInput.value = url; sendMessage(); gifPicker.classList.remove('show'); }
+  
+  gifBtn.onclick = () => {
+    gifPicker.classList.toggle('show');
+    emojiPicker.classList.remove('show');
+    searchGifs('trending');
+  };
+  document.getElementById('gifSearch').oninput = (e) => searchGifs(e.target.value);
+  
+  // ===== MODAL FUNCTIONS =====
+  document.getElementById('addFriendBtn').onclick = () => addFriendModal.classList.add('show');
+  document.getElementById('createGroupBtn').onclick = () => createGroupModal.classList.add('show');
+  document.getElementById('closeAddFriendModalBtn').onclick = () => addFriendModal.classList.remove('show');
+  document.getElementById('closeCreateGroupModalBtn').onclick = () => createGroupModal.classList.remove('show');
+  document.getElementById('helpBtn').onclick = () => showWelcomeScreen();
+  
+  // Set initial active channel
+  document.querySelector('.server-item.active').classList.remove('active');
+  document.querySelector('.server-item[data-channel="general"]').classList.add('active');
+  
+  console.log('🏟️ Fantarena fully loaded!');
+});
 </script>
 </body>
 </html>
