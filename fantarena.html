@@ -10,59 +10,50 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0a0a1a,#0f0f2a,#1a0a2a);color:#fff;min-height:100vh}
 
-/* WELCOME SCREEN */
 .welcome-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#0a0a1a;z-index:10000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px}
-.welcome-card{background:rgba(20,30,50,.95);border:2px solid #ffcc00;border-radius:30px;padding:40px;text-align:center;max-width:500px;animation:popIn .4s ease}
-@keyframes popIn{0%{opacity:0;transform:scale(.9)}100%{opacity:1;transform:scale(1)}}
+.welcome-card{background:rgba(20,30,50,.95);border:2px solid #ffcc00;border-radius:30px;padding:40px;text-align:center;max-width:500px}
 .welcome-card h1{font-size:48px;color:#ffcc00;margin-bottom:10px}
-.welcome-card p{color:rgba(255,255,255,.7);margin-bottom:20px}
 .feature-list{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:20px 0}
 .feature{background:rgba(45,90,227,.2);padding:10px;border-radius:12px;font-size:13px}
-.enter-btn{background:#2d5ae3;border:none;border-radius:40px;padding:15px 40px;color:#fff;font-size:18px;font-weight:700;cursor:pointer;margin-top:20px;transition:all .2s}
+.enter-btn{background:#2d5ae3;border:none;border-radius:40px;padding:15px 40px;color:#fff;font-size:18px;font-weight:700;cursor:pointer;margin-top:20px}
 .enter-btn:hover{transform:scale(1.02);background:#3a6ae3}
 
-/* MAIN CHAT */
 .chat-container{display:none;height:100vh}
 .chat-container.show{display:flex}
 .sidebar{width:260px;background:rgba(10,15,30,.95);border-right:1px solid rgba(45,90,227,.3);display:flex;flex-direction:column}
 .sidebar-header{padding:15px;border-bottom:1px solid rgba(255,255,255,.1);font-size:18px;color:#ffcc00;font-weight:700}
 .channel-list{padding:10px}
-.channel{display:flex;align-items:center;gap:10px;padding:10px 12px;margin:4px 0;border-radius:10px;cursor:pointer;transition:all .2s;color:rgba(255,255,255,.7)}
-.channel:hover{background:rgba(45,90,227,.2);color:#fff;transform:translateX(3px)}
+.channel{display:flex;align-items:center;gap:10px;padding:10px 12px;margin:4px 0;border-radius:10px;cursor:pointer;color:rgba(255,255,255,.7)}
+.channel:hover{background:rgba(45,90,227,.2);color:#fff}
 .channel.active{background:rgba(45,90,227,.3);color:#ffcc00}
-.channel-icon{font-size:18px}
-.section-title{padding:10px 12px;color:rgba(255,255,255,.4);font-size:11px;text-transform:uppercase;margin-top:10px}
-.friend-item,.group-item,.dm-item{padding:8px 12px;margin:2px 8px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .2s}
-.friend-item:hover,.group-item:hover,.dm-item:hover{background:rgba(45,90,227,.2);transform:translateX(3px)}
+.section-title{padding:10px 12px;color:rgba(255,255,255,.4);font-size:11px;text-transform:uppercase;margin-top:10px;display:flex;justify-content:space-between}
+.friend-item,.group-item,.dm-item{padding:8px 12px;margin:2px 8px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:10px}
+.friend-item:hover,.group-item:hover,.dm-item:hover{background:rgba(45,90,227,.2)}
 .friend-avatar{width:32px;height:32px;background:linear-gradient(135deg,#2d5ae3,#ffcc00);border-radius:50%;display:flex;align-items:center;justify-content:center}
 .status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
-.status-dot.online{background:#0f8;box-shadow:0 0 5px #0f8}
-.status-dot.offline{background:#666}
-.add-btn{background:0 0;border:none;color:#ffcc00;cursor:pointer;font-size:16px;margin-left:auto}
+.status-dot.online{background:#0f8}
+.add-btn{background:0 0;border:none;color:#ffcc00;cursor:pointer;font-size:16px}
 .chat-area{flex:1;display:flex;flex-direction:column}
 .chat-header{padding:15px 20px;border-bottom:1px solid rgba(255,255,255,.1);font-size:18px;color:#ffcc00}
 .messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
-.message{display:flex;gap:12px;padding:8px;border-radius:12px;transition:all .2s;animation:fadeInUp .2s ease}
-@keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.message{display:flex;gap:12px;padding:8px;border-radius:12px}
 .message:hover{background:rgba(255,255,255,.03)}
-.message-avatar{width:36px;height:36px;background:linear-gradient(135deg,#2d5ae3,#ffcc00);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;cursor:pointer;flex-shrink:0}
+.message-avatar{width:36px;height:36px;background:linear-gradient(135deg,#2d5ae3,#ffcc00);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
 .message-content{flex:1}
-.message-name{font-weight:700;color:#ffcc00;cursor:pointer;margin-right:8px}
+.message-name{font-weight:700;color:#ffcc00;margin-right:8px}
 .message-time{font-size:10px;color:rgba(255,255,255,.4)}
-.message-text{word-break:break-word;margin-top:4px;font-size:14px}
-.message-text img{max-width:150px;border-radius:8px}
+.message-text{margin-top:4px;font-size:14px}
 .input-area{display:flex;gap:10px;padding:15px 20px;border-top:1px solid rgba(255,255,255,.1)}
 #messageInput{flex:1;padding:12px 16px;border-radius:25px;border:1px solid rgba(45,90,227,.4);background:rgba(0,0,0,.3);color:#fff;outline:0}
 #messageInput:focus{border-color:#ffcc00}
-.send-btn{background:#2d5ae3;border:none;border-radius:25px;padding:12px 24px;color:#fff;font-weight:600;cursor:pointer;transition:all .2s}
-.send-btn:hover{transform:translateY(-2px);background:#3a6ae3}
+.send-btn{background:#2d5ae3;border:none;border-radius:25px;padding:12px 24px;color:#fff;font-weight:600;cursor:pointer}
+.send-btn:hover{transform:translateY(-2px)}
 .members-sidebar{width:220px;background:rgba(10,15,30,.95);border-left:1px solid rgba(45,90,227,.3);padding:15px;overflow-y:auto}
 .members-header{display:flex;justify-content:space-between;color:#ffcc00;margin-bottom:15px;font-size:13px}
 .member-item{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:13px;cursor:pointer}
 .member-item:hover{color:#ffcc00}
 .member-avatar{width:28px;height:28px;background:linear-gradient(135deg,#2d5ae3,#ffcc00);border-radius:50%;display:flex;align-items:center;justify-content:center}
 
-/* MODALS */
 .modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:10000;display:none;align-items:center;justify-content:center}
 .modal.show{display:flex}
 .modal-content{background:rgba(20,30,50,.98);border:1px solid rgba(45,90,227,.4);border-radius:20px;padding:25px;min-width:300px;max-width:400px}
@@ -74,7 +65,6 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0a0a1a,#0
 </head>
 <body>
 
-<!-- WELCOME SCREEN -->
 <div class="welcome-overlay" id="welcomeScreen">
   <div class="welcome-card">
     <h1>🏟️ FANTARENA</h1>
@@ -93,28 +83,21 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0a0a1a,#0
   </div>
 </div>
 
-<!-- MAIN CHAT -->
 <div class="chat-container" id="chatContainer">
   <div class="sidebar">
     <div class="sidebar-header">🏟️ FANTARENA</div>
     <div class="channel-list">
-      <div class="channel active" data-channel="general"><span class="channel-icon">💬</span> general</div>
-      <div class="channel" data-channel="game-recs"><span class="channel-icon">🎮</span> game recs</div>
-      <div class="channel" data-channel="lfg"><span class="channel-icon">👥</span> lfg</div>
-      <div class="channel" data-channel="flex"><span class="channel-icon">🏆</span> flex</div>
+      <div class="channel active" data-channel="general">💬 general</div>
+      <div class="channel" data-channel="game-recs">🎮 game recs</div>
+      <div class="channel" data-channel="lfg">👥 lfg</div>
+      <div class="channel" data-channel="flex">🏆 flex</div>
     </div>
     <div class="section-title">💬 DIRECT MESSAGES</div>
-    <div id="dmList"></div>
-    <div class="section-title" style="display:flex;justify-content:space-between">
-      <span>👥 GROUPS</span>
-      <button class="add-btn" id="createGroupBtn">+</button>
-    </div>
-    <div id="groupsList"></div>
-    <div class="section-title" style="display:flex;justify-content:space-between">
-      <span>⭐ FRIENDS</span>
-      <button class="add-btn" id="addFriendBtn">+</button>
-    </div>
-    <div id="friendsList"></div>
+    <div id="dmList"><div style="padding:8px 12px;color:gray">no DMs yet</div></div>
+    <div class="section-title"><span>👥 GROUPS</span><button class="add-btn" id="createGroupBtn">+</button></div>
+    <div id="groupsList"><div style="padding:8px 12px;color:gray">no groups yet</div></div>
+    <div class="section-title"><span>⭐ FRIENDS</span><button class="add-btn" id="addFriendBtn">+</button></div>
+    <div id="friendsList"><div style="padding:8px 12px;color:gray">no friends yet</div></div>
     <div style="margin-top:auto;padding:15px">
       <button id="settingsBtn" class="send-btn" style="width:100%;padding:10px;background:rgba(255,255,255,.1);margin-bottom:8px">⚙️ settings</button>
       <button id="dailyBtn" class="send-btn" style="width:100%;padding:10px;background:rgba(255,255,255,.1)">🎁 daily reward</button>
@@ -123,7 +106,7 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0a0a1a,#0
   
   <div class="chat-area">
     <div class="chat-header" id="chatHeader"># general</div>
-    <div class="messages" id="messages"><div style="text-align:center;padding:40px;color:gray">✨ welcome! send a message to start ✨</div></div>
+    <div class="messages" id="messages"><div style="text-align:center;padding:40px;color:gray">✨ welcome! send a message ✨</div></div>
     <div class="input-area">
       <input type="text" id="messageInput" placeholder="Type a message...">
       <button class="send-btn" id="sendBtn">send</button>
@@ -137,23 +120,22 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0a0a1a,#0
   </div>
 </div>
 
-<!-- MODALS -->
 <div class="modal" id="addFriendModal"><div class="modal-content"><h3>➕ add friend</h3><input type="text" id="friendUsername" placeholder="username"><div class="modal-buttons"><button id="confirmAddFriend" style="background:#2d5ae3;color:#fff">add</button><button id="closeAddFriendModal">cancel</button></div></div></div>
 <div class="modal" id="createGroupModal"><div class="modal-content"><h3>👥 create group</h3><input type="text" id="groupName" placeholder="group name"><div class="modal-buttons"><button id="confirmCreateGroup" style="background:#2d5ae3;color:#fff">create</button><button id="closeCreateGroupModal">cancel</button></div></div></div>
 <div class="modal" id="settingsModal"><div class="modal-content"><h3>⚙️ settings</h3><input type="color" id="nameColor" value="#ffcc00"><input type="text" id="customActivity" placeholder="custom activity"><textarea id="userBio" rows="2" placeholder="bio" style="width:100%;padding:10px;border-radius:10px;background:rgba(0,0,0,.3);color:#fff;border:1px solid rgba(45,90,227,.4);margin-bottom:15px"></textarea><div class="modal-buttons"><button id="saveSettings" style="background:#2d5ae3;color:#fff">save</button><button id="closeSettingsModal">close</button></div></div></div>
 <div class="modal" id="dailyModal"><div class="modal-content" style="text-align:center"><h3>🎁 DAILY REWARD</h3><div id="dailyAmount" style="font-size:36px;color:#ffcc00;margin:20px 0">+50 🪙</div><div id="dailyStreak" style="margin-bottom:20px">streak: 1 day</div><div class="modal-buttons"><button id="claimDaily" style="background:#2d5ae3;color:#fff">claim</button><button id="closeDailyModal">close</button></div></div></div>
 
 <script>
-// ===== SIMPLE WORKING FANTARENA =====
-(function() {
-  console.log('🔥 Fantarena starting...');
+// ===== WORKING FANTARENA - FIXED =====
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🔥 Fantarena loading...');
   
-  // Supabase
+  // Supabase config
   const SUPABASE_URL = "https://luxutkabqgitoteosctr.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eHV0a2FicWdpdG90ZW9zY3RyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2Mjc5NjAsImV4cCI6MjA5MjIwMzk2MH0.7GjvQMZaujg0YFmTBr2wotGWCIUoBWCBplGocMo6TDM";
-  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   
-  // Get current user from localStorage
+  // Get current user
   let currentUser = JSON.parse(localStorage.getItem('fanter_currentUser') || 'null');
   if (!currentUser || currentUser.username === 'Guest') {
     alert('Please log in on the main site first!');
@@ -166,15 +148,10 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0a0a1a,#0
   // State
   let currentChannel = 'general';
   let messages = [];
-  let friends = [];
-  let groups = [];
-  let dmList = [];
   let channelSubscription = null;
   let nameColor = localStorage.getItem('fanter_nameColor') || '#ffcc00';
   let customActivity = localStorage.getItem('fanter_activity') || '🎮 gaming';
   let userBio = localStorage.getItem('fanter_bio') || 'Just a gamer';
-  let dailyStreak = parseInt(localStorage.getItem('dailyStreak') || 0);
-  let lastDaily = localStorage.getItem('lastDailyClaim');
   
   // DOM elements
   const welcomeScreen = document.getElementById('welcomeScreen');
@@ -184,13 +161,7 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0a0a1a,#0
   const messageInput = document.getElementById('messageInput');
   const sendBtn = document.getElementById('sendBtn');
   const chatHeader = document.getElementById('chatHeader');
-  const friendsList = document.getElementById('friendsList');
-  const groupsList = document.getElementById('groupsList');
-  const dmListDiv = document.getElementById('dmList');
-  const membersList = document.getElementById('membersList');
-  const onlineCountSpan = document.getElementById('onlineCount');
   
-  // Helper functions
   function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
   
   function formatMessage(text) {
@@ -198,11 +169,11 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0a0a1a,#0
     return text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\*(.*?)\*/g, '<i>$1</i>').replace(/~~(.*?)~~/g, '<s>$1</s>');
   }
   
-  // Load messages from Supabase
+  // Load messages
   async function loadMessages() {
     try {
-      console.log('Loading messages for channel:', currentChannel);
-      let { data, error } = await supabase
+      console.log('Loading messages for:', currentChannel);
+      let { data, error } = await supabaseClient
         .from('fanter_chat')
         .select('*')
         .eq('channel_id', currentChannel)
@@ -211,34 +182,28 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0a0a1a,#0
       
       if (error) throw error;
       messages = data || [];
-      renderMessages();
-      console.log('Loaded', messages.length, 'messages');
-    } catch(e) {
-      console.error('Load messages error:', e);
-      messagesDiv.innerHTML = '<div style="text-align:center;padding:40px;color:red">Error loading messages. Make sure Supabase is connected.</div>';
-    }
-  }
-  
-  function renderMessages() {
-    if (!messagesDiv) return;
-    if (messages.length === 0) {
-      messagesDiv.innerHTML = '<div style="text-align:center;padding:40px;color:gray">✨ no messages yet — be the first! ✨</div>';
-      return;
-    }
-    
-    messagesDiv.innerHTML = messages.map(msg => `
-      <div class="message">
-        <div class="message-avatar">${(msg.username?.[0] || 'U').toUpperCase()}</div>
-        <div class="message-content">
-          <div>
-            <span class="message-name" style="color:${msg.nameColor || '#ffcc00'}">${escapeHtml(msg.username)}</span>
-            <span class="message-time">${new Date(msg.created_at).toLocaleTimeString()}</span>
+      
+      if (messages.length === 0) {
+        messagesDiv.innerHTML = '<div style="text-align:center;padding:40px;color:gray">✨ no messages yet — be the first! ✨</div>';
+        return;
+      }
+      
+      messagesDiv.innerHTML = messages.map(msg => `
+        <div class="message">
+          <div class="message-avatar">${(msg.username?.[0] || 'U').toUpperCase()}</div>
+          <div class="message-content">
+            <div>
+              <span class="message-name" style="color:${msg.nameColor || '#ffcc00'}">${escapeHtml(msg.username)}</span>
+              <span class="message-time">${new Date(msg.created_at).toLocaleTimeString()}</span>
+            </div>
+            <div class="message-text">${formatMessage(escapeHtml(msg.message))}</div>
           </div>
-          <div class="message-text">${formatMessage(escapeHtml(msg.message))}</div>
         </div>
-      </div>
-    `).join('');
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      `).join('');
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    } catch(e) {
+      console.error('Load error:', e);
+    }
   }
   
   // Send message
@@ -246,10 +211,8 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0a0a1a,#0
     const text = messageInput.value.trim();
     if (!text) return;
     
-    console.log('Sending message:', text);
-    
     try {
-      let { error } = await supabase
+      let { error } = await supabaseClient
         .from('fanter_chat')
         .insert({
           channel_id: currentChannel,
@@ -260,32 +223,49 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0a0a1a,#0
         });
       
       if (error) throw error;
-      
       messageInput.value = '';
       console.log('Message sent!');
     } catch(e) {
       console.error('Send error:', e);
-      alert('Failed to send message: ' + e.message);
+      alert('Failed to send: ' + e.message);
     }
   }
   
   // Real-time subscription
   function setupRealtime() {
     if (channelSubscription) {
-      supabase.removeChannel(channelSubscription);
+      supabaseClient.removeChannel(channelSubscription);
     }
     
-    channelSubscription = supabase
-      .channel('fantarena-chat')
+    channelSubscription = supabaseClient
+      .channel('fantarena-live')
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
         table: 'fanter_chat',
         filter: `channel_id=eq.${currentChannel}`
       }, payload => {
-        console.log('New message:', payload.new);
+        console.log('New message!');
         messages.push(payload.new);
-        renderMessages();
+        if (messages.length === 1) {
+          loadMessages();
+        } else {
+          const msg = payload.new;
+          const msgHtml = `
+            <div class="message">
+              <div class="message-avatar">${(msg.username?.[0] || 'U').toUpperCase()}</div>
+              <div class="message-content">
+                <div>
+                  <span class="message-name" style="color:${msg.nameColor || '#ffcc00'}">${escapeHtml(msg.username)}</span>
+                  <span class="message-time">${new Date(msg.created_at).toLocaleTimeString()}</span>
+                </div>
+                <div class="message-text">${formatMessage(escapeHtml(msg.message))}</div>
+              </div>
+            </div>
+          `;
+          messagesDiv.insertAdjacentHTML('beforeend', msgHtml);
+          messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
       })
       .subscribe();
   }
@@ -293,16 +273,15 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0a0a1a,#0
   // Load members
   async function loadMembers() {
     try {
-      let { data } = await supabase.from('fanter_presence').select('*').order('status', { ascending: false });
+      let { data } = await supabaseClient.from('fanter_presence').select('*').order('status', { ascending: false });
       if (data) {
         let online = data.filter(m => m.status === 'online').length;
-        onlineCountSpan.textContent = online + ' online';
-        membersList.innerHTML = `
-          <div style="font-size:11px;color:gray;margin:8px 0">ONLINE — ${online}</div>
-          ${data.filter(m => m.status === 'online').map(m => `<div class="member-item"><div class="member-avatar">${(m.username?.[0] || 'U').toUpperCase()}</div><span>${escapeHtml(m.display_name || m.username)}</span></div>`).join('')}
-          <div style="font-size:11px;color:gray;margin:8px 0">OFFLINE</div>
-          ${data.filter(m => m.status !== 'online').map(m => `<div class="member-item"><div class="member-avatar">${(m.username?.[0] || 'U').toUpperCase()}</div><span>${escapeHtml(m.display_name || m.username)}</span></div>`).join('')}
-        `;
+        document.getElementById('onlineCount').textContent = online + ' online';
+        let membersHtml = `<div style="font-size:11px;color:gray;margin:8px 0">ONLINE — ${online}</div>`;
+        membersHtml += data.filter(m => m.status === 'online').map(m => `<div class="member-item"><div class="member-avatar">${(m.username?.[0] || 'U').toUpperCase()}</div><span>${escapeHtml(m.display_name || m.username)}</span></div>`).join('');
+        membersHtml += `<div style="font-size:11px;color:gray;margin:8px 0">OFFLINE</div>`;
+        membersHtml += data.filter(m => m.status !== 'online').map(m => `<div class="member-item"><div class="member-avatar">${(m.username?.[0] || 'U').toUpperCase()}</div><span>${escapeHtml(m.display_name || m.username)}</span></div>`).join('');
+        document.getElementById('membersList').innerHTML = membersHtml;
       }
     } catch(e) { console.error(e); }
   }
@@ -310,7 +289,7 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0a0a1a,#0
   // Update presence
   async function updatePresence() {
     try {
-      await supabase.from('fanter_presence').upsert({
+      await supabaseClient.from('fanter_presence').upsert({
         user_id: currentUser.id,
         username: currentUser.displayName || currentUser.username,
         display_name: currentUser.displayName || currentUser.username,
@@ -325,48 +304,18 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0a0a1a,#0
   function switchChannel(channel) {
     currentChannel = channel;
     chatHeader.textContent = '# ' + channel;
-    
     document.querySelectorAll('.channel').forEach(c => {
       if (c.dataset.channel === channel) c.classList.add('active');
       else c.classList.remove('active');
     });
-    
     loadMessages();
     setupRealtime();
   }
   
-  // Load friends (simplified)
-  async function loadFriends() {
-    try {
-      let { data } = await supabase.from('fanter_friends').select('friend_id').eq('user_id', currentUser.id);
-      if (data?.length) {
-        let { data: f } = await supabase.from('fanter_presence').select('*').in('user_id', data.map(d => d.friend_id));
-        friends = f || [];
-      }
-      friendsList.innerHTML = friends.length ? friends.map(f => `
-        <div class="friend-item"><div class="friend-avatar">${(f.username?.[0] || 'U').toUpperCase()}</div><div>${escapeHtml(f.display_name || f.username)}</div></div>
-      `).join('') : '<div style="padding:8px 12px;color:gray;font-size:12px">no friends yet</div>';
-    } catch(e) {}
-  }
-  
-  // Load groups
-  async function loadGroups() {
-    try {
-      let { data } = await supabase.from('fanter_groups').select('*');
-      groups = (data || []).filter(g => g.members?.includes(currentUser.id));
-      groupsList.innerHTML = groups.length ? groups.map(g => `
-        <div class="group-item"><span>👥</span><span>${escapeHtml(g.name)}</span></div>
-      `).join('') : '<div style="padding:8px 12px;color:gray;font-size:12px">no groups yet</div>';
-    } catch(e) {}
-  }
-  
   // Initialize chat
   async function initChat() {
-    console.log('Initializing chat...');
     await updatePresence();
     await loadMessages();
-    await loadFriends();
-    await loadGroups();
     await loadMembers();
     setupRealtime();
     setInterval(loadMembers, 10000);
@@ -382,7 +331,7 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0a0a1a,#0
     localStorage.setItem('fantarena_welcomed', 'true');
   };
   
-  // Check if already entered
+  // Auto-enter if already welcomed
   if (localStorage.getItem('fantarena_welcomed') === 'true') {
     welcomeScreen.style.display = 'none';
     chatContainer.classList.add('show');
@@ -420,7 +369,6 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0a0a1a,#0
     alert('Settings saved!');
   };
   
-  // Load saved settings into modal
   document.getElementById('nameColor').value = nameColor;
   document.getElementById('customActivity').value = customActivity;
   document.getElementById('userBio').value = userBio;
@@ -436,9 +384,9 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0a0a1a,#0
   confirmAddFriend.onclick = async () => {
     const username = document.getElementById('friendUsername').value.trim();
     if (!username) return;
-    let { data: users } = await supabase.from('fanter_presence').select('user_id').ilike('username', username);
+    let { data: users } = await supabaseClient.from('fanter_presence').select('user_id').ilike('username', username);
     if (users?.length) {
-      await supabase.from('fanter_friend_requests').insert({ sender_id: currentUser.id, receiver_id: users[0].user_id });
+      await supabaseClient.from('fanter_friend_requests').insert({ sender_id: currentUser.id, receiver_id: users[0].user_id });
       alert('Friend request sent!');
     } else {
       alert('User not found');
@@ -458,10 +406,9 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0a0a1a,#0
   confirmCreateGroup.onclick = async () => {
     const name = document.getElementById('groupName').value.trim();
     if (!name) return;
-    await supabase.from('fanter_groups').insert({ name, owner_id: currentUser.id, members: [currentUser.id] });
+    await supabaseClient.from('fanter_groups').insert({ name, owner_id: currentUser.id, members: [currentUser.id] });
     alert('Group created!');
     createGroupModal.classList.remove('show');
-    loadGroups();
     document.getElementById('groupName').value = '';
   };
   
@@ -470,10 +417,11 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0a0a1a,#0
   const dailyBtn = document.getElementById('dailyBtn');
   const closeDailyModal = document.getElementById('closeDailyModal');
   const claimDaily = document.getElementById('claimDaily');
+  let lastDailyClaim = localStorage.getItem('lastDailyClaim');
   
   dailyBtn.onclick = () => {
     const today = new Date().toDateString();
-    if (lastDaily === today) {
+    if (lastDailyClaim === today) {
       alert('Already claimed today! Come back tomorrow.');
       return;
     }
@@ -485,14 +433,15 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0a0a1a,#0
     user.coins = (user.coins || 0) + 50;
     localStorage.setItem('fanter_currentUser', JSON.stringify(user));
     localStorage.setItem('lastDailyClaim', new Date().toDateString());
-    localStorage.setItem('dailyStreak', (dailyStreak + 1));
+    let streak = parseInt(localStorage.getItem('dailyStreak') || 0);
+    localStorage.setItem('dailyStreak', streak + 1);
     alert('🎁 You claimed 50 coins!');
     dailyModal.classList.remove('show');
     if (typeof updateHeaderCoins === 'function') updateHeaderCoins();
   };
   
-  console.log('✅ Fantarena ready!');
-})();
+  console.log('✅ Fantarena ready! Click ENTER to start');
+});
 </script>
 </body>
 </html>
