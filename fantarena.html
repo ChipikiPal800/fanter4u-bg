@@ -66,17 +66,16 @@
     .server-item.active::before { content: ''; position: absolute; left: -8px; top: 0; bottom: 0; width: 3px; background: #ffcc00; border-radius: 3px; }
     .unread-badge { background: #ff4444; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-left: auto; animation: pulse 1s infinite; }
     @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+    .channel-indicator { position: absolute; left: -8px; width: 3px; background: #ffcc00; border-radius: 3px; transition: top 0.2s ease, height 0.2s ease; pointer-events: none; }
     
     /* CHANNEL TOPIC */
     .channel-topic { padding: 5px 20px 10px; font-size: 11px; color: rgba(255,255,255,0.4); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 8px; }
     .channel-topic span { cursor: pointer; }
-    .channel-topic input { background: rgba(0,0,0,0.3); border: 1px solid rgba(45,90,227,0.4); border-radius: 15px; padding: 4px 10px; color: white; font-size: 11px; flex: 1; }
     
     /* CHAT MAIN */
     .chat-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
     .chat-header { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .chat-header h3 { font-weight: 700; color: #ffcc00; font-size: 16px; }
-    .slow-mode-indicator { font-size: 10px; background: rgba(255,204,0,0.2); padding: 2px 8px; border-radius: 12px; color: #ffcc00; }
     .messages-container { flex: 1; overflow-y: auto; padding: 15px 20px; display: flex; flex-direction: column; gap: 14px; }
     .message { display: flex; align-items: flex-start; gap: 12px; position: relative; animation: fadeInUp 0.2s ease; }
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -222,7 +221,7 @@
         <div class="server-item" data-channel="game-recs" data-display="# game recs"><span>🎮</span> game recs <span class="unread-badge" style="display:none;">new</span></div>
         <div class="server-item" data-channel="lfg" data-display="# looking for group"><span>👥</span> looking for group <span class="unread-badge" style="display:none;">new</span></div>
         <div class="server-item" data-channel="flex" data-display="# flex"><span>🏆</span> flex <span class="unread-badge" style="display:none;">new</span></div>
-        <div id="channelIndicator" class="channel-indicator" style="top: 6px; height: 38px;"></div>
+        <div id="channelIndicator" class="channel-indicator"></div>
       </div>
     </div>
     
@@ -416,6 +415,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const createGroupModal = document.getElementById('createGroupModal');
   const topicModal = document.getElementById('topicModal');
   const giveCoinsModal = document.getElementById('giveCoinsModal');
+  const channelIndicator = document.getElementById('channelIndicator');
   
   // ===== WELCOME SCREEN FUNCTIONS =====
   function enterFantarena() {
@@ -520,11 +520,10 @@ document.addEventListener('DOMContentLoaded', function() {
   function updateChannelIndicator() {
     const activeItem = document.querySelector('.server-item.active');
     if (!activeItem) return;
-    const indicator = document.getElementById('channelIndicator');
     const offsetTop = activeItem.offsetTop;
     const height = activeItem.offsetHeight;
-    indicator.style.top = offsetTop + 'px';
-    indicator.style.height = height + 'px';
+    channelIndicator.style.top = offsetTop + 'px';
+    channelIndicator.style.height = height + 'px';
   }
   
   // ===== CHANNEL SWITCHING =====
@@ -543,7 +542,8 @@ document.addEventListener('DOMContentLoaded', function() {
       if (unreadChannels[currentChannel]) {
         delete unreadChannels[currentChannel];
         localStorage.setItem('unreadChannels', JSON.stringify(unreadChannels));
-        item.querySelector('.unread-badge').style.display = 'none';
+        const badge = item.querySelector('.unread-badge');
+        if (badge) badge.style.display = 'none';
       }
       
       messages = [];
@@ -621,7 +621,10 @@ document.addEventListener('DOMContentLoaded', function() {
       unreadChannels[channel] = true;
       localStorage.setItem('unreadChannels', JSON.stringify(unreadChannels));
       const channelItem = document.querySelector(`.server-item[data-channel="${channel}"]`);
-      if (channelItem) channelItem.querySelector('.unread-badge').style.display = 'inline-block';
+      if (channelItem) {
+        const badge = channelItem.querySelector('.unread-badge');
+        if (badge) badge.style.display = 'inline-block';
+      }
     }
   }
   
@@ -640,6 +643,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   function renderDMList() {
+    if (!dmList) return;
     if (dmConversations.length === 0) {
       dmList.innerHTML = '<div style="padding:8px 15px; color:rgba(255,255,255,0.3); font-size:12px;">no DMs yet</div>';
       return;
@@ -705,6 +709,7 @@ document.addEventListener('DOMContentLoaded', function() {
     try {
       const { data } = await supabaseClient.from('fanter_groups').select('*');
       groups = (data || []).filter(g => g.members.includes(currentUser.id));
+      if (!groupsList) return;
       if (groups.length === 0) {
         groupsList.innerHTML = '<div style="padding:8px 15px; color:rgba(255,255,255,0.3); font-size:12px;">no groups yet</div>';
         return;
@@ -757,6 +762,7 @@ document.addEventListener('DOMContentLoaded', function() {
       } else {
         friends = [];
       }
+      if (!friendsList) return;
       if (friends.length === 0) {
         friendsList.innerHTML = '<div style="padding:8px 15px; color:rgba(255,255,255,0.3); font-size:12px;">no friends yet</div>';
         return;
@@ -821,13 +827,17 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   function renderMessages() {
+    if (!messagesContainer) return;
     if (messages.length === 0) {
       messagesContainer.innerHTML = '<div style="text-align:center; color:rgba(255,255,255,0.4);">no messages yet</div>';
       return;
     }
     messagesContainer.innerHTML = messages.map(msg => {
       const isMe = msg.user_id === currentUser.id;
-      const reactions = msg.reactions ? JSON.parse(msg.reactions) : {};
+      let reactions = {};
+      try {
+        reactions = msg.reactions ? JSON.parse(msg.reactions) : {};
+      } catch(e) { reactions = {}; }
       const userPic = msg.profile_pic;
       const isEdited = msg.edited;
       return `<div class="message" data-message-id="${msg.id}" data-channel="${msg.channel_id}">
@@ -845,7 +855,7 @@ document.addEventListener('DOMContentLoaded', function() {
           </div>
           <div class="message-actions">
             <button class="message-action-btn" onclick="window.replyToMessage('${msg.id}', '${msg.username}')">↩️</button>
-            ${isMe ? `<button class="message-action-btn" onclick="window.editMessage('${msg.id}', \`${msg.message?.replace(/`/g,'\\`').replace(/'/g,"\\'") || ''}\`)">✏️</button>` : ''}
+            ${isMe ? `<button class="message-action-btn" onclick="window.editMessage('${msg.id}', \`${(msg.message || '').replace(/`/g,'\\`').replace(/'/g,"\\'")}\`)">✏️</button>` : ''}
             ${isMe ? `<button class="message-action-btn" onclick="window.deleteMessage('${msg.id}')">🗑️</button>` : ''}
           </div>
         </div>
@@ -887,11 +897,17 @@ document.addEventListener('DOMContentLoaded', function() {
         profile_pic: profilePic
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Send error:', error);
+        alert('Failed to send: ' + error.message);
+        return;
+      }
       
+      console.log('✅ Message sent to', channelId);
       messageInput.value = '';
       cancelReply();
-      localStorage.removeItem(currentDM ? `draft_dm_${currentDM}` : currentGroup ? `draft_group_${currentGroup}` : `draft_${currentChannel}`);
+      const draftKey = currentDM ? `draft_dm_${currentDM}` : currentGroup ? `draft_group_${currentGroup}` : `draft_${currentChannel}`;
+      localStorage.removeItem(draftKey);
       
       if (currentDM) {
         await supabaseClient.from('fanter_dm_conversations').upsert({
@@ -902,7 +918,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         loadDMConversations();
       }
-    } catch (e) { console.error('Send error:', e); alert('failed to send message'); }
+    } catch (e) { console.error('Send exception:', e); alert('Connection error'); }
   }
   
   function handleSlashCommand(cmd) {
@@ -937,7 +953,10 @@ document.addEventListener('DOMContentLoaded', function() {
   window.toggleReaction = async function(messageId, emoji) {
     const msg = messages.find(m => m.id == messageId);
     if (!msg) return;
-    let reactions = msg.reactions ? JSON.parse(msg.reactions) : {};
+    let reactions = {};
+    try {
+      reactions = msg.reactions ? JSON.parse(msg.reactions) : {};
+    } catch(e) {}
     if (!reactions[emoji]) reactions[emoji] = [];
     const userIdStr = currentUser.id;
     const index = reactions[emoji].indexOf(userIdStr);
@@ -1023,19 +1042,21 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Drag & drop
   const chatMain = document.querySelector('.chat-main');
-  chatMain.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    chatMain.classList.add('drag-over');
-  });
-  chatMain.addEventListener('dragleave', () => {
-    chatMain.classList.remove('drag-over');
-  });
-  chatMain.addEventListener('drop', (e) => {
-    e.preventDefault();
-    chatMain.classList.remove('drag-over');
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) uploadImage(file);
-  });
+  if (chatMain) {
+    chatMain.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      chatMain.classList.add('drag-over');
+    });
+    chatMain.addEventListener('dragleave', () => {
+      chatMain.classList.remove('drag-over');
+    });
+    chatMain.addEventListener('drop', (e) => {
+      e.preventDefault();
+      chatMain.classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) uploadImage(file);
+    });
+  }
   
   // ===== REALTIME =====
   function setupRealtime() {
@@ -1111,7 +1132,7 @@ document.addEventListener('DOMContentLoaded', function() {
   async function loadMembers() {
     try {
       const { data } = await supabaseClient.from('fanter_presence').select('*').order('status', { ascending: false });
-      if (data) {
+      if (data && membersList) {
         const online = data.filter(m => m.status === 'online').length;
         onlineCount.textContent = `${online} online`;
         membersList.innerHTML = `
@@ -1151,7 +1172,10 @@ document.addEventListener('DOMContentLoaded', function() {
     try {
       const res = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_API_KEY}&q=${query}&limit=12`);
       const data = await res.json();
-      document.getElementById('gifGrid').innerHTML = data.data.map(g => `<div class="gif-item" onclick="sendGif('${g.images.fixed_height.url}')"><img src="${g.images.fixed_height_small.url}"></div>`).join('');
+      const gifGrid = document.getElementById('gifGrid');
+      if (gifGrid) {
+        gifGrid.innerHTML = data.data.map(g => `<div class="gif-item" onclick="sendGif('${g.images.fixed_height.url}')"><img src="${g.images.fixed_height_small.url}"></div>`).join('');
+      }
     } catch (e) { console.error('GIF error:', e); }
   }
   
@@ -1162,7 +1186,8 @@ document.addEventListener('DOMContentLoaded', function() {
     emojiPicker.classList.remove('show');
     searchGifs('trending');
   };
-  document.getElementById('gifSearch').oninput = (e) => searchGifs(e.target.value);
+  const gifSearch = document.getElementById('gifSearch');
+  if (gifSearch) gifSearch.oninput = (e) => searchGifs(e.target.value);
   
   // ===== MODAL FUNCTIONS =====
   document.getElementById('addFriendBtn').onclick = () => addFriendModal.classList.add('show');
@@ -1172,8 +1197,12 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('helpBtn').onclick = () => showWelcomeScreen();
   
   // Set initial active channel
-  document.querySelector('.server-item.active').classList.remove('active');
-  document.querySelector('.server-item[data-channel="general"]').classList.add('active');
+  const defaultChannel = document.querySelector('.server-item[data-channel="general"]');
+  if (defaultChannel) {
+    document.querySelectorAll('.server-item').forEach(i => i.classList.remove('active'));
+    defaultChannel.classList.add('active');
+    updateChannelIndicator();
+  }
   
   console.log('🏟️ Fantarena fully loaded!');
 });
