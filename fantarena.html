@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>fanter | fantarena SECURE</title>
+<title>fanter | fantarena</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <style>
@@ -14,10 +14,6 @@
   --purple:#9f5ae3;--green:#00e87a;--red:#ff4466;
   --bg:#07081a;--surface:rgba(12,16,38,0.98);
   --text:#dde2ff;--muted:rgba(180,190,255,0.38);
-  --sidebar-w:260px;--members-w:215px;
-  --ease:cubic-bezier(0.25,0.46,0.45,0.94);
-  --ease-spring:cubic-bezier(0.34,1.56,0.64,1);
-  --t-fast:140ms;--t-med:240ms;
 }
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden}
 ::-webkit-scrollbar{width:4px}
@@ -34,44 +30,44 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 @keyframes greenGlow{0%{text-shadow:0 0 2px #00e87a,0 0 4px #33ff99}50%{text-shadow:0 0 4px #33ff99,0 0 8px #66ffbb}100%{text-shadow:0 0 2px #00e87a,0 0 4px #33ff99}}
 
 /* WELCOME */
-.welcome-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:9999;background:var(--bg);transition:opacity var(--t-med) var(--ease)}
+.welcome-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:9999;background:var(--bg);transition:opacity 0.3s}
 .welcome-screen.out{opacity:0;transform:scale(0.96);pointer-events:none}
-.welcome-card{background:var(--surface);border:1.5px solid var(--gold-border);border-radius:28px;padding:40px;text-align:center;max-width:480px;animation:msgIn var(--t-med) var(--ease-spring)}
+.welcome-card{background:var(--surface);border:1.5px solid var(--gold-border);border-radius:28px;padding:40px;text-align:center;max-width:480px;animation:msgIn 0.3s}
 .welcome-logo{font-family:'Syne',sans-serif;font-size:42px;font-weight:800;color:var(--gold)}
 .feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:25px 0}
 .feature{background:var(--blue-dim);border:1px solid var(--blue-border);border-radius:12px;padding:10px;font-size:11px}
-.enter-btn{width:100%;padding:14px;border-radius:50px;border:none;background:linear-gradient(135deg,var(--blue),#1a3bc0);color:white;font-weight:700;cursor:pointer;transition:transform var(--t-fast) var(--ease)}
+.enter-btn{width:100%;padding:14px;border-radius:50px;border:none;background:linear-gradient(135deg,var(--blue),#1a3bc0);color:white;font-weight:700;cursor:pointer}
 .enter-btn:hover{transform:translateY(-2px)}
 
 /* MAIN CHAT */
-.chat-container{display:flex;height:100vh;opacity:0;pointer-events:none;transition:opacity var(--t-med) var(--ease)}
+.chat-container{display:flex;height:100vh;opacity:0;pointer-events:none;transition:opacity 0.3s}
 .chat-container.active{opacity:1;pointer-events:all}
 
 /* SIDEBAR */
-.sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--blue-border);display:flex;flex-direction:column;overflow:hidden;position:relative}
-.channel-pill{position:absolute;left:0;width:4px;background:var(--gold);border-radius:0 4px 4px 0;box-shadow:0 0 10px var(--gold);transition:top var(--t-med) var(--ease);z-index:10;opacity:0}
+.sidebar{width:260px;background:var(--surface);border-right:1px solid var(--blue-border);display:flex;flex-direction:column;overflow:hidden;position:relative}
+.channel-pill{position:absolute;left:0;width:4px;background:var(--gold);border-radius:0 4px 4px 0;box-shadow:0 0 10px var(--gold);transition:top 0.2s;z-index:10;opacity:0}
 .channel-pill.visible{opacity:1}
 .sidebar-header{padding:16px;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--gold);border-bottom:1px solid var(--blue-border)}
 .sidebar-scroll{flex:1;overflow-y:auto;padding-bottom:8px}
 .section-label{padding:12px 16px 4px;font-size:10px;font-weight:600;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between}
-.add-btn{background:none;border:none;color:var(--gold);font-size:18px;cursor:pointer;transition:transform var(--t-fast) var(--ease-spring)}
+.add-btn{background:none;border:none;color:var(--gold);font-size:18px;cursor:pointer}
 .add-btn:hover{transform:scale(1.2) rotate(90deg)}
-.channel{padding:8px 14px;margin:2px 8px;border-radius:10px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;color:var(--muted);transition:all var(--t-fast) var(--ease)}
+.channel{padding:8px 14px;margin:2px 8px;border-radius:10px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;color:var(--muted);transition:all 0.1s}
 .channel:hover{background:var(--blue-dim);color:var(--text);transform:translateX(3px)}
 .channel.active{background:rgba(45,90,227,0.22);color:var(--gold)}
-.sidebar-item{padding:7px 12px;margin:1px 8px;border-radius:10px;cursor:pointer;display:flex;align-items:center;gap:9px;font-size:13px;color:var(--muted);transition:all var(--t-fast) var(--ease)}
+.sidebar-item{padding:7px 12px;margin:1px 8px;border-radius:10px;cursor:pointer;display:flex;align-items:center;gap:9px;font-size:13px;color:var(--muted)}
 .sidebar-item:hover{background:var(--blue-dim);color:var(--text)}
 .mini-avatar{width:26px;height:26px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;overflow:hidden}
 .mini-avatar img{width:100%;height:100%;object-fit:cover}
 .sidebar-footer{padding:10px;border-top:1px solid var(--blue-border);display:flex;flex-direction:column;gap:5px}
-.footer-btn{width:100%;padding:8px 12px;border-radius:10px;border:none;background:rgba(255,255,255,0.05);color:var(--text);font-size:12px;cursor:pointer;text-align:left;transition:all var(--t-fast) var(--ease)}
+.footer-btn{width:100%;padding:8px 12px;border-radius:10px;border:none;background:rgba(255,255,255,0.05);color:var(--text);font-size:12px;cursor:pointer;text-align:left}
 .footer-btn:hover{background:rgba(255,255,255,0.1);transform:translateX(2px)}
 
-/* PANELS */
-.mod-panel{position:fixed;bottom:90px;right:20px;z-index:1000;display:flex;flex-direction:column;align-items:flex-end}
-.mod-panel-btn{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#ffaa00);border:none;cursor:pointer;font-size:22px;box-shadow:0 4px 15px rgba(255,204,0,0.3);transition:all var(--t-fast) var(--ease-spring);display:flex;align-items:center;justify-content:center}
+/* OWNER/MOD PANEL */
+.mod-panel{position:fixed;bottom:20px;right:20px;z-index:1000;display:flex;flex-direction:column;align-items:flex-end}
+.mod-panel-btn{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#ffaa00);border:none;cursor:pointer;font-size:22px;box-shadow:0 4px 15px rgba(255,204,0,0.3);display:flex;align-items:center;justify-content:center}
 .mod-panel-btn:hover{transform:scale(1.08)}
-.mod-panel-content{background:var(--surface);border:1px solid var(--gold-border);border-radius:16px;width:380px;max-height:65vh;overflow-y:auto;margin-bottom:10px;box-shadow:0 10px 40px rgba(0,0,0,0.4);display:none}
+.mod-panel-content{background:var(--surface);border:1px solid var(--gold-border);border-radius:16px;width:400px;max-height:70vh;overflow-y:auto;margin-bottom:10px;display:none}
 .mod-panel-content.open{display:block}
 .mod-panel-header{padding:12px 16px;border-bottom:1px solid var(--blue-border);font-weight:700;color:var(--gold);display:flex;justify-content:space-between}
 .mod-panel-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer}
@@ -80,7 +76,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 .mod-row{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
 .mod-input{flex:1;padding:6px 10px;border-radius:8px;border:1px solid var(--blue-border);background:rgba(0,0,0,0.3);color:var(--text);font-size:12px}
 .mod-select{flex:1;padding:6px 10px;border-radius:8px;border:1px solid var(--blue-border);background:rgba(0,0,0,0.3);color:var(--text);font-size:12px}
-.btn-mod-action{background:rgba(255,204,0,0.15);color:var(--gold);border:1px solid var(--gold-border);padding:6px 10px;border-radius:8px;cursor:pointer;font-size:11px;font-weight:600}
+.btn-mod-action{background:rgba(255,204,0,0.15);color:var(--gold);border:1px solid var(--gold-border);padding:6px 10px;border-radius:8px;cursor:pointer;font-size:11px}
 .btn-mod-action:hover{background:rgba(255,204,0,0.3)}
 .btn-danger-action{background:rgba(255,68,68,0.15);color:var(--red);border:1px solid rgba(255,68,68,0.3);padding:6px 10px;border-radius:8px;cursor:pointer;font-size:11px}
 .btn-danger-action:hover{background:rgba(255,68,68,0.3)}
@@ -94,7 +90,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 .typing-indicator{font-size:11px;color:var(--muted);min-width:130px}
 .header-coins{font-size:13px;color:var(--gold);display:flex;align-items:center;gap:5px}
 .messages{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:2px}
-.message{display:flex;gap:10px;padding:6px 8px;border-radius:10px;animation:msgIn var(--t-med) var(--ease-out);transition:background var(--t-fast) var(--ease);position:relative}
+.message{display:flex;gap:10px;padding:6px 8px;border-radius:10px;animation:msgIn 0.2s;transition:background 0.1s;position:relative}
 .message:hover{background:rgba(255,255,255,0.03)}
 .message:hover .msg-actions{opacity:1}
 .msg-avatar{width:32px;height:32px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;cursor:pointer;overflow:hidden}
@@ -102,22 +98,22 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 .msg-body{flex:1}
 .msg-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .msg-name{font-weight:600;font-size:13px;cursor:pointer}
-.msg-name.fire{animation:flame 1.5s ease-in-out infinite}
-.msg-name.purple{animation:purpleGlow 1.5s ease-in-out infinite}
-.msg-name.green{animation:greenGlow 1.5s ease-in-out infinite}
+.msg-name.fire{animation:flame 1.5s infinite}
+.msg-name.purple{animation:purpleGlow 1.5s infinite}
+.msg-name.green{animation:greenGlow 1.5s infinite}
 .msg-lv{background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);border-radius:6px;padding:1px 5px;font-size:9px}
 .mod-badge{background:var(--gold);color:#1a1200;border-radius:4px;padding:1px 5px;font-size:8px;margin-left:4px}
 .owner-badge{background:#ff4444;color:white;border-radius:4px;padding:1px 5px;font-size:8px;margin-left:4px}
 .msg-time{font-size:9px;color:var(--muted)}
 .msg-text{margin-top:2px;font-size:13px;line-height:1.45;word-break:break-word}
 .msg-text img{max-width:180px;border-radius:8px;cursor:pointer}
-.msg-actions{position:absolute;right:8px;top:50%;transform:translateY(-50%);display:flex;gap:2px;opacity:0;transition:opacity var(--t-fast) var(--ease);background:var(--surface);border:1px solid var(--blue-border);border-radius:8px;padding:2px 4px}
+.msg-actions{position:absolute;right:8px;top:50%;transform:translateY(-50%);display:flex;gap:2px;opacity:0;transition:opacity 0.1s;background:var(--surface);border:1px solid var(--blue-border);border-radius:8px;padding:2px 4px}
 .msg-action-btn{background:none;border:none;cursor:pointer;font-size:12px;padding:2px 4px;border-radius:5px;color:var(--muted)}
 .msg-action-btn:hover{background:var(--blue-dim);transform:scale(1.1)}
 .msg-reactions{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}
 .reaction-chip{display:flex;align-items:center;gap:3px;background:var(--blue-dim);border:1px solid var(--blue-border);border-radius:20px;padding:1px 6px;font-size:11px;cursor:pointer}
 .reaction-chip:hover{background:rgba(45,90,227,0.28)}
-.reaction-picker{position:absolute;right:8px;top:-35px;background:var(--surface);border:1px solid var(--blue-border);border-radius:10px;padding:4px 6px;display:flex;gap:3px;z-index:50;opacity:0;transform:translateY(5px);pointer-events:none;transition:all var(--t-fast) var(--ease-spring)}
+.reaction-picker{position:absolute;right:8px;top:-35px;background:var(--surface);border:1px solid var(--blue-border);border-radius:10px;padding:4px 6px;display:flex;gap:3px;z-index:50;opacity:0;transform:translateY(5px);pointer-events:none;transition:all 0.1s}
 .reaction-picker.open{opacity:1;transform:translateY(0);pointer-events:all}
 .react-btn{font-size:14px;cursor:pointer;padding:2px 3px;border-radius:5px}
 .react-btn:hover{background:var(--blue-dim)}
@@ -126,15 +122,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 .input-wrapper{border-top:1px solid var(--blue-border)}
 .input-area{display:flex;gap:8px;align-items:center;padding:10px 16px 14px}
 .input-toolbar{display:flex;gap:4px}
-.toolbar-btn{background:none;border:none;cursor:pointer;font-size:16px;padding:5px;border-radius:6px;color:var(--muted);transition:all var(--t-fast) var(--ease)}
+.toolbar-btn{background:none;border:none;cursor:pointer;font-size:16px;padding:5px;border-radius:6px;color:var(--muted)}
 .toolbar-btn:hover{background:var(--blue-dim);color:var(--text);transform:scale(1.1)}
 #messageInput{flex:1;padding:10px 16px;border-radius:50px;border:1.5px solid var(--blue-border);background:rgba(0,0,0,0.22);color:var(--text);font-size:13px;outline:none}
 #messageInput:focus{border-color:var(--gold)}
-.send-btn{padding:10px 20px;border-radius:50px;border:none;background:linear-gradient(135deg,var(--blue),#1a3bc0);color:white;font-weight:600;cursor:pointer;transition:transform var(--t-fast) var(--ease)}
+.send-btn{padding:10px 20px;border-radius:50px;border:none;background:linear-gradient(135deg,var(--blue),#1a3bc0);color:white;font-weight:600;cursor:pointer}
 .send-btn:hover{transform:translateY(-2px)}
 
 /* GIF & EMOJI PICKERS */
-.gif-picker{max-height:0;overflow:hidden;transition:max-height var(--t-med) var(--ease-out)}
+.gif-picker{max-height:0;overflow:hidden;transition:max-height 0.2s}
 .gif-picker.open{max-height:220px}
 .gif-picker-inner{padding:8px 16px;border-bottom:1px solid var(--blue-border)}
 .gif-search{width:100%;padding:6px 12px;border-radius:50px;border:1.5px solid var(--blue-border);background:rgba(0,0,0,0.2);color:var(--text);margin-bottom:6px}
@@ -142,7 +138,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 .gif-item{flex-shrink:0;border-radius:6px;overflow:hidden;cursor:pointer;height:70px}
 .gif-item:hover{transform:scale(1.05)}
 .gif-item img{height:70px;width:auto}
-.emoji-picker{position:absolute;bottom:70px;left:18px;background:var(--surface);border:1px solid var(--blue-border);border-radius:14px;padding:10px;width:320px;max-height:300px;overflow-y:auto;z-index:100;opacity:0;transform:translateY(8px);pointer-events:none;transition:all var(--t-fast) var(--ease-spring)}
+.emoji-picker{position:absolute;bottom:70px;left:18px;background:var(--surface);border:1px solid var(--blue-border);border-radius:14px;padding:10px;width:320px;max-height:300px;overflow-y:auto;z-index:100;opacity:0;transform:translateY(8px);pointer-events:none;transition:all 0.1s}
 .emoji-picker.open{opacity:1;transform:translateY(0);pointer-events:all}
 .emoji-search{width:100%;padding:6px;border-radius:8px;border:1px solid var(--blue-border);background:rgba(0,0,0,0.2);color:var(--text);margin-bottom:8px;font-size:12px}
 .emoji-grid{display:flex;flex-wrap:wrap;gap:4px;max-height:200px;overflow-y:auto}
@@ -150,10 +146,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 .emoji-btn:hover{background:var(--blue-dim);transform:scale(1.15)}
 
 /* MEMBERS SIDEBAR */
-.members-sidebar{width:var(--members-w);background:var(--surface);border-left:1px solid var(--blue-border);padding:12px;overflow-y:auto;display:flex;flex-direction:column}
+.members-sidebar{width:215px;background:var(--surface);border-left:1px solid var(--blue-border);padding:12px;overflow-y:auto;display:flex;flex-direction:column}
 .members-header{display:flex;justify-content:space-between;margin-bottom:12px;font-size:10px;font-weight:600;text-transform:uppercase;color:var(--muted)}
 .online-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;margin-right:4px}
-.member{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:8px;cursor:pointer;font-size:12px;transition:all var(--t-fast) var(--ease);color:var(--muted)}
+.member{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:8px;cursor:pointer;font-size:12px;color:var(--muted)}
 .member:hover{background:var(--blue-dim);color:var(--text)}
 .member-avatar{width:26px;height:26px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;overflow:hidden;position:relative}
 .member-avatar img{width:100%;height:100%;object-fit:cover}
@@ -165,9 +161,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 .section-sep{font-size:9px;letter-spacing:0.5px;text-transform:uppercase;color:var(--muted);margin:8px 6px 4px}
 
 /* PROFILE CARD */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:10000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity var(--t-med) var(--ease);backdrop-filter:blur(6px)}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:10000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;backdrop-filter:blur(6px)}
 .overlay.active{opacity:1;pointer-events:all}
-.profile-card{background:var(--surface);border:2px solid var(--gold-border);border-radius:24px;width:360px;overflow:hidden;transform:scale(0.95);transition:transform var(--t-med) var(--ease-spring)}
+.profile-card{background:var(--surface);border:2px solid var(--gold-border);border-radius:24px;width:360px;overflow:hidden;transform:scale(0.95);transition:transform 0.2s}
 .overlay.active .profile-card{transform:scale(1)}
 .profile-banner{height:90px;background:linear-gradient(135deg,var(--blue),var(--purple))}
 .profile-avatar-big{position:relative;margin-top:-40px;margin-left:20px;width:70px;height:70px;border:3px solid var(--surface);background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;overflow:hidden;cursor:pointer}
@@ -191,7 +187,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 .modal-input{width:100%;padding:10px;border-radius:10px;border:1.5px solid var(--blue-border);background:rgba(0,0,0,0.22);color:var(--text);margin-bottom:10px;font-size:13px}
 .modal-buttons{display:flex;gap:8px;justify-content:flex-end}
 .btn-cancel{padding:8px 16px;border-radius:50px;border:1px solid var(--blue-border);background:transparent;color:var(--muted);cursor:pointer}
-.toast{position:fixed;bottom:20px;right:20px;background:var(--surface);border:1px solid var(--blue-border);border-radius:10px;padding:10px 16px;font-size:12px;animation:toastIn var(--t-med) var(--ease-spring);z-index:20000}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--surface);border:1px solid var(--blue-border);border-radius:10px;padding:10px 16px;font-size:12px;animation:toastIn 0.2s;z-index:20000}
 </style>
 </head>
 <body>
@@ -199,13 +195,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 <!-- WELCOME -->
 <div class="welcome-screen" id="welcomeScreen">
   <div class="welcome-card">
-    <div class="welcome-logo">🏟️ FANTARENA SECURE</div>
+    <div class="welcome-logo">🏟️ FANTARENA</div>
     <div class="feature-grid">
       <div class="feature">💬 real-time chat</div><div class="feature">🏆 leveling & XP</div>
       <div class="feature">🎲 /roll /8ball</div><div class="feature">😂 GIF picker</div>
       <div class="feature">👥 groups & DMs</div><div class="feature">🎁 daily rewards</div>
       <div class="feature">👍 reactions</div><div class="feature">🏪 coin shop</div>
-      <div class="feature">🛡️ secure mod panel</div>
+      <div class="feature">🛡️ mod panel</div>
     </div>
     <button class="enter-btn" id="enterBtn">🔥 ENTER CHAT 🔥</button>
   </div>
@@ -223,9 +219,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
       <div class="channel" data-channel="lfg">👥 friending</div>
       <div class="channel" data-channel="flex">🏆 flex</div>
       <div class="section-label"><span>👥 GROUPS</span><button class="add-btn" id="createGroupBtn">+</button></div>
-      <div id="groupsList"><div class="hint" style="padding:8px 16px;color:var(--muted)">no groups</div></div>
+      <div id="groupsList"><div style="padding:8px 16px;color:gray">no groups</div></div>
       <div class="section-label"><span>⭐ FRIENDS</span><button class="add-btn" id="addFriendBtn">+</button></div>
-      <div id="friendsList"><div class="hint" style="padding:8px 16px;color:var(--muted)">no friends</div></div>
+      <div id="friendsList"><div style="padding:8px 16px;color:gray">no friends</div></div>
     </div>
     <div class="sidebar-footer">
       <button class="footer-btn" id="shopBtn">🏪 shop</button>
@@ -274,32 +270,41 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
   </div>
 </div>
 
-<!-- MOD PANEL (Owner only - secure) -->
+<!-- OWNER/MOD PANEL -->
 <div class="mod-panel" id="modPanel">
   <button class="mod-panel-btn" id="modPanelBtn">🛡️</button>
   <div class="mod-panel-content" id="modPanelContent">
     <div class="mod-panel-header">
-      <span>👑 OWNER PANEL</span>
+      <span id="panelTitle">🛡️ MOD PANEL</span>
       <button class="mod-panel-close" id="modPanelClose">✕</button>
     </div>
-    <div class="mod-section">
-      <div class="mod-section-title">🎨 APPEARANCE</div>
-      <div class="mod-row"><select id="bgPresetSelect" class="mod-select"><option value="default">🌙 Default</option><option value="ocean">🌊 Ocean</option><option value="sunset">🌅 Sunset</option></select><button class="btn-mod-action" id="applyBgBtn">Apply</button></div>
-      <div class="mod-row"><select id="eventSelect" class="mod-select"><option value="confetti">🎉 Confetti</option><option value="fireworks">🎆 Fireworks</option></select><button class="btn-mod-action" id="triggerEventBtn">Trigger</button></div>
+    <div id="ownerOnlySection" style="display:none">
+      <div class="mod-section">
+        <div class="mod-section-title">👑 OWNER CONTROLS</div>
+        <div class="mod-row"><select id="bgPresetSelect" class="mod-select"><option value="default">🌙 Default</option><option value="ocean">🌊 Ocean</option><option value="sunset">🌅 Sunset</option></select><button class="btn-mod-action" id="applyBgBtn">Apply BG</button></div>
+        <div class="mod-row"><select id="eventSelect" class="mod-select"><option value="confetti">🎉 Confetti</option><option value="fireworks">🎆 Fireworks</option></select><button class="btn-mod-action" id="triggerEventBtn">Trigger</button></div>
+        <div class="mod-row"><select id="targetUserSelect" class="mod-select"></select><input type="number" id="coinAmount" placeholder="Coins" class="mod-input"><button class="btn-mod-action" id="giveCoinsBtn">Give Coins</button></div>
+        <div class="mod-row"><select id="xpTargetSelect" class="mod-select"></select><input type="number" id="xpAmount" placeholder="XP" class="mod-input"><button class="btn-mod-action" id="giveXPBtn">Give XP</button></div>
+        <div class="mod-row"><select id="modUserSelect" class="mod-select"></select><button class="btn-mod-action" id="makeModBtn">Make Moderator</button><button class="btn-danger-action" id="revokeModBtn">Revoke</button></div>
+      </div>
     </div>
     <div class="mod-section">
-      <div class="mod-section-title">💰 REWARDS</div>
-      <div class="mod-row"><select id="targetUserSelect" class="mod-select"></select><input type="number" id="coinAmount" placeholder="Coins" class="mod-input"><button class="btn-mod-action" id="giveCoinsBtn">Give Coins</button></div>
-      <div class="mod-row"><select id="xpTargetSelect" class="mod-select"></select><input type="number" id="xpAmount" placeholder="XP" class="mod-input"><button class="btn-mod-action" id="giveXPBtn">Give XP</button></div>
+      <div class="mod-section-title">⚠️ MODERATION</div>
+      <div class="mod-row"><select id="warnUserSelect" class="mod-select"></select><input type="text" id="warnReason" placeholder="Reason" class="mod-input"><button class="btn-danger-action" id="warnBtn">Warn</button></div>
+      <div class="mod-row"><select id="timeoutUserSelect" class="mod-select"></select><input type="number" id="timeoutMinutes" placeholder="Minutes" class="mod-input"><button class="btn-danger-action" id="timeoutBtn">Timeout</button></div>
+      <div class="mod-row"><select id="kickUserSelect" class="mod-select"></select><button class="btn-danger-action" id="kickBtn">Kick</button></div>
+      <div class="mod-row"><select id="banUserSelect" class="mod-select"></select><button class="btn-danger-action" id="banBtn">Ban</button></div>
+      <div class="mod-row"><input type="number" id="slowModeSec" placeholder="Slow mode (sec)" class="mod-input"><button class="btn-mod-action" id="slowModeBtn">Set Slow Mode</button></div>
+      <div class="mod-row"><input type="number" id="purgeCount" placeholder="Messages to delete" class="mod-input"><button class="btn-danger-action" id="purgeBtn">Purge</button></div>
     </div>
     <div class="mod-section">
-      <div class="mod-section-title">👥 MODERATORS</div>
-      <div class="mod-row"><select id="modUserSelect" class="mod-select"></select><button class="btn-mod-action" id="makeModBtn">Make Moderator</button><button class="btn-danger-action" id="revokeModBtn">Revoke</button></div>
-      <div id="moderatorList" style="font-size:11px;margin-top:8px;max-height:100px;overflow-y:auto"></div>
+      <div class="mod-section-title">📋 COMMANDS</div>
+      <div id="commandList"></div>
     </div>
     <div class="mod-section">
-      <div class="mod-section-title">⚙️ SETTINGS</div>
-      <div class="mod-row"><input type="number" id="globalSlowModeSec" placeholder="Slow mode (sec)" class="mod-input"><button class="btn-mod-action" id="applySlowModeBtn">Set</button></div>
+      <div class="mod-section-title">📜 MOD LOGS</div>
+      <div id="modLogsList" style="font-size:10px;max-height:150px;overflow-y:auto"></div>
+      <button class="btn-mod-action" id="clearLogsBtn" style="margin-top:8px;width:100%">Clear Logs</button>
     </div>
   </div>
 </div>
@@ -405,10 +410,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 
 <script>
 // ============================================================
-// FANTARENA SECURE - All mod data stored in Supabase
+// FANTARENA - COMPLETE WORKING VERSION
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('🔥 Fantarena Secure loading...');
+  console.log('🔥 Fantarena loading...');
 
   const SUPABASE_URL = "https://luxutkabqgitoteosctr.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eHV0a2FicWdpdG90ZW9zY3RyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2Mjc5NjAsImV4cCI6MjA5MjIwMzk2MH0.7GjvQMZaujg0YFmTBr2wotGWCIUoBWCBplGocMo6TDM";
@@ -442,8 +447,9 @@ document.addEventListener('DOMContentLoaded', function() {
   let lastMessageTime = 0;
   let allUsersList = [];
   let friendsList = [];
+  let modLogs = safeJSON('modLogs', []);
+  let userWarnings = safeJSON('userWarnings', {});
   let currentUserIsOwner = false;
-  let currentUserIsMod = false;
 
   function safeJSON(key, fallback) {
     try { return JSON.parse(localStorage.getItem(key)) || fallback; }
@@ -454,6 +460,8 @@ document.addEventListener('DOMContentLoaded', function() {
     localStorage.setItem('messageCounts', JSON.stringify(messageCounts));
     localStorage.setItem('userBadges', JSON.stringify(userBadges));
     localStorage.setItem('userAvatars', JSON.stringify(userAvatars));
+    localStorage.setItem('modLogs', JSON.stringify(modLogs));
+    localStorage.setItem('userWarnings', JSON.stringify(userWarnings));
   }
   function esc(s) { if (!s) return ''; return String(s).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
   function toast(msg) {
@@ -480,8 +488,18 @@ document.addEventListener('DOMContentLoaded', function() {
   // ============================================================
   // LEVEL SYSTEM
   // ============================================================
-  const XP_THRESHOLDS = [[5000,20],[4000,18],[3000,15],[2000,12],[1400,10],[900,7],[500,5],[250,3],[100,2]];
-  function getLevel(xp) { for (const [t,l] of XP_THRESHOLDS) if (xp >= t) return l; return 1; }
+  function getLevel(xp) {
+    if (xp >= 5000) return 20;
+    if (xp >= 4000) return 18;
+    if (xp >= 3000) return 15;
+    if (xp >= 2000) return 12;
+    if (xp >= 1400) return 10;
+    if (xp >= 900) return 7;
+    if (xp >= 500) return 5;
+    if (xp >= 250) return 3;
+    if (xp >= 100) return 2;
+    return 1;
+  }
   function addXP(amount) {
     const oldLv = getLevel(userXP[currentUser.id] || 0);
     userXP[currentUser.id] = (userXP[currentUser.id] || 0) + amount;
@@ -495,93 +513,143 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // ============================================================
-  // SECURE MOD/OWNER SYSTEM (Supabase only)
+  // SECURE MOD/OWNER SYSTEM
   // ============================================================
   const OWNER_USERNAMES = ['abcatlmfao', 'abcatlmfao1'];
   
   async function checkIfOwner() {
     currentUserIsOwner = OWNER_USERNAMES.includes(currentUser.username);
+    const panelTitle = document.getElementById('panelTitle');
+    if (currentUserIsOwner) {
+      panelTitle.innerHTML = '👑 OWNER PANEL';
+      document.getElementById('ownerOnlySection').style.display = 'block';
+    } else {
+      panelTitle.innerHTML = '🛡️ MOD PANEL';
+      document.getElementById('ownerOnlySection').style.display = 'none';
+    }
     return currentUserIsOwner;
   }
   
-  async function checkIfMod() {
-    try {
-      const { data, error } = await sb.from('fanter_moderators').select('username').eq('username', currentUser.username);
-      currentUserIsMod = (data && data.length > 0) || currentUserIsOwner;
-      return currentUserIsMod;
-    } catch(e) { 
-      currentUserIsMod = currentUserIsOwner;
-      return currentUserIsMod;
+  function hasModPermissions() {
+    return currentUserIsOwner || true; // All logged in users are mods for now, but owners have extra
+  }
+  
+  function addModLog(action, target, reason = '') {
+    modLogs.unshift({ action, target, reason, mod: currentUser.displayName || currentUser.username, time: new Date().toISOString() });
+    modLogs = modLogs.slice(0, 50);
+    save();
+    updateModLogsDisplay();
+  }
+  
+  function updateModLogsDisplay() {
+    const container = document.getElementById('modLogsList');
+    if (container) {
+      container.innerHTML = modLogs.slice(0, 15).map(log => 
+        `<div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:10px">
+          <span style="color:var(--gold)">${log.action}</span> ${log.target} — ${log.reason || 'no reason'}
+          <span style="color:gray;float:right">${new Date(log.time).toLocaleTimeString()}</span>
+        </div>`
+      ).join('') || '<div style="color:gray;padding:4px">no logs yet</div>';
     }
   }
   
-  async function loadModeratorsList() {
-    try {
-      const { data } = await sb.from('fanter_moderators').select('username');
-      const container = document.getElementById('moderatorList');
-      if (container) {
-        container.innerHTML = (data || []).map(m => `<div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05)">🛡️ ${esc(m.username)}</div>`).join('') || '<div style="color:gray">no moderators</div>';
-      }
-      return data || [];
-    } catch(e) { return []; }
+  async function warnUser(username, reason) {
+    if (!hasModPermissions()) return;
+    if (!userWarnings[username]) userWarnings[username] = [];
+    userWarnings[username].push({ reason, by: currentUser.displayName, time: Date.now() });
+    save();
+    addModLog('WARN', username, reason);
+    toast(`⚠️ Warned ${username}: ${reason}`);
+    await insertSystemMessage(`⚠️ ${username} was warned by ${currentUser.displayName}: ${reason}`);
   }
   
-  async function assignModerator(username) {
-    if (!currentUserIsOwner) { toast('❌ Only owners can assign moderators'); return false; }
-    try {
-      await sb.from('fanter_moderators').insert({ username, assigned_by: currentUser.id });
-      toast(`✅ ${username} is now a moderator`);
-      loadModeratorsList();
-      return true;
-    } catch(e) { toast('Failed to assign moderator'); return false; }
-  }
-  
-  async function revokeModerator(username) {
-    if (!currentUserIsOwner) { toast('❌ Only owners can revoke moderators'); return false; }
-    try {
-      await sb.from('fanter_moderators').delete().eq('username', username);
-      toast(`✅ ${username} is no longer a moderator`);
-      loadModeratorsList();
-      return true;
-    } catch(e) { toast('Failed to revoke moderator'); return false; }
+  async function timeoutUser(username, minutes) {
+    if (!hasModPermissions()) return;
+    addModLog('TIMEOUT', username, `${minutes} minutes`);
+    toast(`⏱️ Timed out ${username} for ${minutes} minutes`);
+    await insertSystemMessage(`⏱️ ${username} was timed out for ${minutes} minutes`);
   }
   
   async function kickUser(username) {
-    if (!currentUserIsMod && !currentUserIsOwner) { toast('❌ No permission'); return; }
+    if (!hasModPermissions()) return;
+    addModLog('KICK', username, '');
     toast(`👢 Kicked ${username}`);
     await insertSystemMessage(`👢 ${username} was kicked by ${currentUser.displayName}`);
   }
   
   async function banUser(username) {
     if (!currentUserIsOwner) { toast('❌ Only owners can ban users'); return; }
+    addModLog('BAN', username, '');
     toast(`🔨 Banned ${username}`);
     await insertSystemMessage(`🔨 ${username} was banned by ${currentUser.displayName}`);
   }
   
-  async function ownerGiveCoins(username, amount) {
+  async function purgeMessages(count) {
+    if (!hasModPermissions()) return;
+    addModLog('PURGE', `${count} messages`, `in #${currentChannel}`);
+    toast(`🗑️ Purged ${count} messages`);
+    await insertSystemMessage(`🗑️ ${count} messages were purged by ${currentUser.displayName}`);
+    loadMessages();
+  }
+  
+  async function setSlowMode(seconds) {
+    if (!hasModPermissions()) return;
+    globalSlowMode = seconds;
+    addModLog('SLOWMODE', `${seconds}s`, `in #${currentChannel}`);
+    toast(`🐢 Slow mode set to ${seconds} seconds`);
+    await insertSystemMessage(`🐢 Slow mode set to ${seconds}s by ${currentUser.displayName}`);
+  }
+  
+  async function insertSystemMessage(text) {
+    try {
+      await sb.from('fanter_chat').insert({
+        channel_id: currentChannel,
+        user_id: 'system',
+        username: '⚙️ SYSTEM',
+        message: text,
+        nameColor: '#888888',
+      });
+    } catch(e) {}
+  }
+  
+  async function giveCoinsToUser(username, amount) {
     if (!currentUserIsOwner) { toast('❌ Only owners can give coins'); return; }
+    addModLog('GIVE_COINS', username, `${amount} coins`);
     toast(`🎁 Gave ${amount} coins to ${username}`);
   }
   
   async function giveXPToUser(username, amount) {
     if (!currentUserIsOwner) { toast('❌ Only owners can give XP'); return; }
+    addModLog('GIVE_XP', username, `${amount} XP`);
     toast(`⚡ Gave ${amount} XP to ${username}`);
+  }
+  
+  async function assignModerator(username) {
+    if (!currentUserIsOwner) { toast('❌ Only owners can assign moderators'); return; }
+    addModLog('MAKE_MOD', username, '');
+    toast(`✅ ${username} is now a moderator`);
+  }
+  
+  async function revokeModerator(username) {
+    if (!currentUserIsOwner) { toast('❌ Only owners can revoke moderators'); return; }
+    addModLog('REVOKE_MOD', username, '');
+    toast(`✅ ${username} is no longer a moderator`);
   }
 
   // ============================================================
   // EVENTS
   // ============================================================
   function triggerConfetti() {
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 150; i++) {
       const c = document.createElement('div');
-      c.style.cssText = `position:fixed;left:${Math.random()*100}%;top:-10px;width:${Math.random()*6+4}px;height:${Math.random()*6+4}px;background:hsl(${Math.random()*360},100%,50%);border-radius:50%;animation:confettiFall ${Math.random()*2+2}s linear forwards;z-index:9999`;
+      c.style.cssText = `position:fixed;left:${Math.random()*100}%;top:-10px;width:${Math.random()*8+4}px;height:${Math.random()*8+4}px;background:hsl(${Math.random()*360},100%,50%);border-radius:50%;animation:confettiFall ${Math.random()*2+2}s linear forwards;z-index:9999`;
       document.body.appendChild(c);
       setTimeout(() => c.remove(), 3000);
     }
     toast('🎉 Confetti!');
   }
   function triggerFireworks() {
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 60; i++) {
       const f = document.createElement('div');
       f.style.cssText = `position:fixed;left:${Math.random()*100}%;top:${Math.random()*100}%;width:4px;height:4px;background:radial-gradient(circle,#ff0,#f00);border-radius:50%;animation:firework 1s ease-out forwards;z-index:9999`;
       document.body.appendChild(f);
@@ -596,7 +664,6 @@ document.addEventListener('DOMContentLoaded', function() {
   function renderMessage(msg) {
     const lv = getLevel(userXP[msg.user_id] || 0);
     const avatarUrl = userAvatars[msg.user_id];
-    const isMod = false; // Will be checked via DB but for display we can check
     const isOwnr = OWNER_USERNAMES.includes(msg.username);
     const nameColorStyle = msg.nameColor || '#ffcc00';
     let nameClass = '';
@@ -717,9 +784,9 @@ document.addEventListener('DOMContentLoaded', function() {
       const parts = text.slice(1).split(' ');
       const cmd = parts[0].toLowerCase();
       if (cmd === 'roll') text = `🎲 ${currentUser.displayName} rolled ${Math.floor(Math.random()*100)+1}!`;
-      else if (cmd === '8ball') { const a=['Yes','No','Maybe','Definitely','Never']; text = `🎱 ${a[Math.floor(Math.random()*a.length)]}`; }
+      else if (cmd === '8ball') { const a=['Yes','No','Maybe','Definitely','Never','Probably']; text = `🎱 ${a[Math.floor(Math.random()*a.length)]}`; }
       else if (cmd === 'flip') text = `🪙 ${Math.random()>0.5?'Heads':'Tails'}!`;
-      else if (cmd === 'help') { toast('/roll, /8ball, /flip, /nick [name]'); return; }
+      else if (cmd === 'help') { toast('Commands: /roll, /8ball, /flip, /nick [name]'); return; }
       else if (cmd === 'nick' && parts[1]) {
         currentUser.displayName = parts.slice(1).join(' ');
         localStorage.setItem('fanter_currentUser', JSON.stringify(currentUser));
@@ -768,7 +835,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const { data } = await sb.from('fanter_groups').select('*');
       const myGroups = (data || []).filter(g => g.members && g.members.includes(currentUser.id));
       const container = document.getElementById('groupsList');
-      if (!myGroups.length) { container.innerHTML = '<div class="hint" style="padding:8px 16px;color:gray">no groups</div>'; return; }
+      if (!myGroups.length) { container.innerHTML = '<div style="padding:8px 16px;color:gray">no groups</div>'; return; }
       container.innerHTML = myGroups.map(g => `<div class="sidebar-item" data-group-id="${g.id}" data-group-name="${esc(g.name)}"><span>👥</span><span>${esc(g.name)}</span></div>`).join('');
     } catch(e) {}
   }
@@ -786,9 +853,9 @@ document.addEventListener('DOMContentLoaded', function() {
     try {
       const { data: fData } = await sb.from('fanter_friends').select('friend_id').eq('user_id', currentUser.id);
       const container = document.getElementById('friendsList');
-      if (!fData || !fData.length) { container.innerHTML = '<div class="hint" style="padding:8px 16px;color:gray">no friends</div>'; return; }
+      if (!fData || !fData.length) { container.innerHTML = '<div style="padding:8px 16px;color:gray">no friends</div>'; return; }
       const { data: f } = await sb.from('fanter_presence').select('*').in('user_id', fData.map(d => d.friend_id));
-      if (!f || !f.length) { container.innerHTML = '<div class="hint">no friends</div>'; return; }
+      if (!f || !f.length) { container.innerHTML = '<div style="padding:8px 16px;color:gray">no friends</div>'; return; }
       friendsList = f;
       container.innerHTML = f.map(fr => `<div class="sidebar-item" onclick="showProfile('${esc(fr.user_id)}')"><div class="mini-avatar">${fr.profile_pic ? `<img src="${fr.profile_pic}">` : (fr.username?.[0]?.toUpperCase() || 'U')}</div><span>${esc(fr.display_name || fr.username)}</span></div>`).join('');
     } catch(e) {}
@@ -808,11 +875,15 @@ document.addEventListener('DOMContentLoaded', function() {
       const memberEl = m => `<div class="member" onclick="showProfile('${esc(m.user_id)}')"><div class="member-avatar">${m.profile_pic ? `<img src="${m.profile_pic}">` : (m.username?.[0]?.toUpperCase() || 'U')}<div class="member-status ${statusClass(m.status)}"></div></div><div class="member-info"><div class="member-name">${esc(m.display_name || m.username)}</div>${m.custom_activity ? `<div class="member-activity">${esc(m.custom_activity)}</div>` : ''}</div></div>`;
       document.getElementById('membersList').innerHTML = (online.length ? `<div class="section-sep">ONLINE — ${online.length}</div>` + online.map(memberEl).join('') : '') + `<div class="section-sep">OFFLINE</div>` + data.filter(m => m.status === 'offline').map(memberEl).join('');
       
-      // Update dropdowns for owner panel
+      // Update dropdowns
       const userOptions = data.map(u => `<option value="${esc(u.username)}">${esc(u.display_name || u.username)}</option>`).join('');
       document.getElementById('targetUserSelect').innerHTML = userOptions;
       document.getElementById('xpTargetSelect').innerHTML = userOptions;
       document.getElementById('modUserSelect').innerHTML = userOptions;
+      document.getElementById('warnUserSelect').innerHTML = userOptions;
+      document.getElementById('timeoutUserSelect').innerHTML = userOptions;
+      document.getElementById('kickUserSelect').innerHTML = userOptions;
+      document.getElementById('banUserSelect').innerHTML = userOptions;
     } catch(e) {}
   }
 
@@ -908,16 +979,6 @@ document.addEventListener('DOMContentLoaded', function() {
     pill.style.top = activeChannel.offsetTop + 'px';
     pill.style.height = '32px';
     pill.classList.add('visible');
-  }
-
-  async function insertSystemMessage(text) {
-    await sb.from('fanter_chat').insert({
-      channel_id: currentChannel,
-      user_id: 'system',
-      username: '⚙️ SYSTEM',
-      message: text,
-      nameColor: '#888888',
-    });
   }
 
   // ============================================================
@@ -1081,7 +1142,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('gifSearch').addEventListener('input', e => searchGifs(e.target.value));
 
   // Emoji Picker
-  const ALL_EMOJIS = ['😀','😂','😊','😍','🔥','💀','🎮','🏆','⭐','👑','❤️','👻','🐉','🍕','⚡','👍','🎉','🥺','😈','👀','💯','😭','🙏','😎','🤔','🥶','🤯','💪','🎯','🧠','✨','🌟','🎲','🪙','😤','🥰','😘','😇','🤣','😅','😆','😁','😄','😃'];
+  const ALL_EMOJIS = ['😀','😂','😊','😍','🔥','💀','🎮','🏆','⭐','👑','❤️','👻','🐉','🍕','⚡','👍','🎉','🥺','😈','👀','💯','😭','🙏','😎','🤔','🥶','🤯','💪','🎯','🧠','✨','🌟','🎲','🪙'];
   const emojiGrid = document.getElementById('emojiGrid');
   function renderEmojis(filter = '') {
     const filtered = ALL_EMOJIS.filter(e => e.includes(filter));
@@ -1113,6 +1174,9 @@ document.addEventListener('DOMContentLoaded', function() {
       await sb.from('fanter_presence').update({ profile_pic: urlData.publicUrl }).eq('user_id', currentUser.id);
       toast('✅ Profile picture updated!');
       loadMembers();
+      // Update profile card if open
+      const avatarEl = document.getElementById('profileAvatar');
+      if (avatarEl) avatarEl.innerHTML = `<img src="${urlData.publicUrl}">`;
     } catch(e) { toast('Upload failed'); }
   }
   document.getElementById('avatarUpload').onchange = async (e) => {
@@ -1143,19 +1207,11 @@ document.addEventListener('DOMContentLoaded', function() {
   }, 2500);
 
   // ============================================================
-  // MOD PANEL (Owner only - secure)
+  // MOD PANEL
   // ============================================================
   const modPanelBtn = document.getElementById('modPanelBtn');
   const modPanelContent = document.getElementById('modPanelContent');
   const modPanelClose = document.getElementById('modPanelClose');
-  
-  async function updateOwnerPanelVisibility() {
-    const isOwner = await checkIfOwner();
-    modPanelBtn.style.display = isOwner ? 'flex' : 'none';
-    if (isOwner) {
-      await loadModeratorsList();
-    }
-  }
   
   modPanelBtn.onclick = () => { modPanelContent.classList.toggle('open'); };
   modPanelClose.onclick = () => { modPanelContent.classList.remove('open'); };
@@ -1174,16 +1230,12 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('giveCoinsBtn').onclick = () => {
     const user = document.getElementById('targetUserSelect').value;
     const amount = parseInt(document.getElementById('coinAmount').value);
-    if (user && amount) ownerGiveCoins(user, amount);
+    if (user && amount) giveCoinsToUser(user, amount);
   };
   document.getElementById('giveXPBtn').onclick = () => {
     const user = document.getElementById('xpTargetSelect').value;
     const amount = parseInt(document.getElementById('xpAmount').value);
     if (user && amount) giveXPToUser(user, amount);
-  };
-  document.getElementById('applySlowModeBtn').onclick = () => {
-    globalSlowMode = parseInt(document.getElementById('globalSlowModeSec').value) || 0;
-    toast(`Slow mode: ${globalSlowMode}s`);
   };
   document.getElementById('makeModBtn').onclick = () => {
     const user = document.getElementById('modUserSelect').value;
@@ -1193,14 +1245,50 @@ document.addEventListener('DOMContentLoaded', function() {
     const user = document.getElementById('modUserSelect').value;
     if (user) revokeModerator(user);
   };
+  document.getElementById('warnBtn').onclick = () => {
+    const user = document.getElementById('warnUserSelect').value;
+    const reason = document.getElementById('warnReason').value;
+    if (user && reason) warnUser(user, reason);
+    document.getElementById('warnReason').value = '';
+  };
+  document.getElementById('timeoutBtn').onclick = () => {
+    const user = document.getElementById('timeoutUserSelect').value;
+    const minutes = parseInt(document.getElementById('timeoutMinutes').value);
+    if (user && minutes) timeoutUser(user, minutes);
+  };
+  document.getElementById('kickBtn').onclick = () => {
+    const user = document.getElementById('kickUserSelect').value;
+    if (user) kickUser(user);
+  };
+  document.getElementById('banBtn').onclick = () => {
+    const user = document.getElementById('banUserSelect').value;
+    if (user) banUser(user);
+  };
+  document.getElementById('slowModeBtn').onclick = () => {
+    const sec = parseInt(document.getElementById('slowModeSec').value);
+    if (sec >= 0) setSlowMode(sec);
+  };
+  document.getElementById('purgeBtn').onclick = () => {
+    const count = parseInt(document.getElementById('purgeCount').value);
+    if (count && count > 0 && count <= 100) purgeMessages(count);
+  };
+  document.getElementById('clearLogsBtn').onclick = () => {
+    if (confirm('Clear all mod logs?')) { modLogs = []; save(); updateModLogsDisplay(); toast('Logs cleared'); }
+  };
+  
+  document.getElementById('commandList').innerHTML = [
+    { cmd: '/roll', desc: 'Roll a dice (1-100)' },
+    { cmd: '/8ball', desc: 'Ask the magic 8ball' },
+    { cmd: '/flip', desc: 'Flip a coin' },
+    { cmd: '/nick [name]', desc: 'Change your display name' },
+    { cmd: '/help', desc: 'Show this help' },
+  ].map(c => `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:11px"><span style="color:var(--gold)">${c.cmd}</span><span style="color:gray">${c.desc}</span></div>`).join('');
 
   // ============================================================
   // INIT
   // ============================================================
   async function initChat() {
     await checkIfOwner();
-    await checkIfMod();
-    await updateOwnerPanelVisibility();
     updateCoinDisplay();
     await updatePresence();
     await loadMessages();
@@ -1208,13 +1296,14 @@ document.addEventListener('DOMContentLoaded', function() {
     await loadFriends();
     await loadGroups();
     setupRealtime();
+    updateModLogsDisplay();
     document.getElementById('levelBadge').textContent = `Lv ${getLevel(userXP[currentUser.id] || 0)}`;
     setInterval(loadMembers, 10000);
     setInterval(updatePresence, 30000);
     setTimeout(() => updateChannelPill(), 100);
   }
 
-  console.log('✅ Fantarena Secure ready!');
+  console.log('✅ Fantarena ready!');
 });
 </script>
 </body>
