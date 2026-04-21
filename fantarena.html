@@ -227,6 +227,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
       <button class="footer-btn" id="shopBtn">🏪 shop</button>
       <button class="footer-btn" id="settingsBtn">⚙️ settings</button>
       <button class="footer-btn" id="dailyBtn">🎁 daily</button>
+       <button class="footer-btn" id="stageBtn" style="background:linear-gradient(135deg,var(--purple),#7a3ac0);margin-top:5px;">the stage (VC)</button
     </div>
   </div>
 
@@ -1090,6 +1091,10 @@ document.addEventListener('DOMContentLoaded', function() {
     renderShop();
   };
   document.getElementById('shopBtn').onclick = () => { renderShop(); openOverlay('shopOverlay'); };
+    // Voice Chat Stage button
+  document.getElementById('stageBtn').onclick = () => {
+    window.open('fantarena-voice.html', 'TheStage', 'width=500,height=700,popup=true,resizable=true');
+  };
 
   // Add friend
   document.getElementById('addFriendBtn').onclick = () => openOverlay('addFriendOverlay');
