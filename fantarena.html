@@ -1,200 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Fantarena | Live Chat + Groups + Voice</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --gold:#ffcc00;--gold-dim:rgba(255,204,0,0.15);--gold-border:rgba(255,204,0,0.3);
-  --blue:#2d5ae3;--blue-dim:rgba(45,90,227,0.18);--blue-border:rgba(45,90,227,0.32);
-  --purple:#9f5ae3;--green:#00e87a;--red:#ff4466;--orange:#ff8844;
-  --bg:#07081a;--surface:rgba(12,16,38,0.98);--surface2:rgba(20,26,55,0.9);
-  --text:#dde2ff;--muted:rgba(180,190,255,0.38);
-  --ease:cubic-bezier(0.25,0.46,0.45,0.94);
-}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(45,90,227,0.25);border-radius:99px}
-
-/* VOICE MESSAGE */
-.voice-message{display:flex;align-items:center;gap:10px;background:rgba(45,90,227,0.15);border-radius:30px;padding:6px 14px;width:fit-content;margin-top:4px}
-.voice-play-btn{background:none;border:none;font-size:18px;cursor:pointer;color:var(--gold);transition:transform 0.15s}
-.voice-play-btn:hover{transform:scale(1.15)}
-.voice-wave{display:flex;align-items:center;gap:3px;height:28px}
-.voice-wave span{width:3px;background:var(--gold);border-radius:2px;animation:wave 0.8s ease-in-out infinite}
-@keyframes wave{0%,100%{height:4px}50%{height:18px}}
-.voice-duration{font-size:11px;color:var(--muted)}
-.voice-recording-indicator{position:fixed;bottom:90px;right:20px;background:var(--red);color:white;padding:8px 16px;border-radius:30px;font-size:12px;z-index:9000;cursor:pointer;animation:recPulse 1s infinite}
-@keyframes recPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.7;transform:scale(0.97)}}
-@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-@keyframes toastIn{from{opacity:0;transform:translateX(40px) scale(0.9)}to{opacity:1;transform:translateX(0) scale(1)}}
-@keyframes confettiFall{0%{transform:translateY(-100px) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
-
-/* MAIN CHAT */
-.chat-container{display:flex;height:100vh;width:100vw;opacity:1;pointer-events:all}
-
-/* SIDEBAR */
-.sidebar{width:260px;background:var(--surface);border-right:1px solid var(--blue-border);display:flex;flex-direction:column;overflow:hidden;position:relative;flex-shrink:0}
-.channel-pill{position:absolute;left:0;width:4px;height:32px;background:linear-gradient(180deg,var(--gold),rgba(255,204,0,0.6));border-radius:0 4px 4px 0;box-shadow:0 0 12px rgba(255,204,0,0.5);transition:transform 0.25s;z-index:10;opacity:0}
-.channel-pill.visible{opacity:1}
-.sidebar-header{padding:16px;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--gold);border-bottom:1px solid var(--blue-border)}
-.sidebar-scroll{flex:1;overflow-y:auto;padding-bottom:8px}
-.section-label{padding:12px 16px 4px;font-size:10px;font-weight:600;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between}
-.add-btn{background:none;border:none;color:var(--gold);font-size:18px;cursor:pointer}
-.add-btn:hover{transform:scale(1.25) rotate(90deg)}
-.channel{padding:8px 14px;margin:2px 8px;border-radius:10px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;color:var(--muted)}
-.channel:hover{background:var(--blue-dim);color:var(--text);transform:translateX(3px)}
-.channel.active{background:rgba(45,90,227,0.22);color:var(--gold);font-weight:600}
-.sidebar-item{padding:7px 12px;margin:1px 8px;border-radius:10px;cursor:pointer;display:flex;align-items:center;gap:9px;font-size:13px;color:var(--muted)}
-.sidebar-item:hover{background:var(--blue-dim);color:var(--text)}
-.mini-avatar{width:26px;height:26px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;overflow:hidden}
-.mini-avatar img{width:100%;height:100%;object-fit:cover}
-.sidebar-footer{padding:10px;border-top:1px solid var(--blue-border);display:flex;flex-direction:column;gap:5px}
-.footer-btn{width:100%;padding:8px 12px;border-radius:10px;border:none;background:rgba(255,255,255,0.05);color:var(--text);font-size:12px;cursor:pointer;text-align:left}
-.footer-btn:hover{background:rgba(255,255,255,0.1);transform:translateX(2px)}
-
-/* CHAT AREA */
-.chat-area{flex:1;display:flex;flex-direction:column;min-width:0}
-.chat-header{padding:12px 20px;border-bottom:1px solid var(--blue-border);display:flex;align-items:center;gap:10px}
-.chat-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700}
-.level-badge{background:var(--gold);color:#1a1200;border-radius:8px;padding:2px 8px;font-size:10px;font-weight:700}
-.header-spacer{flex:1}
-.typing-indicator{font-size:11px;color:var(--muted);min-width:120px}
-.header-coins{font-size:13px;color:var(--gold);font-weight:600}
-.messages{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:1px}
-.message{display:flex;gap:10px;padding:6px 8px;border-radius:10px;animation:msgIn 0.2s both;position:relative}
-.message:hover{background:rgba(255,255,255,0.03)}
-.message:hover .msg-actions{opacity:1}
-.msg-avatar{width:32px;height:32px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;cursor:pointer;overflow:hidden;flex-shrink:0}
-.msg-avatar img{width:100%;height:100%;object-fit:cover}
-.msg-body{flex:1}
-.msg-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.msg-name{font-weight:600;font-size:13px;cursor:pointer}
-.msg-name.fire{animation:flame 1.5s infinite}
-.msg-name.purple{animation:purpleGlow 1.5s infinite}
-.msg-name.green{animation:greenGlow 1.5s infinite}
-@keyframes flame{0%,100%{text-shadow:0 0 4px #ff4400}50%{text-shadow:0 0 8px #ff6600}}
-@keyframes purpleGlow{0%,100%{text-shadow:0 0 4px #9f5ae3}50%{text-shadow:0 0 8px #bf7ae3}}
-@keyframes greenGlow{0%,100%{text-shadow:0 0 4px #00e87a}50%{text-shadow:0 0 8px #33ff99}}
-.msg-lv{background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);border-radius:6px;padding:1px 5px;font-size:9px}
-.mod-badge{background:var(--gold);color:#1a1200;border-radius:4px;padding:1px 5px;font-size:8px}
-.owner-badge{background:#ff4444;color:white;border-radius:4px;padding:1px 5px;font-size:8px}
-.msg-time{font-size:9px;color:var(--muted)}
-.msg-text{margin-top:3px;font-size:13px;line-height:1.5;word-break:break-word}
-.msg-text img{max-width:200px;border-radius:8px;cursor:pointer}
-.msg-actions{position:absolute;right:8px;top:50%;transform:translateY(-50%);display:flex;gap:2px;opacity:0;background:var(--surface);border:1px solid var(--blue-border);border-radius:8px;padding:2px 4px}
-.msg-action-btn{background:none;border:none;cursor:pointer;font-size:12px;padding:2px 4px;border-radius:5px;color:var(--muted)}
-.msg-action-btn:hover{background:var(--blue-dim);transform:scale(1.1)}
-.msg-reactions{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}
-.reaction-chip{display:flex;align-items:center;gap:3px;background:var(--blue-dim);border:1px solid var(--blue-border);border-radius:20px;padding:2px 8px;font-size:11px;cursor:pointer}
-.reaction-picker{position:absolute;right:8px;top:-38px;background:var(--surface);border:1px solid var(--blue-border);border-radius:10px;padding:4px 6px;display:flex;gap:3px;z-index:50;opacity:0;transform:translateY(5px);pointer-events:none}
-.reaction-picker.open{opacity:1;transform:translateY(0);pointer-events:all}
-.react-btn{font-size:14px;cursor:pointer;padding:2px 3px;border-radius:5px}
-.react-btn:hover{background:var(--blue-dim);transform:scale(1.25)}
-
-/* INPUT */
-.input-wrapper{border-top:1px solid var(--blue-border)}
-.reply-bar{display:flex;align-items:center;gap:8px;padding:0 16px;font-size:11px;color:var(--muted);max-height:0;overflow:hidden}
-.reply-bar.show{max-height:34px;padding:7px 16px}
-.reply-cancel{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px}
-.input-area{display:flex;gap:8px;align-items:center;padding:10px 16px 14px}
-.input-toolbar{display:flex;gap:3px}
-.toolbar-btn{background:none;border:none;cursor:pointer;font-size:16px;padding:5px;border-radius:7px;color:var(--muted)}
-.toolbar-btn:hover{background:var(--blue-dim);color:var(--text);transform:scale(1.15)}
-#messageInput{flex:1;padding:10px 16px;border-radius:50px;border:1.5px solid var(--blue-border);background:rgba(0,0,0,0.22);color:var(--text);font-size:13px;outline:none}
-#messageInput:focus{border-color:var(--gold)}
-.send-btn{padding:10px 20px;border-radius:50px;border:none;background:linear-gradient(135deg,var(--blue),#1a3bc0);color:white;font-weight:600;cursor:pointer}
-
-.gif-picker{max-height:0;overflow:hidden}
-.gif-picker.open{max-height:220px}
-.gif-picker-inner{padding:8px 16px}
-.gif-search{width:100%;padding:6px 12px;border-radius:50px;border:1.5px solid var(--blue-border);background:rgba(0,0,0,0.2);color:var(--text);margin-bottom:6px}
-.gif-grid{display:flex;gap:5px;overflow-x:auto}
-.gif-item{flex-shrink:0;border-radius:7px;overflow:hidden;cursor:pointer;height:75px}
-.gif-item img{height:75px}
-.emoji-picker{position:absolute;bottom:68px;left:16px;background:var(--surface);border:1px solid var(--blue-border);border-radius:14px;padding:10px;width:310px;max-height:280px;overflow-y:auto;z-index:200;opacity:0;transform:translateY(8px);pointer-events:none}
-.emoji-picker.open{opacity:1;transform:translateY(0);pointer-events:all}
-.emoji-search{width:100%;padding:6px 10px;border-radius:8px;border:1px solid var(--blue-border);background:rgba(0,0,0,0.2);color:var(--text);margin-bottom:8px}
-.emoji-grid{display:flex;flex-wrap:wrap;gap:3px}
-.emoji-btn{width:33px;height:33px;font-size:18px;display:flex;align-items:center;justify-content:center;border-radius:6px;cursor:pointer}
-.emoji-btn:hover{background:var(--blue-dim);transform:scale(1.2)}
-
-/* MEMBERS */
-.members-sidebar{width:215px;background:var(--surface);border-left:1px solid var(--blue-border);padding:12px;overflow-y:auto;display:flex;flex-direction:column;flex-shrink:0}
-.members-header{display:flex;justify-content:space-between;margin-bottom:12px;font-size:10px;font-weight:600;text-transform:uppercase;color:var(--muted)}
-.online-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;margin-right:4px}
-.member{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:8px;cursor:pointer;font-size:12px;color:var(--muted)}
-.member:hover{background:var(--blue-dim);color:var(--text)}
-.member-avatar{width:26px;height:26px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;overflow:hidden;position:relative}
-.member-avatar img{width:100%;height:100%;object-fit:cover}
-.member-status{position:absolute;bottom:-1px;right:-1px;width:9px;height:9px;border-radius:50%;border:2px solid var(--surface)}
-.status-online{background:var(--green)}.status-away{background:var(--gold)}.status-gaming{background:var(--blue)}.status-offline{background:rgba(255,255,255,0.2)}
-.member-info{flex:1}
-.member-name{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.section-sep{font-size:9px;letter-spacing:0.5px;text-transform:uppercase;color:var(--muted);margin:8px 6px 4px}
-
-/* MODALS */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:10000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;backdrop-filter:blur(6px)}
-.overlay.active{opacity:1;pointer-events:all}
-.modal-card{background:var(--surface);border:1px solid var(--blue-border);border-radius:20px;padding:22px;min-width:290px;max-width:390px;width:92%}
-.modal-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--gold);margin-bottom:15px}
-.modal-input{width:100%;padding:10px 13px;border-radius:10px;border:1.5px solid var(--blue-border);background:rgba(0,0,0,0.22);color:var(--text);margin-bottom:10px;font-size:13px;outline:none}
-.modal-input:focus{border-color:var(--blue)}
-.modal-buttons{display:flex;gap:8px;justify-content:flex-end}
-.btn-primary{padding:8px 18px;border-radius:50px;border:none;background:linear-gradient(135deg,var(--blue),#1a3bc0);color:white;font-size:13px;font-weight:600;cursor:pointer}
-.btn-cancel{padding:8px 16px;border-radius:50px;border:1px solid var(--blue-border);background:transparent;color:var(--muted);cursor:pointer}
-.profile-card{background:var(--surface);border:2px solid var(--gold-border);border-radius:24px;width:360px;overflow:hidden}
-.profile-banner{height:85px;background:linear-gradient(135deg,var(--blue),var(--purple))}
-.profile-avatar-big{position:relative;margin-top:-38px;margin-left:20px;width:70px;height:70px;border:3px solid var(--surface);background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;overflow:hidden;cursor:pointer}
-.profile-avatar-big img{width:100%;height:100%;object-fit:cover}
-.profile-info-section{padding:12px 20px 20px}
-.profile-name-big{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--gold)}
-.profile-username{font-size:11px;color:var(--muted);margin-bottom:8px}
-.profile-bio-text{font-size:12px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--blue-border)}
-.profile-stats-row{display:flex;gap:16px;margin-bottom:12px}
-.profile-stat{text-align:center}
-.stat-val{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:var(--gold)}
-.stat-lbl{font-size:9px;color:var(--muted)}
-.badges-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
-.badge{background:var(--gold-dim);border:1px solid var(--gold-border);border-radius:20px;padding:3px 9px;font-size:10px;color:var(--gold)}
-.mod-panel{position:fixed;bottom:20px;right:20px;z-index:5000;display:none;flex-direction:column;align-items:flex-end;gap:10px}
-.mod-panel.visible{display:flex}
-.mod-panel-btn{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#ffaa00);border:none;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center}
-.mod-panel-content{background:var(--surface);border:1px solid var(--gold-border);border-radius:16px;width:380px;max-height:70vh;overflow-y:auto;display:none}
-.mod-panel-content.open{display:block}
-.mod-panel-header{padding:12px 16px;border-bottom:1px solid var(--blue-border);font-weight:700;color:var(--gold);display:flex;justify-content:space-between}
-.mod-panel-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer}
-.mod-section{padding:10px 14px;border-bottom:1px solid var(--blue-border)}
-.mod-section-title{font-size:10px;font-weight:600;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
-.mod-row{display:flex;gap:6px;margin-bottom:7px;align-items:center;flex-wrap:wrap}
-.mod-select,.mod-input{flex:1;padding:6px 9px;border-radius:8px;border:1px solid var(--blue-border);background:rgba(0,0,0,0.3);color:var(--text);font-size:12px}
-.btn-mod-action{padding:5px 10px;border-radius:8px;border:1px solid var(--gold-border);background:rgba(255,204,0,0.12);color:var(--gold);font-size:11px;cursor:pointer}
-.btn-danger-action{background:rgba(255,68,102,0.12);color:var(--red);border:1px solid rgba(255,68,102,0.3)}
-.shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
-.shop-item{background:var(--surface2);border:1px solid var(--blue-border);border-radius:13px;padding:12px;text-align:center;cursor:pointer}
-.shop-item:hover{border-color:var(--gold)}
-.shop-price{font-size:12px;color:var(--gold);font-weight:700}
-#toastContainer{position:fixed;bottom:22px;right:22px;z-index:20000;display:flex;flex-direction:column;gap:7px}
-.toast{background:var(--surface);border:1px solid var(--blue-border);border-radius:11px;padding:10px 16px;font-size:12px;animation:toastIn 0.25s both}
-.hint{padding:7px 16px;color:var(--muted);font-size:12px}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Fantarena — Live Chat + Voice + Groups</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --gold:#ffcc00;--gold-dim:rgba(255,204,0,0.15);--gold-border:rgba(255,204,0,0.3);
+      --blue:#2d5ae3;--blue-dim:rgba(45,90,227,0.18);--blue-border:rgba(45,90,227,0.32);
+      --purple:#9f5ae3;--green:#00e87a;--red:#ff4466;--orange:#ff8844;
+      --bg:#07081a;--surface:rgba(12,16,38,0.98);--surface2:rgba(20,26,55,0.9);
+      --text:#dde2ff;--muted:rgba(180,190,255,0.38);
+    }
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden}
+    ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(45,90,227,0.25);border-radius:99px}
+    .voice-message{display:flex;align-items:center;gap:10px;background:rgba(45,90,227,0.15);border-radius:30px;padding:6px 14px;width:fit-content;margin-top:4px}
+    .voice-play-btn{background:none;border:none;font-size:18px;cursor:pointer;color:var(--gold)}
+    .voice-wave{display:flex;align-items:center;gap:3px;height:28px}
+    .voice-wave span{width:3px;background:var(--gold);border-radius:2px;animation:wave 0.8s ease infinite}
+    @keyframes wave{0%,100%{height:4px}50%{height:18px}}
+    .voice-recording-indicator{position:fixed;bottom:90px;right:20px;background:var(--red);color:white;padding:8px 16px;border-radius:30px;font-size:12px;z-index:9000;cursor:pointer;animation:pulse 1s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
+    @keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+    .chat-container{display:flex;height:100vh;width:100vw}
+    .sidebar{width:260px;background:var(--surface);border-right:1px solid var(--blue-border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+    .sidebar-header{padding:16px;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--gold);border-bottom:1px solid var(--blue-border)}
+    .sidebar-scroll{flex:1;overflow-y:auto;padding-bottom:8px}
+    .section-label{padding:12px 16px 4px;font-size:10px;font-weight:600;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between}
+    .add-btn{background:none;border:none;color:var(--gold);font-size:18px;cursor:pointer}
+    .channel{padding:8px 14px;margin:2px 8px;border-radius:10px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;color:var(--muted)}
+    .channel:hover{background:var(--blue-dim);color:var(--text)}
+    .channel.active{background:rgba(45,90,227,0.22);color:var(--gold);font-weight:600}
+    .sidebar-item{padding:7px 12px;margin:1px 8px;border-radius:10px;cursor:pointer;display:flex;align-items:center;gap:9px;font-size:13px;color:var(--muted)}
+    .sidebar-item:hover{background:var(--blue-dim);color:var(--text)}
+    .mini-avatar{width:26px;height:26px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;overflow:hidden}
+    .sidebar-footer{padding:10px;border-top:1px solid var(--blue-border);display:flex;flex-direction:column;gap:5px}
+    .footer-btn{width:100%;padding:8px 12px;border-radius:10px;border:none;background:rgba(255,255,255,0.05);color:var(--text);font-size:12px;cursor:pointer;text-align:left}
+    .footer-btn:hover{background:rgba(255,255,255,0.1)}
+    .chat-area{flex:1;display:flex;flex-direction:column;min-width:0}
+    .chat-header{padding:12px 20px;border-bottom:1px solid var(--blue-border);display:flex;align-items:center;gap:10px}
+    .chat-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700}
+    .level-badge{background:var(--gold);color:#1a1200;border-radius:8px;padding:2px 8px;font-size:10px;font-weight:700}
+    .header-spacer{flex:1}
+    .typing-indicator{font-size:11px;color:var(--muted);min-width:120px}
+    .header-coins{font-size:13px;color:var(--gold);font-weight:600}
+    .messages{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:4px}
+    .message{display:flex;gap:10px;padding:6px 8px;border-radius:10px;animation:msgIn 0.2s both;position:relative}
+    .message:hover{background:rgba(255,255,255,0.03)}
+    .message:hover .msg-actions{opacity:1}
+    .msg-avatar{width:32px;height:32px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;cursor:pointer;overflow:hidden;flex-shrink:0}
+    .msg-avatar img{width:100%;height:100%;object-fit:cover}
+    .msg-body{flex:1}
+    .msg-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+    .msg-name{font-weight:600;font-size:13px;cursor:pointer}
+    .msg-lv{background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);border-radius:6px;padding:1px 5px;font-size:9px}
+    .owner-badge{background:#ff4444;color:white;border-radius:4px;padding:1px 5px;font-size:8px}
+    .mod-badge{background:var(--gold);color:#1a1200;border-radius:4px;padding:1px 5px;font-size:8px}
+    .msg-time{font-size:9px;color:var(--muted)}
+    .msg-text{margin-top:3px;font-size:13px;line-height:1.4;word-break:break-word}
+    .msg-text img{max-width:200px;border-radius:8px;cursor:pointer}
+    .msg-actions{position:absolute;right:8px;top:50%;transform:translateY(-50%);display:flex;gap:2px;opacity:0;background:var(--surface);border:1px solid var(--blue-border);border-radius:8px;padding:2px 4px}
+    .msg-action-btn{background:none;border:none;cursor:pointer;font-size:12px;padding:2px 4px;border-radius:5px;color:var(--muted)}
+    .msg-action-btn:hover{background:var(--blue-dim)}
+    .msg-reactions{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}
+    .reaction-chip{display:flex;align-items:center;gap:3px;background:var(--blue-dim);border:1px solid var(--blue-border);border-radius:20px;padding:2px 8px;font-size:11px;cursor:pointer}
+    .reaction-picker{position:absolute;right:8px;top:-38px;background:var(--surface);border:1px solid var(--blue-border);border-radius:10px;padding:4px 6px;display:flex;gap:3px;z-index:50;opacity:0;transform:translateY(5px);pointer-events:none}
+    .reaction-picker.open{opacity:1;transform:translateY(0);pointer-events:all}
+    .react-btn{font-size:14px;cursor:pointer;padding:2px 3px;border-radius:5px}
+    .input-wrapper{border-top:1px solid var(--blue-border)}
+    .reply-bar{display:flex;align-items:center;gap:8px;padding:0 16px;font-size:11px;color:var(--muted);max-height:0;overflow:hidden}
+    .reply-bar.show{max-height:34px;padding:7px 16px}
+    .reply-cancel{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px}
+    .input-area{display:flex;gap:8px;align-items:center;padding:10px 16px 14px}
+    .input-toolbar{display:flex;gap:3px}
+    .toolbar-btn{background:none;border:none;cursor:pointer;font-size:16px;padding:5px;border-radius:7px;color:var(--muted)}
+    .toolbar-btn:hover{background:var(--blue-dim);color:var(--text)}
+    #messageInput{flex:1;padding:10px 16px;border-radius:50px;border:1.5px solid var(--blue-border);background:rgba(0,0,0,0.22);color:var(--text);font-size:13px;outline:none}
+    #messageInput:focus{border-color:var(--gold)}
+    .send-btn{padding:10px 20px;border-radius:50px;border:none;background:linear-gradient(135deg,var(--blue),#1a3bc0);color:white;font-weight:600;cursor:pointer}
+    .gif-picker{max-height:0;overflow:hidden}
+    .gif-picker.open{max-height:220px}
+    .gif-picker-inner{padding:8px 16px}
+    .gif-search{width:100%;padding:6px 12px;border-radius:50px;border:1px solid var(--blue-border);background:rgba(0,0,0,0.2);color:var(--text);margin-bottom:6px}
+    .gif-grid{display:flex;gap:5px;overflow-x:auto}
+    .gif-item{flex-shrink:0;border-radius:7px;overflow:hidden;cursor:pointer;height:75px}
+    .gif-item img{height:75px}
+    .emoji-picker{position:absolute;bottom:68px;left:16px;background:var(--surface);border:1px solid var(--blue-border);border-radius:14px;padding:10px;width:310px;max-height:280px;overflow-y:auto;z-index:200;opacity:0;transform:translateY(8px);pointer-events:none}
+    .emoji-picker.open{opacity:1;transform:translateY(0);pointer-events:all}
+    .emoji-grid{display:flex;flex-wrap:wrap;gap:3px}
+    .emoji-btn{width:33px;height:33px;font-size:18px;display:flex;align-items:center;justify-content:center;border-radius:6px;cursor:pointer}
+    .members-sidebar{width:215px;background:var(--surface);border-left:1px solid var(--blue-border);padding:12px;overflow-y:auto;display:flex;flex-direction:column;flex-shrink:0}
+    .members-header{display:flex;justify-content:space-between;margin-bottom:12px;font-size:10px;font-weight:600;text-transform:uppercase;color:var(--muted)}
+    .online-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;margin-right:4px}
+    .member{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:8px;cursor:pointer;font-size:12px;color:var(--muted)}
+    .member:hover{background:var(--blue-dim);color:var(--text)}
+    .member-avatar{width:26px;height:26px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;overflow:hidden;position:relative}
+    .member-status{position:absolute;bottom:-1px;right:-1px;width:9px;height:9px;border-radius:50%;border:2px solid var(--surface)}
+    .status-online{background:var(--green)}
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:10000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;backdrop-filter:blur(6px)}
+    .overlay.active{opacity:1;pointer-events:all}
+    .modal-card{background:var(--surface);border:1px solid var(--blue-border);border-radius:20px;padding:22px;min-width:290px;max-width:390px;width:92%}
+    .modal-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--gold);margin-bottom:15px}
+    .modal-input{width:100%;padding:10px 13px;border-radius:10px;border:1.5px solid var(--blue-border);background:rgba(0,0,0,0.22);color:var(--text);margin-bottom:10px;font-size:13px;outline:none}
+    .modal-buttons{display:flex;gap:8px;justify-content:flex-end}
+    .btn-primary{padding:8px 18px;border-radius:50px;border:none;background:linear-gradient(135deg,var(--blue),#1a3bc0);color:white;font-size:13px;font-weight:600;cursor:pointer}
+    .btn-cancel{padding:8px 16px;border-radius:50px;border:1px solid var(--blue-border);background:transparent;color:var(--muted);cursor:pointer}
+    .profile-card{background:var(--surface);border:2px solid var(--gold-border);border-radius:24px;width:360px;overflow:hidden}
+    .profile-banner{height:85px;background:linear-gradient(135deg,var(--blue),var(--purple))}
+    .profile-avatar-big{position:relative;margin-top:-38px;margin-left:20px;width:70px;height:70px;border:3px solid var(--surface);background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;overflow:hidden;cursor:pointer}
+    .profile-info-section{padding:12px 20px 20px}
+    #toastContainer{position:fixed;bottom:22px;right:22px;z-index:20000;display:flex;flex-direction:column;gap:7px}
+    .toast{background:var(--surface);border:1px solid var(--blue-border);border-radius:11px;padding:10px 16px;font-size:12px;animation:toastIn 0.25s both}
+    .hint{padding:7px 16px;color:var(--muted);font-size:12px;text-align:center}
+  </style>
 </head>
 <body>
 
-<!-- MAIN CHAT - NO WELCOME SCREEN -->
-<div class="chat-container" id="chatContainer">
-  <div class="sidebar" id="sidebar">
-    <div class="channel-pill" id="channelPill"></div>
+<div class="chat-container">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
     <div class="sidebar-header">🏟️ FANTARENA</div>
     <div class="sidebar-scroll">
       <div class="section-label">💬 CHANNELS</div>
       <div class="channel active" data-channel="general">💬 general</div>
       <div class="channel" data-channel="game-recs">🎮 game recs</div>
       <div class="channel" data-channel="lfg">👥 friending</div>
-      <div class="channel" data-channel="flex">🏆 flex</div>
       <div class="section-label"><span>👥 GROUPS</span><button class="add-btn" id="createGroupBtn">+</button></div>
       <div id="groupsList"><div class="hint">no groups</div></div>
       <div class="section-label"><span>⭐ FRIENDS</span><button class="add-btn" id="addFriendBtn">+</button></div>
@@ -206,10 +140,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
       <button class="footer-btn" id="shopBtn">🏪 shop</button>
       <button class="footer-btn" id="settingsBtn">⚙️ settings</button>
       <button class="footer-btn" id="dailyBtn">🎁 daily</button>
-      <button class="footer-btn" id="stageBtn" style="background:linear-gradient(135deg,var(--purple),#7a3ac0);">🎤 THE STAGE</button>
     </div>
   </div>
 
+  <!-- CHAT AREA -->
   <div class="chat-area">
     <div class="chat-header">
       <span class="chat-title" id="chatTitle"># general</span>
@@ -218,11 +152,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
       <div class="typing-indicator" id="typingIndicator"></div>
       <div class="header-coins">🪙 <span id="coinCount">0</span></div>
     </div>
-    <div class="messages" id="messages"><div class="hint" style="text-align:center">✨ welcome to fantarena! ✨</div></div>
+    <div class="messages" id="messages"><div class="hint">✨ welcome to fantarena! ✨</div></div>
     <div class="input-wrapper">
       <div class="reply-bar" id="replyBar"><span id="replyBarText">replying to...</span><button class="reply-cancel" id="replyCancel">×</button></div>
-      <div class="gif-picker" id="gifPicker"><div class="gif-picker-inner"><input type="text" class="gif-search" id="gifSearch" placeholder="🔍 search GIFs..."><div class="gif-grid" id="gifGrid"></div></div></div>
-      <div class="emoji-picker" id="emojiPicker"><input type="text" class="emoji-search" id="emojiSearch" placeholder="🔍 search emojis..."><div class="emoji-grid" id="emojiGrid"></div></div>
+      <div class="gif-picker" id="gifPicker"><div class="gif-picker-inner"><input class="gif-search" id="gifSearch" placeholder="🔍 search GIFs..."><div class="gif-grid" id="gifGrid"></div></div></div>
+      <div class="emoji-picker" id="emojiPicker"><div class="emoji-grid" id="emojiGrid"></div></div>
       <div class="input-area">
         <div class="input-toolbar"><button class="toolbar-btn" id="gifBtn">🎬</button><button class="toolbar-btn" id="emojiBtn">😊</button><button class="toolbar-btn" id="voiceMsgBtn" style="color:var(--red)">🎙️</button></div>
         <input type="text" id="messageInput" placeholder="Message... /help">
@@ -231,6 +165,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
     </div>
   </div>
 
+  <!-- MEMBERS -->
   <div class="members-sidebar">
     <div class="members-header"><span>MEMBERS</span><span><span class="online-dot"></span><span id="onlineCount">0</span></span></div>
     <div id="membersList"></div>
@@ -240,180 +175,281 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 
 <!-- MODALS -->
 <div class="overlay" id="profileOverlay"><div class="profile-card"><div class="profile-banner"></div><div class="profile-avatar-big" id="profileAvatar">?</div><input type="file" id="avatarUpload" accept="image/*" style="display:none"><div class="profile-info-section"><div class="profile-name-big" id="profileName">Username</div><div class="profile-username" id="profileUsername">@username</div><div class="profile-bio-text" id="profileBio"></div><div class="profile-stats-row"><div class="profile-stat"><div class="stat-val" id="profileMessages">0</div><div class="stat-lbl">msgs</div></div><div class="profile-stat"><div class="stat-val" id="profileLevel">1</div><div class="stat-lbl">level</div></div><div class="profile-stat"><div class="stat-val" id="profileXP">0</div><div class="stat-lbl">xp</div></div><div class="profile-stat"><div class="stat-val" id="profileCoins">0</div><div class="stat-lbl">coins</div></div></div><div class="badges-row" id="profileBadges"></div><div class="profile-actions"><button class="btn-primary" id="dmFromProfileBtn">💬 Message</button><button class="btn-cancel" id="closeProfileBtn">Close</button></div></div></div></div>
-<div class="overlay" id="settingsOverlay"><div class="modal-card"><div class="modal-title">⚙️ Settings</div><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><label>Name color</label><input type="color" id="nameColor" value="#ffcc00"></div><input type="text" class="modal-input" id="customActivity" placeholder="Activity"><textarea class="modal-input" id="userBio" rows="2" placeholder="Bio..."></textarea><div class="modal-buttons"><button class="btn-cancel" id="closeSettingsModal">cancel</button><button class="btn-primary" id="saveSettings">save</button></div></div></div>
-<div class="overlay" id="dailyOverlay"><div class="modal-card" style="text-align:center"><div class="modal-title">🎁 Daily Reward</div><div style="font-size:40px;color:var(--gold);margin:15px 0" id="dailyAmount">+50 🪙</div><div id="dailyStreakText" style="margin-bottom:15px">streak: 1 day</div><div class="modal-buttons"><button class="btn-cancel" id="closeDailyModal">close</button><button class="btn-primary" id="claimDaily">claim</button></div></div></div>
+<div class="overlay" id="settingsOverlay"><div class="modal-card"><div class="modal-title">⚙️ Settings</div><div><label>Name color</label><input type="color" id="nameColor" value="#ffcc00" style="width:100%;margin-bottom:10px"></div><input class="modal-input" id="customActivity" placeholder="Activity"><textarea class="modal-input" id="userBio" rows="2" placeholder="Bio..."></textarea><div class="modal-buttons"><button class="btn-cancel" id="closeSettingsModal">cancel</button><button class="btn-primary" id="saveSettings">save</button></div></div></div>
+<div class="overlay" id="dailyOverlay"><div class="modal-card" style="text-align:center"><div class="modal-title">🎁 Daily Reward</div><div style="font-size:40px;color:var(--gold);margin:15px 0" id="dailyAmount">+50 🪙</div><div id="dailyStreakText"></div><div class="modal-buttons"><button class="btn-cancel" id="closeDailyModal">close</button><button class="btn-primary" id="claimDaily">claim</button></div></div></div>
 <div class="overlay" id="shopOverlay"><div class="modal-card"><div class="modal-title">🏪 Shop <span style="font-size:12px">🪙 <span id="shopCoinDisplay">0</span></span></div><div class="shop-grid" id="shopGrid"></div></div></div>
-<div class="overlay" id="addFriendOverlay"><div class="modal-card"><div class="modal-title">➕ Add Friend</div><input type="text" class="modal-input" id="friendUsername" placeholder="Username"><div class="modal-buttons"><button class="btn-cancel" id="closeAddFriendModal">cancel</button><button class="btn-primary" id="confirmAddFriend">send</button></div></div></div>
-<div class="overlay" id="createGroupOverlay"><div class="modal-card"><div class="modal-title">👥 Create Group</div><input type="text" class="modal-input" id="groupName" placeholder="Group name"><div class="modal-buttons"><button class="btn-cancel" id="closeCreateGroupModal">cancel</button><button class="btn-primary" id="confirmCreateGroup">create</button></div></div></div>
-
+<div class="overlay" id="addFriendOverlay"><div class="modal-card"><div class="modal-title">➕ Add Friend</div><input class="modal-input" id="friendUsername" placeholder="Username"><div class="modal-buttons"><button class="btn-cancel" id="closeAddFriendModal">cancel</button><button class="btn-primary" id="confirmAddFriend">send</button></div></div></div>
+<div class="overlay" id="createGroupOverlay"><div class="modal-card"><div class="modal-title">👥 Create Group</div><input class="modal-input" id="groupName" placeholder="Group name"><div class="modal-buttons"><button class="btn-cancel" id="closeCreateGroupModal">cancel</button><button class="btn-primary" id="confirmCreateGroup">create</button></div></div></div>
 <div id="toastContainer"></div>
 
 <script>
 // ============================================================
-// FANTARENA - FULL FEATURED, NO WELCOME SCREEN
+// FANTARENA — COMPLETE FIXED VERSION (MESSAGES WORKING)
 // ============================================================
 (function() {
   const SUPABASE_URL = "https://luxutkabqgitoteosctr.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eHV0a2FicWdpdG90ZW9zY3RyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2Mjc5NjAsImV4cCI6MjA5MjIwMzk2MH0.7GjvQMZaujg0YFmTBr2wotGWCIUoBWCBplGocMo6TDM";
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  console.log('✅ Supabase ready');
+  console.log('Supabase initialised');
 
-  const OWNER_USERNAMES = ['abcatlmfao', 'abcatlmfao1'];
+  // --- USER DATA ---
   let currentUser = JSON.parse(localStorage.getItem('fanter_currentUser') || 'null');
   if (!currentUser || !currentUser.id) {
-    currentUser = { 
-      id: 'user_' + Math.random().toString(36).slice(2,10) + Date.now(), 
+    currentUser = {
+      id: 'user_' + Math.random().toString(36).slice(2,10) + Date.now(),
       username: 'Guest' + Math.floor(Math.random()*9999),
-      displayName: 'Guest' + Math.floor(Math.random()*9999), 
-      coins: 100 
+      displayName: 'Guest' + Math.floor(Math.random()*9999),
+      coins: 100
     };
     localStorage.setItem('fanter_currentUser', JSON.stringify(currentUser));
   }
 
-  let messageCounts = JSON.parse(localStorage.getItem('messageCounts') || '{}');
   let userXP = JSON.parse(localStorage.getItem('userXP') || '{}');
-  let userBadges = JSON.parse(localStorage.getItem('userBadges') || '{}');
   let userAvatars = JSON.parse(localStorage.getItem('userAvatars') || '{}');
   let userCoinsMap = JSON.parse(localStorage.getItem('userCoinsMap') || '{}');
-  let moderatorsList = JSON.parse(localStorage.getItem('fanter_moderators') || '[]');
-  
   if (!userXP[currentUser.id]) userXP[currentUser.id] = 0;
-  if (!messageCounts[currentUser.id]) messageCounts[currentUser.id] = 0;
-  if (!userBadges[currentUser.id]) userBadges[currentUser.id] = [];
-  if (!userCoinsMap[currentUser.id]) userCoinsMap[currentUser.id] = currentUser.coins || 0;
+  if (!userCoinsMap[currentUser.id]) userCoinsMap[currentUser.id] = currentUser.coins;
   
   function saveLocal() {
     localStorage.setItem('userXP', JSON.stringify(userXP));
-    localStorage.setItem('messageCounts', JSON.stringify(messageCounts));
-    localStorage.setItem('userBadges', JSON.stringify(userBadges));
     localStorage.setItem('userAvatars', JSON.stringify(userAvatars));
     localStorage.setItem('userCoinsMap', JSON.stringify(userCoinsMap));
-    localStorage.setItem('fanter_moderators', JSON.stringify(moderatorsList));
   }
-  
   function esc(s) { if (!s) return ''; return String(s).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
-  function toast(msg) { const tc = document.getElementById('toastContainer'); const el = document.createElement('div'); el.className = 'toast'; el.innerHTML = msg; tc.appendChild(el); setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 3000); }
-  function updateCoinDisplay() { document.getElementById('coinCount').textContent = currentUser.coins || 0; document.getElementById('shopCoinDisplay').textContent = currentUser.coins || 0; }
-  function addCoins(n) { currentUser.coins = (currentUser.coins || 0) + n; userCoinsMap[currentUser.id] = currentUser.coins; localStorage.setItem('fanter_currentUser', JSON.stringify(currentUser)); saveLocal(); updateCoinDisplay(); }
-  
+  function toast(msg) { const tc = document.getElementById('toastContainer'); const el = document.createElement('div'); el.className = 'toast'; el.innerText = msg; tc.appendChild(el); setTimeout(() => el.remove(), 2500); }
   function getLevel(xp) { if (xp >= 5000) return 20; if (xp >= 4000) return 18; if (xp >= 3000) return 15; if (xp >= 2000) return 12; if (xp >= 1400) return 10; if (xp >= 900) return 7; if (xp >= 500) return 5; if (xp >= 250) return 3; if (xp >= 100) return 2; return 1; }
-  function addXP(amount) { const oldLv = getLevel(userXP[currentUser.id] || 0); userXP[currentUser.id] = (userXP[currentUser.id] || 0) + amount; saveLocal(); const newLv = getLevel(userXP[currentUser.id]); if (newLv > oldLv) { document.getElementById('levelBadge').textContent = `Lv ${newLv}`; toast(`🎉 Level up! Level ${newLv}!`); } document.getElementById('levelBadge').textContent = `Lv ${getLevel(userXP[currentUser.id])}`; }
+  function addXP(amount) { userXP[currentUser.id] = (userXP[currentUser.id] || 0) + amount; saveLocal(); document.getElementById('levelBadge').innerText = `Lv ${getLevel(userXP[currentUser.id])}`; }
+  function updateCoinDisplay() { document.getElementById('coinCount').innerText = currentUser.coins; document.getElementById('shopCoinDisplay').innerText = currentUser.coins; }
   
-  function isOwner() { return OWNER_USERNAMES.includes(currentUser.displayName || currentUser.username); }
-  function isModerator() { return moderatorsList.includes(currentUser.displayName || currentUser.username) || isOwner(); }
-  
-  let currentChannel = 'general', currentGroupId = null, currentDMUserId = null, channelSub = null;
+  // --- CHAT STATE ---
+  let currentChannel = 'general';
+  let currentGroupId = null;
+  let currentDMUserId = null;
+  let channelSub = null;
   let nameColor = localStorage.getItem('fanter_nameColor') || '#ffcc00';
   let customActivity = localStorage.getItem('fanter_activity') || '🎮 gaming';
   let userBio = localStorage.getItem('fanter_bio') || '';
+  let replyingTo = null;
   let dailyStreak = parseInt(localStorage.getItem('dailyStreak') || '0');
   let lastDailyClaim = localStorage.getItem('lastDailyClaim') || '';
-  let globalSlowMode = 0, lastMessageTime = 0, allUsersList = [], replyingTo = null;
 
+  // --- HELPER: get channel id ---
+  function getChannelId() {
+    if (currentDMUserId) return `dm_${[currentUser.id, currentDMUserId].sort().join('_')}`;
+    if (currentGroupId) return `group_${currentGroupId}`;
+    return currentChannel;
+  }
+
+  // --- RENDER MESSAGE ---
   function renderMessage(msg) {
     const lv = getLevel(userXP[msg.user_id] || 0);
     const avatarUrl = userAvatars[msg.user_id];
-    const isMod = moderatorsList.includes(msg.username);
-    const isOwnr = OWNER_USERNAMES.includes(msg.username);
-    const nameColorStyle = msg.name_color || '#ffcc00';
-    let nameClass = nameColorStyle === '#ff4444' ? 'fire' : nameColorStyle === '#9f5ae3' ? 'purple' : nameColorStyle === '#00e87a' ? 'green' : '';
-    let messageContent = esc(msg.message);
-    const canDelete = (msg.user_id === currentUser.id) || isModerator();
-    if (msg.is_voice_message && msg.voice_url) messageContent = `<div class="voice-message"><button class="voice-play-btn" onclick="window.playVoice('${msg.voice_url}', this)">🔊</button><div class="voice-wave" style="display:none"><span></span><span></span><span></span><span></span><span></span></div><span class="voice-duration">${msg.voice_duration || 5}s</span></div>`;
-    else { const gifMatch = msg.message.match(/\[GIF\]\s*(https?:\/\/[^\s]+)/i); if (gifMatch) messageContent = `<img src="${gifMatch[1]}" onclick="window.open('${gifMatch[1]}')">`; }
-    return `<div class="message" id="msg-${msg.id}"><div class="msg-avatar" onclick="window.showProfile('${esc(msg.user_id)}')">${avatarUrl ? `<img src="${avatarUrl}">` : (msg.username?.[0]?.toUpperCase() || 'U')}</div><div class="msg-body"><div class="msg-meta"><span class="msg-name ${nameClass}" onclick="window.showProfile('${esc(msg.user_id)}')" style="color:${nameColorStyle}">${esc(msg.username)}</span><span class="msg-lv">Lv${lv}</span>${isOwnr ? '<span class="owner-badge">OWNER</span>' : ''}${isMod && !isOwnr ? '<span class="mod-badge">MOD</span>' : ''}<span class="msg-time">${new Date(msg.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span></div><div class="msg-text">${messageContent}${msg.edited ? '<span style="font-size:9px;color:gray"> (edited)</span>' : ''}</div><div class="msg-reactions" id="reactions-${msg.id}"></div></div><div class="msg-actions"><div class="reaction-picker" id="rp-${msg.id}">${['👍','❤️','😂','🔥','💀','🏆'].map(e => `<span class="react-btn" onclick="window.addReaction('${msg.id}','${e}')">${e}</span>`).join('')}</div><button class="msg-action-btn" onclick="window.togglePicker('${msg.id}')">😊</button><button class="msg-action-btn" onclick="window.startReply(${msg.id},'${esc(msg.username)}','${esc((msg.message||'').slice(0,50))}')">↩</button>${msg.user_id === currentUser.id ? `<button class="msg-action-btn" onclick="window.editMsg('${msg.id}')">✏️</button>` : ''}${canDelete ? `<button class="msg-action-btn" onclick="window.delMsg('${msg.id}')" style="color:var(--red)">🗑</button>` : ''}</div></div>`;
+    const isOwner = msg.username === 'abcatlmfao' || msg.username === 'abcatlmfao1';
+    let messageHtml = esc(msg.message);
+    if (msg.is_voice_message && msg.voice_url) {
+      messageHtml = `<div class="voice-message"><button class="voice-play-btn" onclick="window.playVoice('${msg.voice_url}', this)">🔊</button><div class="voice-wave" style="display:none"><span></span><span></span><span></span><span></span><span></span></div><span class="voice-duration">${msg.voice_duration||5}s</span></div>`;
+    } else {
+      const gifMatch = msg.message.match(/\[GIF\]\s*(https?:\/\/[^\s]+)/i);
+      if (gifMatch) messageHtml = `<img src="${gifMatch[1]}" onclick="window.open('${gifMatch[1]}')">`;
+    }
+    return `<div class="message" id="msg-${msg.id}">
+      <div class="msg-avatar" onclick="window.showProfile('${esc(msg.user_id)}')">${avatarUrl ? `<img src="${avatarUrl}">` : (msg.username?.[0]?.toUpperCase() || 'U')}</div>
+      <div class="msg-body">
+        <div class="msg-meta">
+          <span class="msg-name" onclick="window.showProfile('${esc(msg.user_id)}')" style="color:${msg.name_color || '#ffcc00'}">${esc(msg.username)}</span>
+          <span class="msg-lv">Lv${lv}</span>${isOwner ? '<span class="owner-badge">OWNER</span>' : ''}<span class="msg-time">${new Date(msg.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span>
+        </div>
+        <div class="msg-text">${messageHtml}${msg.edited ? '<span style="font-size:9px;color:gray"> (edited)</span>' : ''}</div>
+        <div class="msg-reactions" id="reactions-${msg.id}"></div>
+      </div>
+      <div class="msg-actions">
+        <div class="reaction-picker" id="rp-${msg.id}">${['👍','❤️','😂','🔥','💀','🏆'].map(e => `<span class="react-btn" onclick="window.addReaction('${msg.id}','${e}')">${e}</span>`).join('')}</div>
+        <button class="msg-action-btn" onclick="window.togglePicker('${msg.id}')">😊</button>
+        <button class="msg-action-btn" onclick="window.startReply(${msg.id},'${esc(msg.username)}','${esc((msg.message||'').slice(0,50))}')">↩</button>
+        ${msg.user_id === currentUser.id ? `<button class="msg-action-btn" onclick="window.editMsg('${msg.id}')">✏️</button><button class="msg-action-btn" onclick="window.delMsg('${msg.id}')" style="color:var(--red)">🗑</button>` : ''}
+      </div>
+    </div>`;
   }
 
   window.playVoice = (url, btn) => { const audio = new Audio(url); const wave = btn.parentElement.querySelector('.voice-wave'); audio.onplay = () => { if(wave) wave.style.display = 'flex'; }; audio.onended = () => { if(wave) wave.style.display = 'none'; }; audio.play(); };
-  window.showProfile = async (userId) => { try { const { data } = await sb.from('fanter_presence').select('*').eq('user_id', userId).single(); if(!data) return; const name = data.display_name || data.username; const avatarUrl = userAvatars[userId]; const isOwn = userId === currentUser.id; document.getElementById('profileAvatar').innerHTML = avatarUrl ? `<img src="${avatarUrl}">` : name[0].toUpperCase(); document.getElementById('profileAvatar').style.cursor = isOwn ? 'pointer' : 'default'; document.getElementById('profileAvatar').onclick = isOwn ? () => document.getElementById('avatarUpload').click() : null; document.getElementById('profileName').textContent = name; document.getElementById('profileUsername').textContent = `@${data.username}`; document.getElementById('profileBio').textContent = data.bio || ''; document.getElementById('profileMessages').textContent = messageCounts[userId] || 0; document.getElementById('profileLevel').textContent = getLevel(userXP[userId] || 0); document.getElementById('profileXP').textContent = userXP[userId] || 0; document.getElementById('profileCoins').textContent = userCoinsMap[userId] || 0; const badges = userBadges[userId] || []; document.getElementById('profileBadges').innerHTML = badges.length ? badges.map(b => `<div class="badge">🏆 ${esc(b)}</div>`).join('') : '<div style="font-size:11px;color:var(--muted)">no badges</div>'; const dmBtn = document.getElementById('dmFromProfileBtn'); dmBtn.style.display = isOwn ? 'none' : 'block'; dmBtn.onclick = () => { closeOverlay('profileOverlay'); openDM(userId, name); }; openOverlay('profileOverlay'); } catch(e) { toast('Error'); } };
-  window.addReaction = async (msgId, emoji) => { try { const { data: existing } = await sb.from('fanter_reactions').select('id').eq('message_id', msgId).eq('user_id', currentUser.id).eq('emoji', emoji); if (existing && existing.length) await sb.from('fanter_reactions').delete().eq('id', existing[0].id); else await sb.from('fanter_reactions').insert({ message_id: msgId, user_id: currentUser.id, emoji }); loadReactions(msgId); } catch(e) {} };
+  window.addReaction = async (msgId, emoji) => { try { await sb.from('fanter_reactions').insert({ message_id: msgId, user_id: currentUser.id, emoji }); loadReactions(msgId); } catch(e) {} };
   window.togglePicker = (id) => { document.querySelectorAll('.reaction-picker.open').forEach(p => p.classList.remove('open')); const p = document.getElementById(`rp-${id}`); if(p) p.classList.add('open'); };
-  window.startReply = (id, username, preview) => { replyingTo = { id, username, preview }; document.getElementById('replyBarText').innerHTML = `↩ replying to <strong>${esc(username)}</strong>: ${esc(preview)}`; document.getElementById('replyBar').classList.add('show'); document.getElementById('messageInput').focus(); };
-  window.editMsg = async (id) => { const txt = prompt('Edit message:'); if(txt && txt.trim()) { await sb.from('fanter_chat').update({ message: txt, edited: true }).eq('id', id); loadMessages(); toast('✅ Edited'); } };
-  window.delMsg = async (id) => { if(confirm('Delete?')) { await sb.from('fanter_chat').delete().eq('id', id); document.getElementById(`msg-${id}`)?.remove(); toast('🗑 Deleted'); } };
-  async function loadReactions(msgId) { try { const { data } = await sb.from('fanter_reactions').select('*').eq('message_id', msgId); if(!data) return; const grouped = {}; data.forEach(r => { if (!grouped[r.emoji]) grouped[r.emoji] = []; grouped[r.emoji].push(r.user_id); }); const container = document.getElementById(`reactions-${msgId}`); if(container) container.innerHTML = Object.entries(grouped).map(([emoji, users]) => `<div class="reaction-chip" onclick="window.addReaction('${msgId}','${emoji}')">${emoji} ${users.length}</div>`).join(''); } catch(e) {} }
-  
-  async function loadMessages() { try { let channelId = currentDMUserId ? `dm_${[currentUser.id, currentDMUserId].sort().join('_')}` : currentGroupId ? `group_${currentGroupId}` : currentChannel; const { data, error } = await sb.from('fanter_chat').select('*').eq('channel_id', channelId).order('created_at', { ascending: true }).limit(100); if(error) throw error; const container = document.getElementById('messages'); if(!data || !data.length) { container.innerHTML = '<div class="hint" style="text-align:center">✨ no messages yet ✨</div>'; return; } container.innerHTML = data.map(renderMessage).join(''); container.scrollTop = container.scrollHeight; for(const msg of data) loadReactions(msg.id); } catch(e) { console.error(e); toast('Failed to load messages'); } }
-  
-  async function sendMessage() { let text = document.getElementById('messageInput').value.trim(); if(!text) return; document.getElementById('messageInput').value = ''; if(globalSlowMode > 0 && !currentDMUserId && !currentGroupId && Date.now() - lastMessageTime < globalSlowMode * 1000) { toast(`⏸ Slow mode! Wait ${globalSlowMode}s`); document.getElementById('messageInput').value = text; return; } lastMessageTime = Date.now(); try { let channelId = currentDMUserId ? `dm_${[currentUser.id, currentDMUserId].sort().join('_')}` : currentGroupId ? `group_${currentGroupId}` : currentChannel; if(text.startsWith('/')) { const parts = text.slice(1).split(' '); const cmd = parts[0].toLowerCase(); if(cmd === 'roll') text = `🎲 ${currentUser.displayName} rolled ${Math.floor(Math.random()*100)+1}!`; else if(cmd === '8ball') { const a=['Yes','No','Maybe','Definitely','Never']; text = `🎱 ${a[Math.floor(Math.random()*a.length)]}`; } else if(cmd === 'flip') text = `🪙 ${Math.random()>0.5?'Heads':'Tails'}!`; else if(cmd === 'help') { toast('Commands: /roll, /8ball, /flip, /nick [name]'); return; } else if(cmd === 'nick' && parts[1]) { currentUser.displayName = parts.slice(1).join(' '); localStorage.setItem('fanter_currentUser', JSON.stringify(currentUser)); toast(`✅ Nickname: ${currentUser.displayName}`); await updatePresence(); return; } else { toast('Unknown command'); return; } } await sb.from('fanter_chat').insert({ channel_id: channelId, user_id: currentUser.id, username: currentUser.displayName || currentUser.username, message: text, name_color: nameColor, reply_to_id: replyingTo?.id || null, is_voice_message: false }); replyingTo = null; document.getElementById('replyBar').classList.remove('show'); messageCounts[currentUser.id] = (messageCounts[currentUser.id] || 0) + 1; saveLocal(); addXP(5); } catch(e) { toast('❌ Failed'); } }
-  
-  function setupRealtime() { if(channelSub) sb.removeChannel(channelSub); let channelId = currentDMUserId ? `dm_${[currentUser.id, currentDMUserId].sort().join('_')}` : currentGroupId ? `group_${currentGroupId}` : currentChannel; channelSub = sb.channel(`room-${channelId}`).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'fanter_chat', filter: `channel_id=eq.${channelId}` }, payload => { const container = document.getElementById('messages'); if(container.querySelector('.hint')) container.innerHTML = ''; container.insertAdjacentHTML('beforeend', renderMessage(payload.new)); container.scrollTop = container.scrollHeight; loadReactions(payload.new.id); }).subscribe(); }
-  
-  async function loadGroups() { try { const { data } = await sb.from('fanter_groups').select('*'); const myGroups = (data || []).filter(g => g.members && g.members.includes(currentUser.id)); const container = document.getElementById('groupsList'); if (!myGroups.length) { container.innerHTML = '<div class="hint">no groups</div>'; return; } container.innerHTML = myGroups.map(g => `<div class="sidebar-item" onclick="window.openGroup('${g.id}','${esc(g.name)}')"><span>👥</span><span>${esc(g.name)}</span></div>`).join(''); } catch(e) {} }
-  window.openGroup = async (gid, name) => { currentGroupId = gid; currentDMUserId = null; document.getElementById('chatTitle').innerHTML = `👥 ${name}`; document.querySelectorAll('.channel').forEach(c => c.classList.remove('active')); await loadMessages(); setupRealtime(); };
-  
-  async function loadFriends() { try { const { data: fData } = await sb.from('fanter_friends').select('friend_id').eq('user_id', currentUser.id); const container = document.getElementById('friendsList'); if (!fData || !fData.length) { container.innerHTML = '<div class="hint">no friends</div>'; return; } const { data: f } = await sb.from('fanter_presence').select('*').in('user_id', fData.map(d => d.friend_id)); if (!f || !f.length) { container.innerHTML = '<div class="hint">no friends</div>'; return; } container.innerHTML = f.map(fr => `<div class="sidebar-item" onclick="window.openDM('${fr.user_id}', '${esc(fr.display_name || fr.username)}')"><div class="mini-avatar">${fr.profile_pic ? `<img src="${fr.profile_pic}">` : (fr.username?.[0]?.toUpperCase() || 'U')}</div><span>${esc(fr.display_name || fr.username)}</span></div>`).join(''); } catch(e) {} }
-  
-  async function loadDMList() { try { const { data } = await sb.from('fanter_dm_conversations').select('*').or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`).order('last_message_time', { ascending: false }); const container = document.getElementById('dmList'); if (!data || !data.length) { container.innerHTML = '<div class="hint">no DMs</div>'; return; } container.innerHTML = data.map(d => { const otherId = d.user1_id === currentUser.id ? d.user2_id : d.user1_id; const otherUser = allUsersList.find(u => u.user_id === otherId); const name = otherUser?.display_name || otherUser?.username || otherId.slice(0,8); return `<div class="sidebar-item" onclick="window.openDM('${esc(otherId)}','${esc(name)}')"><span>💬</span><span>${esc(name)}</span></div>`; }).join(''); } catch(e) {} }
-  window.openDM = async (userId, username) => { currentDMUserId = userId; currentGroupId = null; document.getElementById('chatTitle').innerHTML = `💬 @${username}`; document.querySelectorAll('.channel').forEach(c => c.classList.remove('active')); await loadMessages(); setupRealtime(); try { const ids = [currentUser.id, userId].sort(); await sb.from('fanter_dm_conversations').upsert({ user1_id: ids[0], user2_id: ids[1], last_message_time: new Date().toISOString() }); } catch(e) {} loadDMList(); };
-  
-  async function updatePresence() { try { await sb.from('fanter_presence').upsert({ user_id: currentUser.id, username: currentUser.username, display_name: currentUser.displayName || currentUser.username, status: 'online', custom_activity: customActivity, bio: userBio, profile_pic: userAvatars[currentUser.id] || null, name_color: nameColor, xp: userXP[currentUser.id] || 0, level: getLevel(userXP[currentUser.id] || 0), coins: currentUser.coins || 0, message_count: messageCounts[currentUser.id] || 0, badges: userBadges[currentUser.id] || [], last_seen: new Date().toISOString() }); } catch(e) {} }
-  async function loadMembers() { try { const { data } = await sb.from('fanter_presence').select('*'); if (!data) return; allUsersList = data; for (const user of data) if (user.profile_pic && !userAvatars[user.user_id]) userAvatars[user.user_id] = user.profile_pic; saveLocal(); const online = data.filter(m => m.status !== 'offline'); document.getElementById('onlineCount').textContent = online.length; const statusClass = s => ({ online:'status-online', away:'status-away', gaming:'status-gaming' }[s] || 'status-offline'); const memberEl = m => { const avatarUrl = userAvatars[m.user_id] || m.profile_pic; return `<div class="member" onclick="window.showProfile('${esc(m.user_id)}')"><div class="member-avatar">${avatarUrl ? `<img src="${avatarUrl}">` : (m.username?.[0]?.toUpperCase() || 'U')}<div class="member-status ${statusClass(m.status)}"></div></div><div class="member-info"><div class="member-name">${esc(m.display_name || m.username)}</div>${m.custom_activity ? `<div class="member-activity">${esc(m.custom_activity)}</div>` : ''}</div></div>`; }; document.getElementById('membersList').innerHTML = (online.length ? `<div class="section-sep">ONLINE — ${online.length}</div>` + online.map(memberEl).join('') : '') + `<div class="section-sep">OFFLINE</div>` + data.filter(m => m.status === 'offline').map(memberEl).join(''); } catch(e) {} }
-  
-  function openOverlay(id) { document.getElementById(id).classList.add('active'); }
-  function closeOverlay(id) { document.getElementById(id).classList.remove('active'); }
-  document.querySelectorAll('.overlay').forEach(o => { o.addEventListener('click', e => { if (e.target === o) o.classList.remove('active'); }); });
-  document.getElementById('closeSettingsModal').onclick = () => closeOverlay('settingsOverlay');
-  document.getElementById('closeProfileBtn').onclick = () => closeOverlay('profileOverlay');
-  document.getElementById('replyCancel').onclick = () => { replyingTo = null; document.getElementById('replyBar').classList.remove('show'); };
+  window.startReply = (id, username, preview) => { replyingTo = { id, username, preview }; document.getElementById('replyBarText').innerHTML = `↩ replying to ${esc(username)}: ${esc(preview)}`; document.getElementById('replyBar').classList.add('show'); };
+  window.editMsg = async (id) => { const txt = prompt('Edit message:'); if(txt && txt.trim()) { await sb.from('fanter_chat').update({ message: txt, edited: true }).eq('id', id); loadMessages(); toast('edited'); } };
+  window.delMsg = async (id) => { if(confirm('Delete?')) { await sb.from('fanter_chat').delete().eq('id', id); document.getElementById(`msg-${id}`)?.remove(); toast('deleted'); } };
+  async function loadReactions(msgId) { try { const { data } = await sb.from('fanter_reactions').select('*').eq('message_id', msgId); if(!data) return; const grouped = {}; data.forEach(r => { if(!grouped[r.emoji]) grouped[r.emoji]=[]; grouped[r.emoji].push(r.user_id); }); const container = document.getElementById(`reactions-${msgId}`); if(container) container.innerHTML = Object.entries(grouped).map(([emoji,users]) => `<div class="reaction-chip" onclick="window.addReaction('${msgId}','${emoji}')">${emoji} ${users.length}</div>`).join(''); } catch(e){} }
+
+  // --- LOAD & SEND MESSAGES (FIXED) ---
+  async function loadMessages() {
+    try {
+      const channelId = getChannelId();
+      const { data, error } = await sb.from('fanter_chat').select('*').eq('channel_id', channelId).order('created_at', { ascending: true }).limit(100);
+      if (error) throw error;
+      const container = document.getElementById('messages');
+      if (!data || !data.length) { container.innerHTML = '<div class="hint">✨ no messages yet ✨</div>'; return; }
+      container.innerHTML = data.map(renderMessage).join('');
+      container.scrollTop = container.scrollHeight;
+      for (const msg of data) loadReactions(msg.id);
+    } catch(e) { console.error(e); toast('Failed to load messages'); }
+  }
+
+  async function sendMessage() {
+    let text = document.getElementById('messageInput').value.trim();
+    if (!text) return;
+    document.getElementById('messageInput').value = '';
+    try {
+      const channelId = getChannelId();
+      // commands
+      if (text.startsWith('/')) {
+        const parts = text.slice(1).split(' ');
+        const cmd = parts[0].toLowerCase();
+        if (cmd === 'roll') text = `🎲 ${currentUser.displayName} rolled ${Math.floor(Math.random()*100)+1}!`;
+        else if (cmd === '8ball') { const a=['Yes','No','Maybe','Definitely','Never']; text = `🎱 ${a[Math.floor(Math.random()*a.length)]}`; }
+        else if (cmd === 'flip') text = `🪙 ${Math.random()>0.5?'Heads':'Tails'}!`;
+        else if (cmd === 'help') { toast('Commands: /roll, /8ball, /flip, /nick [name]'); return; }
+        else if (cmd === 'nick' && parts[1]) { currentUser.displayName = parts.slice(1).join(' '); localStorage.setItem('fanter_currentUser', JSON.stringify(currentUser)); toast(`Nickname: ${currentUser.displayName}`); await updatePresence(); return; }
+        else { toast('Unknown command'); return; }
+      }
+      const { error } = await sb.from('fanter_chat').insert({
+        channel_id: channelId,
+        user_id: currentUser.id,
+        username: currentUser.displayName || currentUser.username,
+        message: text,
+        name_color: nameColor,
+        reply_to_id: replyingTo?.id || null,
+        is_voice_message: false
+      });
+      if (error) throw error;
+      replyingTo = null;
+      document.getElementById('replyBar').classList.remove('show');
+      addXP(3);
+    } catch(e) { console.error(e); toast('❌ Failed to send'); document.getElementById('messageInput').value = text; }
+  }
+
+  // --- REALTIME ---
+  function setupRealtime() {
+    if (channelSub) sb.removeChannel(channelSub);
+    const channelId = getChannelId();
+    channelSub = sb.channel(`room-${channelId}`)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'fanter_chat', filter: `channel_id=eq.${channelId}` }, payload => {
+        const container = document.getElementById('messages');
+        if (container.querySelector('.hint')) container.innerHTML = '';
+        container.insertAdjacentHTML('beforeend', renderMessage(payload.new));
+        container.scrollTop = container.scrollHeight;
+        loadReactions(payload.new.id);
+      })
+      .subscribe();
+  }
+
+  // --- PRESENCE & MEMBERS ---
+  async function updatePresence() {
+    await sb.from('fanter_presence').upsert({
+      user_id: currentUser.id,
+      username: currentUser.username,
+      display_name: currentUser.displayName || currentUser.username,
+      status: 'online',
+      custom_activity: customActivity,
+      bio: userBio,
+      profile_pic: userAvatars[currentUser.id] || null,
+      name_color: nameColor,
+      xp: userXP[currentUser.id] || 0,
+      level: getLevel(userXP[currentUser.id] || 0),
+      coins: currentUser.coins,
+      last_seen: new Date().toISOString()
+    });
+  }
+  async function loadMembers() {
+    try {
+      const { data } = await sb.from('fanter_presence').select('*');
+      if (!data) return;
+      const online = data.filter(m => m.status !== 'offline');
+      document.getElementById('onlineCount').innerText = online.length;
+      const memberEl = m => `<div class="member" onclick="window.showProfile('${esc(m.user_id)}')"><div class="member-avatar">${m.profile_pic ? `<img src="${m.profile_pic}">` : (m.username?.[0]?.toUpperCase() || 'U')}<div class="member-status status-online"></div></div><div class="member-info"><div class="member-name">${esc(m.display_name || m.username)}</div></div></div>`;
+      document.getElementById('membersList').innerHTML = online.map(memberEl).join('');
+    } catch(e) {}
+  }
+  window.showProfile = (userId) => { toast(`Profile: ${userId.slice(0,8)}`); };
+
+  // --- GROUPS / FRIENDS / DM ---
+  async function loadGroups() { try { const { data } = await sb.from('fanter_groups').select('*'); const myGroups = (data||[]).filter(g => g.members?.includes(currentUser.id)); const container = document.getElementById('groupsList'); if(!myGroups.length) { container.innerHTML='<div class="hint">no groups</div>'; return; } container.innerHTML = myGroups.map(g => `<div class="sidebar-item" onclick="window.openGroup('${g.id}','${esc(g.name)}')"><span>👥</span><span>${esc(g.name)}</span></div>`).join(''); } catch(e){} }
+  window.openGroup = async (gid, name) => { currentGroupId = gid; currentDMUserId = null; document.getElementById('chatTitle').innerHTML = `👥 ${name}`; await loadMessages(); setupRealtime(); };
+  async function loadFriends() { try { const { data: fData } = await sb.from('fanter_friends').select('friend_id').eq('user_id', currentUser.id); const container = document.getElementById('friendsList'); if(!fData?.length) { container.innerHTML='<div class="hint">no friends</div>'; return; } const { data: f } = await sb.from('fanter_presence').select('*').in('user_id', fData.map(d=>d.friend_id)); container.innerHTML = f.map(fr => `<div class="sidebar-item" onclick="window.openDM('${fr.user_id}', '${esc(fr.display_name||fr.username)}')"><div class="mini-avatar">${fr.profile_pic?`<img src="${fr.profile_pic}">`:fr.username[0]}</div><span>${esc(fr.display_name||fr.username)}</span></div>`).join(''); } catch(e){} }
+  window.openDM = async (userId, name) => { currentDMUserId = userId; currentGroupId = null; document.getElementById('chatTitle').innerHTML = `💬 @${name}`; await loadMessages(); setupRealtime(); try { await sb.from('fanter_dm_conversations').upsert({ user1_id: currentUser.id, user2_id: userId, last_message_time: new Date().toISOString() }); } catch(e){} };
+  async function loadDMList() { try { const { data } = await sb.from('fanter_dm_conversations').select('*').or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`); const container = document.getElementById('dmList'); if(!data?.length) { container.innerHTML='<div class="hint">no DMs</div>'; return; } container.innerHTML = data.map(d => { const other = d.user1_id===currentUser.id ? d.user2_id : d.user1_id; return `<div class="sidebar-item" onclick="window.openDM('${other}','${other.slice(0,8)}')"><span>💬</span><span>${other.slice(0,8)}</span></div>`; }).join(''); } catch(e){} }
+
+  // --- UI BINDINGS ---
   document.getElementById('sendBtn').onclick = sendMessage;
-  document.getElementById('messageInput').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
-  
+  document.getElementById('messageInput').addEventListener('keypress', e => { if(e.key === 'Enter') sendMessage(); });
+  document.getElementById('replyCancel').onclick = () => { replyingTo = null; document.getElementById('replyBar').classList.remove('show'); };
   document.querySelectorAll('.channel').forEach(ch => { ch.onclick = () => { currentDMUserId = null; currentGroupId = null; currentChannel = ch.dataset.channel; document.getElementById('chatTitle').innerHTML = `# ${currentChannel}`; document.querySelectorAll('.channel').forEach(c => c.classList.remove('active')); ch.classList.add('active'); loadMessages(); setupRealtime(); }; });
-  
-  document.getElementById('settingsBtn').onclick = () => openOverlay('settingsOverlay');
-  document.getElementById('editProfileBtn').onclick = () => openOverlay('settingsOverlay');
-  document.getElementById('saveSettings').onclick = () => { nameColor = document.getElementById('nameColor').value; customActivity = document.getElementById('customActivity').value; userBio = document.getElementById('userBio').value; localStorage.setItem('fanter_nameColor', nameColor); localStorage.setItem('fanter_activity', customActivity); localStorage.setItem('fanter_bio', userBio); updatePresence(); closeOverlay('settingsOverlay'); toast('✅ Settings saved!'); };
-  document.getElementById('nameColor').value = nameColor;
-  document.getElementById('customActivity').value = customActivity;
-  document.getElementById('userBio').value = userBio;
-  
-  document.getElementById('avatarUpload').onchange = async (e) => { if(e.target.files?.[0]) { const file = e.target.files[0]; const reader = new FileReader(); reader.onloadend = () => { userAvatars[currentUser.id] = reader.result; saveLocal(); updatePresence(); toast('✅ Profile picture updated!'); }; reader.readAsDataURL(file); } };
-  
-  document.getElementById('dailyBtn').onclick = () => { if(lastDailyClaim === new Date().toDateString()) { toast('Already claimed today!'); return; } const bonus = dailyStreak >= 6 ? 150 : dailyStreak >= 3 ? 100 : 50; document.getElementById('dailyAmount').innerHTML = `+${bonus} 🪙`; document.getElementById('dailyStreakText').innerHTML = `streak: ${dailyStreak + 1} day`; openOverlay('dailyOverlay'); };
-  document.getElementById('claimDaily').onclick = () => { const bonus = dailyStreak >= 6 ? 150 : dailyStreak >= 3 ? 100 : 50; addCoins(bonus); addXP(25); lastDailyClaim = new Date().toDateString(); dailyStreak++; localStorage.setItem('lastDailyClaim', lastDailyClaim); localStorage.setItem('dailyStreak', dailyStreak); closeOverlay('dailyOverlay'); toast(`🎁 +${bonus} coins!`); };
-  document.getElementById('closeDailyModal').onclick = () => closeOverlay('dailyOverlay');
-  
-  const SHOP_ITEMS = [{ id:'r', name:'Red Name', price:200, emoji:'🔴', value:'#ff4444', type:'name_color' },{ id:'p', name:'Purple Name', price:200, emoji:'🟣', value:'#9f5ae3', type:'name_color' },{ id:'g', name:'Green Name', price:200, emoji:'🟢', value:'#00e87a', type:'name_color' },{ id:'xp', name:'XP Boost (+100 XP)', price:150, emoji:'⚡', value:'100', type:'xp' }];
-  function renderShop() { updateCoinDisplay(); document.getElementById('shopGrid').innerHTML = SHOP_ITEMS.map(item => `<div class="shop-item" onclick="window.buyItem('${item.id}')"><div class="shop-emoji">${item.emoji}</div><div class="shop-name">${item.name}</div><div class="shop-price">🪙 ${item.price}</div></div>`).join(''); }
-  window.buyItem = (itemId) => { const item = SHOP_ITEMS.find(i => i.id === itemId); if(!item) return; if((currentUser.coins || 0) < item.price) { toast(`❌ Need ${item.price} coins`); return; } addCoins(-item.price); if(item.type === 'name_color') { nameColor = item.value; localStorage.setItem('fanter_nameColor', nameColor); document.getElementById('nameColor').value = nameColor; toast(`✅ Name color changed!`); } else if(item.type === 'xp') addXP(100); renderShop(); };
-  document.getElementById('shopBtn').onclick = () => { renderShop(); openOverlay('shopOverlay'); };
-  
+  document.getElementById('settingsBtn').onclick = () => document.getElementById('settingsOverlay').classList.add('active');
+  document.getElementById('editProfileBtn').onclick = () => document.getElementById('settingsOverlay').classList.add('active');
+  document.getElementById('closeSettingsModal').onclick = () => document.getElementById('settingsOverlay').classList.remove('active');
+  document.getElementById('saveSettings').onclick = () => { nameColor = document.getElementById('nameColor').value; customActivity = document.getElementById('customActivity').value; userBio = document.getElementById('userBio').value; localStorage.setItem('fanter_nameColor', nameColor); localStorage.setItem('fanter_activity', customActivity); localStorage.setItem('fanter_bio', userBio); updatePresence(); toast('Saved!'); document.getElementById('settingsOverlay').classList.remove('active'); };
+  document.getElementById('nameColor').value = nameColor; document.getElementById('customActivity').value = customActivity; document.getElementById('userBio').value = userBio;
+  document.getElementById('closeProfileBtn').onclick = () => document.getElementById('profileOverlay').classList.remove('active');
+  document.getElementById('avatarUpload').onchange = (e) => { if(e.target.files[0]) { const reader = new FileReader(); reader.onload = () => { userAvatars[currentUser.id] = reader.result; saveLocal(); updatePresence(); toast('Avatar updated'); }; reader.readAsDataURL(e.target.files[0]); } };
+  function openOverlay(id) { document.getElementById(id).classList.add('active'); }
   document.getElementById('addFriendBtn').onclick = () => openOverlay('addFriendOverlay');
-  document.getElementById('closeAddFriendModal').onclick = () => closeOverlay('addFriendOverlay');
-  document.getElementById('confirmAddFriend').onclick = async () => { const username = document.getElementById('friendUsername').value.trim(); if(!username) return; const { data: users } = await sb.from('fanter_presence').select('user_id').ilike('username', `%${username}%`); if(users && users.length && users[0].user_id !== currentUser.id) { await sb.from('fanter_friends').insert({ user_id: currentUser.id, friend_id: users[0].user_id }); toast('✅ Friend added!'); loadFriends(); } else toast('❌ User not found'); closeOverlay('addFriendOverlay'); };
-  
+  document.getElementById('closeAddFriendModal').onclick = () => document.getElementById('addFriendOverlay').classList.remove('active');
+  document.getElementById('confirmAddFriend').onclick = async () => { const uname = document.getElementById('friendUsername').value.trim(); if(uname) { const { data } = await sb.from('fanter_presence').select('user_id').ilike('username', `%${uname}%`); if(data?.[0]) { await sb.from('fanter_friends').insert({ user_id: currentUser.id, friend_id: data[0].user_id }); toast('Friend added'); loadFriends(); } else toast('Not found'); } document.getElementById('addFriendOverlay').classList.remove('active'); };
   document.getElementById('createGroupBtn').onclick = () => openOverlay('createGroupOverlay');
-  document.getElementById('closeCreateGroupModal').onclick = () => closeOverlay('createGroupOverlay');
-  document.getElementById('confirmCreateGroup').onclick = async () => { const name = document.getElementById('groupName').value.trim(); if(!name) return; const { error } = await sb.from('fanter_groups').insert({ name, owner_id: currentUser.id, members: [currentUser.id] }); if(!error) { toast(`✅ Group "${name}" created!`); loadGroups(); } else toast('❌ Failed'); closeOverlay('createGroupOverlay'); };
+  document.getElementById('closeCreateGroupModal').onclick = () => document.getElementById('createGroupOverlay').classList.remove('active');
+  document.getElementById('confirmCreateGroup').onclick = async () => { const name = document.getElementById('groupName').value.trim(); if(name) { await sb.from('fanter_groups').insert({ name, owner_id: currentUser.id, members: [currentUser.id] }); toast(`Group "${name}" created`); loadGroups(); } document.getElementById('createGroupOverlay').classList.remove('active'); };
+  document.getElementById('dailyBtn').onclick = () => { if(lastDailyClaim === new Date().toDateString()) { toast('Already claimed'); return; } const bonus = dailyStreak>=6?150:dailyStreak>=3?100:50; document.getElementById('dailyAmount').innerHTML = `+${bonus} 🪙`; document.getElementById('dailyStreakText').innerHTML = `streak: ${dailyStreak+1} day`; openOverlay('dailyOverlay'); };
+  document.getElementById('claimDaily').onclick = () => { const bonus = dailyStreak>=6?150:dailyStreak>=3?100:50; currentUser.coins += bonus; userCoinsMap[currentUser.id] = currentUser.coins; localStorage.setItem('fanter_currentUser', JSON.stringify(currentUser)); saveLocal(); addXP(25); lastDailyClaim = new Date().toDateString(); dailyStreak++; localStorage.setItem('lastDailyClaim', lastDailyClaim); localStorage.setItem('dailyStreak', dailyStreak); updateCoinDisplay(); toast(`🎁 +${bonus} coins!`); document.getElementById('dailyOverlay').classList.remove('active'); };
+  document.getElementById('closeDailyModal').onclick = () => document.getElementById('dailyOverlay').classList.remove('active');
+  const SHOP = [{id:'r',name:'Red Name',price:200,value:'#ff4444',type:'color'},{id:'p',name:'Purple Name',price:200,value:'#9f5ae3',type:'color'},{id:'g',name:'Green Name',price:200,value:'#00e87a',type:'color'},{id:'xp',name:'XP Boost',price:150,value:'100',type:'xp'}];
+  function renderShop() { document.getElementById('shopGrid').innerHTML = SHOP.map(i => `<div class="shop-item" onclick="window.buy('${i.id}')"><div>${i.name}</div><div class="shop-price">🪙 ${i.price}</div></div>`).join(''); updateCoinDisplay(); }
+  window.buy = (id) => { const item = SHOP.find(i=>i.id===id); if(currentUser.coins>=item.price) { currentUser.coins -= item.price; userCoinsMap[currentUser.id] = currentUser.coins; localStorage.setItem('fanter_currentUser', JSON.stringify(currentUser)); saveLocal(); updateCoinDisplay(); if(item.type==='color') { nameColor = item.value; localStorage.setItem('fanter_nameColor', nameColor); document.getElementById('nameColor').value = nameColor; toast(`Name color changed!`); } else if(item.type==='xp') addXP(100); renderShop(); } else toast('Not enough coins'); };
+  document.getElementById('shopBtn').onclick = () => { renderShop(); openOverlay('shopOverlay'); };
+  document.getElementById('shopOverlay').addEventListener('click', (e) => { if(e.target === document.getElementById('shopOverlay')) document.getElementById('shopOverlay').classList.remove('active'); });
+  document.getElementById('profileOverlay').addEventListener('click', (e) => { if(e.target === document.getElementById('profileOverlay')) document.getElementById('profileOverlay').classList.remove('active'); });
+  document.getElementById('settingsOverlay').addEventListener('click', (e) => { if(e.target === document.getElementById('settingsOverlay')) document.getElementById('settingsOverlay').classList.remove('active'); });
+  document.getElementById('dailyOverlay').addEventListener('click', (e) => { if(e.target === document.getElementById('dailyOverlay')) document.getElementById('dailyOverlay').classList.remove('active'); });
+  document.getElementById('addFriendOverlay').addEventListener('click', (e) => { if(e.target === document.getElementById('addFriendOverlay')) document.getElementById('addFriendOverlay').classList.remove('active'); });
+  document.getElementById('createGroupOverlay').addEventListener('click', (e) => { if(e.target === document.getElementById('createGroupOverlay')) document.getElementById('createGroupOverlay').classList.remove('active'); });
   
-  document.getElementById('stageBtn').onclick = () => { window.open('fantarena-voice.html', 'TheStage', 'width=500,height=700,popup=true'); };
-  
-  const GIPHY_API_KEY = "PmyjdmHi6rRNGecMM9OaNhQ0dnt2mQfg";
-  async function searchGifs(query) { try { const url = `https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_API_KEY}&q=${encodeURIComponent(query)}&limit=12`; const res = await fetch(url); const data = await res.json(); const grid = document.getElementById('gifGrid'); grid.innerHTML = ''; (data.data || []).forEach(gif => { const src = gif.images?.fixed_height_small?.url; if(!src) return; const el = document.createElement('div'); el.className = 'gif-item'; el.innerHTML = `<img src="${src}">`; el.onclick = () => sendGif(gif.images?.original?.url || src); grid.appendChild(el); }); } catch(e) {} }
-  async function sendGif(url) { let channelId = currentDMUserId ? `dm_${[currentUser.id, currentDMUserId].sort().join('_')}` : currentGroupId ? `group_${currentGroupId}` : currentChannel; await sb.from('fanter_chat').insert({ channel_id: channelId, user_id: currentUser.id, username: currentUser.displayName || currentUser.username, message: `[GIF] ${url}`, name_color: nameColor, is_voice_message: false }); addXP(3); document.getElementById('gifPicker').classList.remove('open'); }
+  // --- GIF & EMOJI ---
+  const GIPHY_KEY = "PmyjdmHi6rRNGecMM9OaNhQ0dnt2mQfg";
+  async function searchGifs(q) { try { const res = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_KEY}&q=${encodeURIComponent(q)}&limit=12`); const data = await res.json(); const grid = document.getElementById('gifGrid'); grid.innerHTML = ''; data.data?.forEach(g => { const img = document.createElement('img'); img.src = g.images.fixed_height_small.url; img.style.height='75px'; const div = document.createElement('div'); div.className='gif-item'; div.appendChild(img); div.onclick = () => sendGif(g.images.original.url); grid.appendChild(div); }); } catch(e){} }
+  async function sendGif(url) { const channelId = getChannelId(); await sb.from('fanter_chat').insert({ channel_id: channelId, user_id: currentUser.id, username: currentUser.displayName||currentUser.username, message: `[GIF] ${url}`, name_color: nameColor }); document.getElementById('gifPicker').classList.remove('open'); addXP(2); }
   document.getElementById('gifBtn').onclick = () => { const p = document.getElementById('gifPicker'); p.classList.toggle('open'); if(p.classList.contains('open')) searchGifs('trending'); };
   document.getElementById('gifSearch').addEventListener('input', e => searchGifs(e.target.value));
-  
-  const ALL_EMOJIS = ['😀','😂','😊','😍','🔥','💀','🎮','🏆','⭐','👑','❤️','👻','🐉','🍕','⚡','👍','🎉','🥺','😈','👀','💯','😭','🙏','😎','🤔','🥶','🤯','💪','🎯','🧠','✨','🌟','🎲','🪙'];
-  function renderEmojis(filter = '') { const f = ALL_EMOJIS.filter(e => e.includes(filter)); document.getElementById('emojiGrid').innerHTML = f.map(e => `<div class="emoji-btn" onclick="window.insertEmoji('${e}')">${e}</div>`).join(''); }
-  window.insertEmoji = (emoji) => { const inp = document.getElementById('messageInput'); inp.value += emoji; inp.focus(); };
+  const EMOJIS = ['😀','😂','😊','😍','🔥','💀','🎮','🏆','⭐','👑','❤️','👻','🐉','🍕','⚡','👍','🎉','😭','🙏','😎','🤔','💪','✨','🌟','🎲','🪙'];
+  function renderEmojis() { document.getElementById('emojiGrid').innerHTML = EMOJIS.map(e => `<div class="emoji-btn" onclick="window.insertEmoji('${e}')">${e}</div>`).join(''); }
+  window.insertEmoji = (e) => { const inp = document.getElementById('messageInput'); inp.value += e; inp.focus(); };
   renderEmojis();
-  document.getElementById('emojiSearch').addEventListener('input', e => renderEmojis(e.target.value));
   document.getElementById('emojiBtn').onclick = (e) => { e.stopPropagation(); document.getElementById('emojiPicker').classList.toggle('open'); };
-  document.addEventListener('click', e => { if(!e.target.closest('#emojiPicker') && !e.target.closest('#emojiBtn')) document.getElementById('emojiPicker').classList.remove('open'); });
+  document.addEventListener('click', (e) => { if(!e.target.closest('#emojiPicker') && !e.target.closest('#emojiBtn')) document.getElementById('emojiPicker').classList.remove('open'); });
   
-  let mediaRecorder = null, audioChunks = [], isRecording = false, currentStream = null;
-  async function startVoiceRecording() { try { const stream = await navigator.mediaDevices.getUserMedia({ audio: true }); currentStream = stream; mediaRecorder = new MediaRecorder(stream); audioChunks = []; mediaRecorder.ondataavailable = (e) => { if(e.data.size > 0) audioChunks.push(e.data); }; mediaRecorder.onstop = async () => { const audioBlob = new Blob(audioChunks, { type: 'audio/webm' }); const reader = new FileReader(); reader.readAsDataURL(audioBlob); reader.onloadend = async () => { const base64Audio = reader.result; let channelId = currentDMUserId ? `dm_${[currentUser.id, currentDMUserId].sort().join('_')}` : currentGroupId ? `group_${currentGroupId}` : currentChannel; await sb.from('fanter_chat').insert({ channel_id: channelId, user_id: currentUser.id, username: currentUser.displayName || currentUser.username, message: '[Voice Message]', name_color: nameColor, is_voice_message: true, voice_duration: 5, voice_url: base64Audio }); toast('✅ Voice message sent!'); }; if(currentStream) currentStream.getTracks().forEach(t => t.stop()); const indicator = document.querySelector('.voice-recording-indicator'); if(indicator) indicator.remove(); }; mediaRecorder.start(); isRecording = true; const indicator = document.createElement('div'); indicator.className = 'voice-recording-indicator'; indicator.innerHTML = '🔴 Recording... click to stop'; indicator.onclick = stopVoiceRecording; document.body.appendChild(indicator); toast('🔴 Recording... click to stop'); } catch(e) { toast('❌ Microphone access denied'); } }
-  function stopVoiceRecording() { if(mediaRecorder && isRecording) { mediaRecorder.stop(); isRecording = false; } const indicator = document.querySelector('.voice-recording-indicator'); if(indicator) indicator.remove(); }
-  document.getElementById('voiceMsgBtn').onclick = () => { if(isRecording) stopVoiceRecording(); else startVoiceRecording(); };
+  // --- VOICE MESSAGES ---
+  let mediaRec, audioChunks=[], recording=false, stream=null;
+  async function startRecording() { try { const s = await navigator.mediaDevices.getUserMedia({ audio: true }); stream = s; mediaRec = new MediaRecorder(s); audioChunks=[]; mediaRec.ondataavailable = e => { if(e.data.size) audioChunks.push(e.data); }; mediaRec.onstop = async () => { const blob = new Blob(audioChunks, { type: 'audio/webm' }); const reader = new FileReader(); reader.readAsDataURL(blob); reader.onloadend = async () => { const base64 = reader.result; const channelId = getChannelId(); await sb.from('fanter_chat').insert({ channel_id: channelId, user_id: currentUser.id, username: currentUser.displayName||currentUser.username, message: 'Voice message', name_color: nameColor, is_voice_message: true, voice_duration: 5, voice_url: base64 }); toast('Voice sent!'); }; if(stream) stream.getTracks().forEach(t=>t.stop()); document.querySelector('.voice-indicator')?.remove(); }; mediaRec.start(); recording=true; const ind = document.createElement('div'); ind.className='voice-recording-indicator'; ind.innerText='🔴 Recording... click to stop'; ind.onclick = stopRecording; document.body.appendChild(ind); } catch(e){ toast('Mic access denied'); } }
+  function stopRecording() { if(mediaRec && recording) { mediaRec.stop(); recording=false; } document.querySelector('.voice-indicator')?.remove(); }
+  document.getElementById('voiceMsgBtn').onclick = () => { if(recording) stopRecording(); else startRecording(); };
   
-  let isTyping = false, typingTimeout = null;
-  document.getElementById('messageInput').addEventListener('input', async () => { if(!isTyping) { isTyping = true; await sb.from('fanter_presence').upsert({ user_id: currentUser.id, is_typing: currentChannel }); } clearTimeout(typingTimeout); typingTimeout = setTimeout(async () => { isTyping = false; await sb.from('fanter_presence').upsert({ user_id: currentUser.id, is_typing: null }); }, 2000); });
-  setInterval(async () => { const { data } = await sb.from('fanter_presence').select('display_name,is_typing').eq('is_typing', currentChannel).neq('user_id', currentUser.id); const ti = document.getElementById('typingIndicator'); if(data && data.length) ti.textContent = `${data.map(d => d.display_name).join(', ')} ${data.length > 1 ? 'are' : 'is'} typing...`; else ti.textContent = ''; }, 2500);
+  // --- TYPING INDICATOR ---
+  let typingTimeout;
+  document.getElementById('messageInput').addEventListener('input', () => { sb.from('fanter_presence').upsert({ user_id: currentUser.id, is_typing: currentChannel }); clearTimeout(typingTimeout); typingTimeout = setTimeout(() => sb.from('fanter_presence').upsert({ user_id: currentUser.id, is_typing: null }), 1500); });
+  setInterval(async () => { const { data } = await sb.from('fanter_presence').select('display_name,is_typing').eq('is_typing', currentChannel).neq('user_id', currentUser.id); const ti = document.getElementById('typingIndicator'); if(data?.length) ti.innerText = `${data.map(d=>d.display_name).join(', ')} is typing...`; else ti.innerText = ''; }, 2000);
   
-  async function initChat() { updateCoinDisplay(); await updatePresence(); await loadMessages(); await loadMembers(); await loadFriends(); await loadGroups(); await loadDMList(); setupRealtime(); document.getElementById('levelBadge').textContent = `Lv ${getLevel(userXP[currentUser.id] || 0)}`; setInterval(loadMembers, 10000); setInterval(updatePresence, 30000); console.log('✅ Fantarena ready!'); }
-  initChat();
+  // --- INIT ---
+  async function init() {
+    await updatePresence();
+    await loadMessages();
+    await loadMembers();
+    await loadGroups();
+    await loadFriends();
+    await loadDMList();
+    setupRealtime();
+    setInterval(loadMembers, 10000);
+    setInterval(updatePresence, 30000);
+    document.getElementById('levelBadge').innerText = `Lv ${getLevel(userXP[currentUser.id] || 0)}`;
+    updateCoinDisplay();
+    console.log('Fantarena ready — messages should work');
+  }
+  init();
 })();
 </script>
 </body>
