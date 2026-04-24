@@ -177,8 +177,8 @@
       position: fixed;
       top: 80px;
       right: -260px;
-      width: 240px;
-      background: rgba(15, 20, 40, 0.95);
+      width: 260px;
+      background: rgba(15, 20, 40, 0.97);
       backdrop-filter: blur(15px);
       border: 1px solid rgba(45, 90, 227, 0.5);
       border-radius: 20px 0 0 20px;
@@ -256,6 +256,17 @@
       height: 1px;
       background: rgba(255, 255, 255, 0.1);
       margin: 12px 0;
+    }
+    
+    /* special highlight for fanter clicker */
+    .menu-item.fanter-clicker-highlight {
+      background: linear-gradient(135deg, rgba(255, 140, 0, 0.25), rgba(255, 204, 0, 0.15));
+      border: 1px solid #ffaa33;
+      box-shadow: 0 0 8px rgba(255, 170, 51, 0.3);
+    }
+    .menu-item.fanter-clicker-highlight:hover {
+      background: linear-gradient(135deg, rgba(255, 140, 0, 0.4), rgba(255, 204, 0, 0.25));
+      border-color: #ffcc44;
     }
     
     /* ===== MAIN CONTENT ===== */
@@ -663,8 +674,17 @@
   <!-- SIDEBAR MENU OVERLAY -->
   <div class="sidebar-menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
   
-  <!-- SIDEBAR MENU -->
+  <!-- SIDEBAR MENU (UPDATED: added Fanter Clicker button with highlight) -->
   <div class="sidebar-menu" id="sidebarMenu">
+    <!-- 🔥 NEW: Fanter Clicker special menu item - prominently placed first -->
+    <div class="menu-item fanter-clicker-highlight" onclick="window.open('https://chipikipal800.github.io/Fanter-Clicker/', '_blank')">
+      <span class="menu-icon">🍪</span>
+      <span class="menu-label">Fanter Clicker</span>
+      <span class="menu-badge">PLAY NOW</span>
+    </div>
+    
+    <div class="menu-divider"></div>
+    
     <div class="menu-item" onclick="window.location.href='settings.html'">
       <span class="menu-icon">⚙️</span>
       <span class="menu-label">Settings</span>
@@ -676,15 +696,15 @@
     <div class="menu-item" onclick="window.location.href='fantarena.html'">
       <span class="menu-icon">🏟️</span>
       <span class="menu-label">Fantarena</span>
-      <span class="menu-badge">CHAT</span>
+      <span class="menu-badge">CHATROOM</span>
     </div>
     
     <div class="menu-divider"></div>
     
     <div class="menu-item" onclick="window.open('https://chipikipal800.github.io/fanter.ai/', '_blank')">
       <span class="menu-icon">🤖</span>
-      <span class="menu-label">AI Chatbot</span>
-      <span class="menu-badge">NEW</span>
+      <span class="menu-label">Fanter AI</span>
+      <span class="menu-badge">CHAT</span>
     </div>
     <div class="menu-item" onclick="window.open('https://chipikipal800.github.io/fanter-studios/', '_blank')">
       <span class="menu-icon">🎮</span>
@@ -692,7 +712,7 @@
       <span class="menu-badge">CREATE</span>
     </div>
     
-    <!-- NEW: Fanter Search Link -->
+    <!-- Fanter Search Link -->
     <div class="menu-item" onclick="window.open('https://chipikipal800.github.io/Fanter-search/', '_blank')">
       <span class="menu-icon">🔍</span>
       <span class="menu-label">Fanter Search</span>
