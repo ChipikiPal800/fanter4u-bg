@@ -1,3 +1,16 @@
+CURRENTLY:
+
+making ts look like an actual OS yk?
+
+WRITTEN IN ONLY HTML CSS AND JS (not subject  to change)
+
+LIGHTWEIGHT AND SIMPLE
+
+
+
+
+
+
 fanter ubg
 
 
