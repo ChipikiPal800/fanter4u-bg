@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>fanterOS — chill desktop</title>
+  <title>fanterOS — desktop environment</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * {
       margin: 0;
@@ -47,13 +46,22 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #0f0f1a 100%);
       z-index: 0;
       overflow: hidden;
     }
 
-    /* Animated background */
-    .desktop::before {
+    .desktop-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #0f0f1a 100%);
+      transition: background-image 0.3s ease;
+      z-index: -1;
+    }
+
+    .desktop-bg::before {
       content: '';
       position: absolute;
       width: 200%;
@@ -71,18 +79,29 @@
       50% { transform: translate(2%, 1%) rotate(1deg); }
     }
 
+    /* ===== WORKSPACE STYLES ===== */
+    body.workspace-games .desktop-bg {
+      background: linear-gradient(135deg, #1a0f2e 0%, #2a1a4e 50%, #1a0f2e 100%);
+    }
+    body.workspace-learning .desktop-bg {
+      background: linear-gradient(135deg, #0f2e1a 0%, #1a4e2a 50%, #0f2e1a 100%);
+    }
+    body.workspace-personal .desktop-bg {
+      background: linear-gradient(135deg, #2e1a2e 0%, #4e2a4e 50%, #2e1a2e 100%);
+    }
+
     /* ===== DESKTOP ICONS ===== */
     .desktop-icons {
       position: absolute;
-      top: 20px;
-      left: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       z-index: 10;
     }
 
     .desktop-icon {
+      position: absolute;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -90,30 +109,69 @@
       padding: 10px 6px;
       border-radius: 12px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
       background: rgba(255, 255, 255, 0);
+      z-index: 15;
+    }
+
+    .desktop-icon.dragging {
+      opacity: 0.8;
+      z-index: 1000;
     }
 
     .desktop-icon:hover {
       background: rgba(255, 255, 255, 0.08);
-      transform: translateY(-3px);
+      transform: translateY(-2px);
     }
 
-    .desktop-icon .icon {
-      font-size: 36px;
-      margin-bottom: 6px;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    .desktop-icon .icon { font-size: 36px; margin-bottom: 6px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+    .desktop-icon .label { font-size: 11px; text-align: center; color: rgba(255, 255, 255, 0.85); font-weight: 500; }
+    .desktop-icon .delete-btn {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      width: 18px;
+      height: 18px;
+      background: var(--danger);
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: white;
     }
+    .desktop-icon:hover .delete-btn { display: flex; }
 
-    .desktop-icon .label {
-      font-size: 11px;
-      text-align: center;
-      color: rgba(255, 255, 255, 0.85);
-      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-      font-weight: 500;
+    /* ===== RECENT GAMES ===== */
+    .recent-games {
+      position: absolute;
+      bottom: 80px;
+      left: 20px;
+      right: 20px;
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      border-radius: 16px;
+      border: 1px solid var(--glass-border);
+      padding: 12px 16px;
+      z-index: 20;
     }
+    .recent-title { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .recent-list { display: flex; gap: 12px; overflow-x: auto; }
+    .recent-game {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 10px;
+      transition: all 0.15s;
+    }
+    .recent-game:hover { background: rgba(255,255,255,0.08); transform: scale(1.05); }
+    .recent-game-icon { font-size: 28px; }
+    .recent-game-name { font-size: 10px; color: var(--text-secondary); white-space: nowrap; max-width: 70px; overflow: hidden; text-overflow: ellipsis; }
 
-    /* ===== TASKBAR (auto-hide) ===== */
+    /* ===== TASKBAR ===== */
     .taskbar {
       position: fixed;
       bottom: -70px;
@@ -132,7 +190,6 @@
       transition: bottom 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
       box-shadow: 0 8px 32px rgba(0,0,0,0.2);
     }
-
     .taskbar.visible { bottom: 10px; }
     .taskbar:hover { bottom: 10px; }
 
@@ -149,21 +206,9 @@
       transition: all 0.2s;
       box-shadow: 0 2px 8px rgba(124, 92, 255, 0.3);
     }
+    .start-btn:hover { transform: scale(1.02); box-shadow: 0 4px 12px rgba(124, 92, 255, 0.4); }
 
-    .start-btn:hover {
-      transform: scale(1.02);
-      box-shadow: 0 4px 12px rgba(124, 92, 255, 0.4);
-    }
-
-    .taskbar-apps {
-      display: flex;
-      gap: 6px;
-      flex: 1;
-      margin-left: 20px;
-      overflow-x: auto;
-      padding: 4px 0;
-    }
-
+    .taskbar-apps { display: flex; gap: 6px; flex: 1; margin-left: 20px; overflow-x: auto; padding: 4px 0; }
     .taskbar-app {
       padding: 6px 16px;
       background: rgba(255, 255, 255, 0.05);
@@ -176,26 +221,23 @@
       white-space: nowrap;
       transition: all 0.15s;
     }
-
     .taskbar-app:hover { background: rgba(255, 255, 255, 0.1); }
     .taskbar-app.active { background: var(--accent); }
 
-    .taskbar-right {
+    .taskbar-right { display: flex; align-items: center; gap: 12px; }
+    .taskbar-datetime {
       display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .taskbar-time {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      color: var(--text-secondary);
+      flex-direction: column;
+      align-items: flex-end;
       background: rgba(255,255,255,0.05);
-      padding: 6px 12px;
+      padding: 4px 12px;
       border-radius: 12px;
+      cursor: pointer;
     }
+    .taskbar-time { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 500; }
+    .taskbar-date { font-size: 9px; color: var(--text-muted); }
 
-    .notification-btn, .workspace-btn {
+    .taskbar-icon {
       background: rgba(255,255,255,0.05);
       border: none;
       border-radius: 10px;
@@ -204,15 +246,14 @@
       font-size: 14px;
       transition: all 0.15s;
     }
-
-    .notification-btn:hover, .workspace-btn:hover { background: rgba(255,255,255,0.1); }
+    .taskbar-icon:hover { background: rgba(255,255,255,0.1); }
 
     /* ===== START MENU ===== */
     .start-menu {
       position: fixed;
       bottom: 76px;
       left: 20px;
-      width: 360px;
+      width: 380px;
       background: var(--glass);
       backdrop-filter: blur(24px);
       border-radius: 20px;
@@ -225,19 +266,13 @@
       overflow: hidden;
       box-shadow: 0 20px 40px rgba(0,0,0,0.3);
     }
-
-    .start-menu.open {
-      transform: translateY(0) scale(1);
-      opacity: 1;
-      visibility: visible;
-    }
+    .start-menu.open { transform: translateY(0) scale(1); opacity: 1; visibility: visible; }
 
     .start-header {
       padding: 20px;
       background: linear-gradient(135deg, rgba(124,92,255,0.2), rgba(124,92,255,0.05));
       border-bottom: 1px solid var(--glass-border);
     }
-
     .start-header .user-name { font-weight: 600; font-size: 16px; }
     .start-header .user-status { font-size: 12px; opacity: 0.7; margin-top: 4px; }
 
@@ -254,12 +289,7 @@
     }
     .start-search input:focus { border-color: var(--accent); }
 
-    .start-apps {
-      max-height: 420px;
-      overflow-y: auto;
-      padding: 8px;
-    }
-
+    .start-apps { max-height: 420px; overflow-y: auto; padding: 8px; }
     .start-app {
       display: flex;
       align-items: center;
@@ -269,13 +299,12 @@
       cursor: pointer;
       transition: all 0.1s;
     }
-
     .start-app:hover { background: rgba(255, 255, 255, 0.08); }
     .start-app-icon { font-size: 24px; width: 40px; text-align: center; }
     .start-app-name { font-size: 14px; font-weight: 500; flex: 1; }
     .start-app-desc { font-size: 11px; color: var(--text-muted); }
 
-    /* ===== BOOT MENU (Ctrl+K) ===== */
+    /* ===== BOOT MENU ===== */
     .boot-menu {
       position: fixed;
       top: 20%;
@@ -293,7 +322,6 @@
       transition: all 0.2s ease;
       box-shadow: 0 24px 48px rgba(0,0,0,0.4);
     }
-
     .boot-menu.open { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
 
     .boot-search { padding: 20px; border-bottom: 1px solid var(--glass-border); }
@@ -324,7 +352,6 @@
     .boot-result-info { flex: 1; }
     .boot-result-name { font-weight: 500; }
     .boot-result-desc { font-size: 11px; color: var(--text-muted); }
-
     .boot-footer {
       padding: 12px 20px;
       border-top: 1px solid var(--glass-border);
@@ -334,38 +361,54 @@
       justify-content: space-between;
     }
 
+    /* ===== RIGHT CLICK MENU ===== */
+    .context-menu {
+      position: fixed;
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 8px 0;
+      min-width: 200px;
+      z-index: 10001;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.1s;
+    }
+    .context-menu.visible { opacity: 1; visibility: visible; }
+    .context-menu-item {
+      padding: 10px 16px;
+      cursor: pointer;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.1s;
+    }
+    .context-menu-item:hover { background: rgba(255,255,255,0.08); }
+    .context-menu-divider { height: 1px; background: var(--glass-border); margin: 6px 0; }
+
     /* ===== WINDOW ===== */
     .window {
       position: absolute;
-      min-width: 500px;
-      min-height: 400px;
+      min-width: 400px;
+      min-height: 300px;
       background: var(--bg-secondary);
-      border-radius: 20px;
+      border-radius: 16px;
       border: 1px solid var(--border);
       box-shadow: 0 12px 40px rgba(0,0,0,0.4);
       z-index: 100;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      backdrop-filter: blur(0px);
     }
-
-    .window.active {
-      z-index: 200;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 2px var(--accent);
-    }
-
-    .window.minimized {
-      transform: scale(0) !important;
-      opacity: 0;
-      pointer-events: none;
-    }
-
+    .window.active { z-index: 200; box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 2px var(--accent); }
+    .window.minimized { transform: scale(0) !important; opacity: 0; pointer-events: none; transition: all 0.2s cubic-bezier(0.34, 1.2, 0.64, 1); }
     .window.maximized {
       top: 0 !important;
       left: 0 !important;
       width: 100% !important;
-      height: calc(100% - 80px) !important;
+      height: calc(100% - 70px) !important;
       border-radius: 0;
     }
 
@@ -378,15 +421,7 @@
       justify-content: space-between;
       border-bottom: 1px solid var(--border);
     }
-
-    .window-title {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 13px;
-      font-weight: 500;
-    }
-
+    .window-title { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 500; }
     .window-controls { display: flex; gap: 8px; }
     .window-control {
       width: 32px;
@@ -404,231 +439,247 @@
     }
     .window-control:hover { background: rgba(255, 255, 255, 0.1); }
     .window-control.close:hover { background: var(--danger); color: white; }
+    .window-content { flex: 1; overflow: auto; background: var(--bg-primary); }
+    .window-content iframe { width: 100%; height: 100%; border: none; }
 
-    .window-content {
-      flex: 1;
-      overflow: auto;
-      background: var(--bg-primary);
-    }
+    /* Resize handles */
+    .resize-handle { position: absolute; width: 10px; height: 10px; z-index: 10; }
+    .resize-nw { top: 0; left: 0; cursor: nw-resize; }
+    .resize-n { top: 0; left: 10px; right: 10px; height: 6px; cursor: n-resize; }
+    .resize-ne { top: 0; right: 0; cursor: ne-resize; }
+    .resize-w { top: 10px; left: 0; bottom: 10px; width: 6px; cursor: w-resize; }
+    .resize-e { top: 10px; right: 0; bottom: 10px; width: 6px; cursor: e-resize; }
+    .resize-sw { bottom: 0; left: 0; cursor: sw-resize; }
+    .resize-s { bottom: 0; left: 10px; right: 10px; height: 6px; cursor: s-resize; }
+    .resize-se { bottom: 0; right: 0; cursor: se-resize; }
 
-    .window-content iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
-    .resize-handle {
+    /* ===== NOTES WIDGET ===== */
+    .notes-widget {
       position: absolute;
-      bottom: 0;
-      right: 0;
-      width: 20px;
-      height: 20px;
-      cursor: nw-resize;
-      background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.1) 50%);
-      z-index: 10;
-      border-radius: 0 0 20px 0;
+      bottom: 150px;
+      right: 20px;
+      width: 260px;
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      border-radius: 16px;
+      border: 1px solid var(--glass-border);
+      z-index: 25;
+      overflow: hidden;
+    }
+    .notes-header {
+      padding: 12px;
+      background: rgba(124,92,255,0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: move;
+    }
+    .notes-header span { font-size: 12px; font-weight: 500; }
+    .notes-header .close-notes { cursor: pointer; font-size: 14px; padding: 2px 6px; border-radius: 6px; }
+    .notes-header .close-notes:hover { background: rgba(255,255,255,0.1); }
+    .notes-content textarea {
+      width: 100%;
+      height: 150px;
+      background: rgba(0,0,0,0.3);
+      border: none;
+      color: white;
+      padding: 12px;
+      font-size: 12px;
+      font-family: inherit;
+      resize: none;
+      outline: none;
     }
 
-    /* ===== NOTIFICATION CENTER ===== */
-    .notification-center {
+    /* ===== QUICK SETTINGS ===== */
+    .quick-settings {
       position: fixed;
-      top: 20px;
-      right: -380px;
-      width: 360px;
+      bottom: 80px;
+      right: 20px;
+      width: 280px;
+      background: var(--glass);
+      backdrop-filter: blur(24px);
+      border-radius: 16px;
+      border: 1px solid var(--glass-border);
+      z-index: 1002;
+      transform: translateY(20px);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s;
+    }
+    .quick-settings.open { transform: translateY(0); opacity: 1; visibility: visible; }
+    .quick-settings-header { padding: 12px 16px; border-bottom: 1px solid var(--glass-border); font-weight: 600; }
+    .quick-settings-item { padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+    .quick-settings-item:hover { background: rgba(255,255,255,0.05); }
+
+    /* ===== SHORTCUTS MODAL ===== */
+    .shortcuts-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.9);
+      width: 500px;
       background: var(--glass);
       backdrop-filter: blur(24px);
       border-radius: 20px;
       border: 1px solid var(--glass-border);
-      z-index: 1002;
-      transition: right 0.3s ease;
-      padding: 16px;
+      z-index: 10003;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s;
+      padding: 20px;
     }
+    .shortcuts-modal.open { transform: translate(-50%, -50%) scale(1); opacity: 1; visibility: visible; }
+    .shortcuts-modal h3 { margin-bottom: 16px; }
+    .shortcut-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--glass-border); font-size: 13px; }
+    .shortcut-key { font-family: monospace; background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 6px; }
 
-    .notification-center.open { right: 20px; }
-
-    .notification-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--glass-border);
-    }
-
-    .notification-list { max-height: 400px; overflow-y: auto; }
-    .notification-item {
-      padding: 12px;
-      background: rgba(255,255,255,0.05);
-      border-radius: 12px;
-      margin-bottom: 8px;
-      font-size: 12px;
-    }
-
-    /* ===== WORKSPACE INDICATOR ===== */
-    .workspace-indicator {
+    /* ===== SCREENSHOT FLASH ===== */
+    .screenshot-flash {
       position: fixed;
-      bottom: 80px;
-      right: 20px;
-      background: var(--glass);
-      backdrop-filter: blur(12px);
-      border-radius: 30px;
-      padding: 8px 16px;
-      font-size: 12px;
-      z-index: 100;
-      border: 1px solid var(--glass-border);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 20000;
+      transition: opacity 0.2s;
     }
+
+    /* ===== CALCULATOR ===== */
+    .calc-btn {
+      background: rgba(255,255,255,0.1);
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.1s;
+    }
+    .calc-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.02); }
 
     /* ===== UTILITIES ===== */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); border-radius: 3px; }
     ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
-
-    .hidden { display: none; }
-
-    /* Game Hub inner styles */
-    .game-hub-inner {
-      padding: 20px;
-      height: 100%;
-      overflow-y: auto;
-    }
-
-    .game-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 16px;
-      margin-top: 16px;
-    }
-
-    .game-card {
-      background: rgba(255,255,255,0.05);
-      border-radius: 12px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: all 0.2s;
-      border: 1px solid transparent;
-    }
-
-    .game-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--accent);
-    }
-
-    .game-card img {
-      width: 100%;
-      aspect-ratio: 16/9;
-      object-fit: cover;
-    }
-
-    .game-card-info { padding: 10px; }
-    .game-card-name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .game-card-category { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
-
-    .search-bar {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    .search-bar input {
-      flex: 1;
-      padding: 10px 16px;
-      background: rgba(0,0,0,0.3);
-      border: 1px solid var(--border);
-      border-radius: 30px;
-      color: white;
-      font-size: 13px;
-      outline: none;
-    }
-
-    .category-filters {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-
-    .cat-chip {
-      padding: 6px 14px;
-      background: rgba(255,255,255,0.05);
-      border-radius: 20px;
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.1s;
-    }
-
-    .cat-chip.active {
-      background: var(--accent);
-    }
-
-    .footer-credit {
-      text-align: center;
-      padding: 20px;
-      color: var(--text-muted);
-      font-size: 11px;
-      border-top: 1px solid var(--border);
-      margin-top: 20px;
-    }
   </style>
 </head>
 <body>
 
-<div class="desktop" id="desktop"></div>
-
-<!-- Desktop Icons -->
-<div class="desktop-icons" id="desktopIcons"></div>
-
-<!-- Workspace Indicator -->
-<div class="workspace-indicator" id="workspaceIndicator">🌿 workspace 1</div>
-
-<!-- Notification Center -->
-<div class="notification-center" id="notificationCenter">
-  <div class="notification-header">
-    <span>🔔 notifications</span>
-    <button class="notification-btn" onclick="closeNotifications()" style="padding:4px 8px;">✕</button>
+<div class="desktop">
+  <div class="desktop-bg" id="desktopBg"></div>
+  <div class="desktop-icons" id="desktopIcons"></div>
+  <div class="notes-widget" id="notesWidget" style="display: none;">
+    <div class="notes-header" id="notesHeader">
+      <span>📝 sticky notes</span>
+      <span class="close-notes" id="closeNotes">✕</span>
+    </div>
+    <div class="notes-content">
+      <textarea id="notesText" placeholder="Write something..."></textarea>
+    </div>
   </div>
-  <div class="notification-list" id="notificationList">
-    <div class="notification-item">🎉 welcome to fanterOS!</div>
-    <div class="notification-item">💡 press Ctrl+K to quick launch games</div>
+  <div class="recent-games" id="recentGames">
+    <div class="recent-title">🕐 recently played</div>
+    <div class="recent-list" id="recentList"></div>
   </div>
 </div>
 
-<!-- Taskbar -->
 <div class="taskbar" id="taskbar">
   <div class="start-btn" id="startBtn">🍥 fanterOS</div>
   <div class="taskbar-apps" id="taskbarApps"></div>
   <div class="taskbar-right">
-    <button class="notification-btn" id="notifBtn" style="font-size:16px;">🔔</button>
-    <button class="workspace-btn" id="workspaceBtn" style="font-size:16px;">🌿</button>
-    <div class="taskbar-time" id="taskbarTime">--:--</div>
+    <button class="taskbar-icon" id="screenshotBtn" title="Screenshot (Ctrl+Shift+S)">📸</button>
+    <button class="taskbar-icon" id="notesBtn" title="Sticky Notes">📝</button>
+    <button class="taskbar-icon" id="calculatorBtn">🧮</button>
+    <div class="taskbar-datetime" id="datetimeBtn">
+      <div class="taskbar-time" id="taskbarTime">--:--</div>
+      <div class="taskbar-date" id="taskbarDate">--/--/----</div>
+    </div>
   </div>
 </div>
 
-<!-- Start Menu -->
 <div class="start-menu" id="startMenu">
   <div class="start-header">
     <div class="user-name" id="startUserName">Guest</div>
-    <div class="user-status">🟢 online · chill mode</div>
+    <div class="user-status">🟢 online</div>
   </div>
   <div class="start-search"><input type="text" id="startSearch" placeholder="Search apps..."></div>
   <div class="start-apps" id="startApps"></div>
 </div>
 
-<!-- Boot Menu -->
 <div class="boot-menu" id="bootMenu">
   <div class="boot-search"><input type="text" id="bootSearch" placeholder="Search games..." autocomplete="off"></div>
   <div class="boot-results" id="bootResults"></div>
-  <div class="boot-footer"><span>↑↓ navigate</span><span>↵ play</span><span>esc close</span></div>
+  <div class="boot-footer"><span>↑↓ navigate</span><span>↵ play</span><span>esc close</span><span>🔮 try "konami" or "matrix"</span></div>
 </div>
+
+<div class="context-menu" id="contextMenu">
+  <div class="context-menu-item" id="ctxChangeWallpaper">🖼️ Change Wallpaper</div>
+  <div class="context-menu-item" id="ctxRefresh">🔄 Refresh</div>
+  <div class="context-menu-divider"></div>
+  <div class="context-menu-item" id="ctxPinGame">📌 Pin Game to Desktop</div>
+  <div class="context-menu-divider"></div>
+  <div class="context-menu-item" id="ctxWorkspaceGames">🎮 Games Workspace</div>
+  <div class="context-menu-item" id="ctxWorkspaceLearning">📚 Learning Workspace</div>
+  <div class="context-menu-item" id="ctxWorkspacePersonal">💭 Personal Workspace</div>
+  <div class="context-menu-divider"></div>
+  <div class="context-menu-item" id="ctxSettings">⚙️ Settings</div>
+</div>
+
+<div class="window" id="calculatorWindow" style="display: none; width: 320px; height: 420px; left: 100px; top: 100px; z-index: 300;">
+  <div class="window-header">
+    <div class="window-title"><span>🧮</span><span>Calculator</span></div>
+    <div class="window-controls">
+      <button class="window-control close-calc" id="closeCalcBtn">✕</button>
+    </div>
+  </div>
+  <div class="window-content" style="padding: 16px;">
+    <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 16px; margin-bottom: 16px; text-align: right; font-size: 32px; font-family: monospace;" id="calcDisplay">0</div>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+      <button class="calc-btn" data-val="7">7</button><button class="calc-btn" data-val="8">8</button><button class="calc-btn" data-val="9">9</button><button class="calc-btn" data-val="/" style="background: var(--accent);">/</button>
+      <button class="calc-btn" data-val="4">4</button><button class="calc-btn" data-val="5">5</button><button class="calc-btn" data-val="6">6</button><button class="calc-btn" data-val="*" style="background: var(--accent);">×</button>
+      <button class="calc-btn" data-val="1">1</button><button class="calc-btn" data-val="2">2</button><button class="calc-btn" data-val="3">3</button><button class="calc-btn" data-val="-" style="background: var(--accent);">-</button>
+      <button class="calc-btn" data-val="0">0</button><button class="calc-btn" data-val=".">.</button><button class="calc-btn" data-val="=" style="background: var(--success);">=</button><button class="calc-btn" data-val="+" style="background: var(--accent);">+</button>
+      <button class="calc-btn" data-val="C" style="grid-column: span 2; background: var(--danger);">C</button>
+      <button class="calc-btn" data-val="⌫" style="background: var(--warning);">⌫</button>
+    </div>
+  </div>
+</div>
+
+<div class="quick-settings" id="quickSettings">
+  <div class="quick-settings-header">Quick Settings</div>
+  <div class="quick-settings-item" id="qsWallpaper">🖼️ Change Wallpaper</div>
+  <div class="quick-settings-item" id="qsWorkspace">🌿 Switch Workspace</div>
+  <div class="quick-settings-item" id="qsShortcuts">⌨️ Keyboard Shortcuts</div>
+  <div class="quick-settings-item" id="qsSettings">⚙️ Full Settings</div>
+</div>
+
+<div class="shortcuts-modal" id="shortcutsModal">
+  <h3>⌨️ Keyboard Shortcuts</h3>
+  <div class="shortcut-row"><span>Ctrl+K</span><span>Quick launch / search games</span></div>
+  <div class="shortcut-row"><span>Ctrl+Shift+S</span><span>Take screenshot</span></div>
+  <div class="shortcut-row"><span>Ctrl+/</span><span>Show this menu</span></div>
+  <div class="shortcut-row"><span>Esc</span><span>Close menus</span></div>
+  <div class="shortcut-row"><span>Ctrl+W</span><span>Close active window</span></div>
+  <div class="shortcut-row"><span>Ctrl+M</span><span>Minimize active window</span></div>
+  <div class="shortcut-row"><span>Double-click titlebar</span><span>Maximize window</span></div>
+  <div class="shortcut-row"><span>Drag window to edge</span><span>Snap to half screen</span></div>
+  <button class="context-menu-item" id="closeShortcuts" style="margin-top: 16px; text-align: center;">Close</button>
+</div>
+
+<div class="screenshot-flash" id="screenshotFlash"></div>
 
 <script>
   // ============================================================
-  // FANTER OS - COMPLETE CHILL DESKTOP
+  // FANTER OS - COMPLETE DESKTOP
   // ============================================================
 
-  // --- App Definitions ---
   const APPS = [
     { id: 'gamehub', name: 'Game Hub', icon: '🎮', url: null, desc: 'Browse all games', isBuiltin: true },
+    { id: 'emulators', name: 'Emulators', icon: '🕹️', url: null, desc: 'GBA, NES, N64, Genesis, Atari', isEmulator: true },
     { id: 'shop', name: 'Item Shop', icon: '🛒', url: 'shop.html', desc: 'Buy themes & pets' },
     { id: 'settings', name: 'Settings', icon: '⚙️', url: 'settings.html', desc: 'Customize your OS' },
     { id: 'fantarena', name: 'Fantarena', icon: '🏟️', url: 'fantarena.html', desc: 'Chat with friends' },
@@ -639,14 +690,24 @@
     { id: 'fanterclicker', name: 'Fanter Clicker', icon: '🍪', url: 'https://chipikipal800.github.io/Fanter-Clicker/', desc: 'Clicker game', external: true }
   ];
 
-  const DESKTOP_ICONS = [
-    { id: 'gamehub', icon: '🎮', label: 'Game Hub' },
-    { id: 'shop', icon: '🛒', label: 'Shop' },
-    { id: 'settings', icon: '⚙️', label: 'Settings' },
-    { id: 'fantarena', icon: '🏟️', label: 'Chat' }
+  const EMULATORS = [
+    { name: 'Game Boy Advance', icon: '🎮', url: 'https://chipikipal800.github.io/MKGBA2.0/' },
+    { name: 'Nintendo NES', icon: '📺', url: 'https://chipikipal800.github.io/nes-emulator-/' },
+    { name: 'Nintendo 64', icon: '🎮', url: 'https://chipikipal800.github.io/n64-emulator/' },
+    { name: 'Sega Genesis', icon: '🌀', url: 'https://chipikipal800.github.io/Sega-Genesis-Emulator-/' },
+    { name: 'Virtual Boy', icon: '🕶️', url: 'https://chipikipal800.github.io/Virtual-boy-emulator-/' },
+    { name: 'Atari 7800', icon: '🎮', url: 'https://chipikipal800.github.io/atari7800-emulatorwroms/' },
+    { name: 'Atari 2600', icon: '🕹️', url: 'https://chipikipal800.github.io/Atari-2600-emulator-/' }
   ];
 
-  // --- State ---
+  const DEFAULT_DESKTOP_ICONS = [
+    { id: 'gamehub', icon: '🎮', label: 'Game Hub', x: 30, y: 30 },
+    { id: 'emulators', icon: '🕹️', label: 'Emulators', x: 30, y: 120 },
+    { id: 'shop', icon: '🛒', label: 'Shop', x: 30, y: 210 },
+    { id: 'fantarena', icon: '🏟️', label: 'Chat', x: 30, y: 300 }
+  ];
+
+  // --- Global State ---
   let windows = [];
   let nextWindowId = 1;
   let activeWindowId = null;
@@ -655,35 +716,34 @@
   let currentBootResults = [];
   let selectedBootIndex = -1;
   let gamesData = [];
-  let currentCategory = 'all';
-  let currentSort = 'default';
-  let favourites = JSON.parse(localStorage.getItem('favourites') || '[]');
-  let userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
-  let globalRatings = JSON.parse(localStorage.getItem('globalRatings') || '{}');
-  let gamePlayCounts = JSON.parse(localStorage.getItem('gamePlayCounts') || '{}');
-
-  // Drag state
+  let desktopIcons = [];
+  let recentGames = [];
+  let currentWorkspace = localStorage.getItem('fanter_workspace') || 'games';
+  let currentWallpaper = localStorage.getItem('fanter_wallpaper') || null;
+  
+  let dragIcon = null;
   let dragWindow = null;
-  let dragOffsetX = 0, dragOffsetY = 0;
-  let resizeWindow = null;
-  let resizeStartX = 0, resizeStartY = 0;
-  let resizeStartW = 0, resizeStartH = 0;
 
   // --- Helper Functions ---
   function escapeHtml(s) { if (!s) return ''; return s.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[m]); }
 
-  function showNotification(msg) {
-    const list = document.getElementById('notificationList');
-    const notif = document.createElement('div');
-    notif.className = 'notification-item';
+  function showNotification(msg, duration = 3000) {
+    let notif = document.getElementById('dynamicNotif');
+    if (!notif) {
+      notif = document.createElement('div');
+      notif.id = 'dynamicNotif';
+      notif.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.9);backdrop-filter:blur(12px);border:1px solid var(--accent);border-radius:30px;padding:10px 20px;color:white;font-size:13px;z-index:20000;opacity:0;transition:opacity 0.2s;pointer-events:none;';
+      document.body.appendChild(notif);
+    }
     notif.textContent = msg;
-    list.prepend(notif);
-    setTimeout(() => notif.remove(), 5000);
+    notif.style.opacity = '1';
+    setTimeout(() => notif.style.opacity = '0', duration);
   }
 
   function updateClock() {
     const now = new Date();
     document.getElementById('taskbarTime').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('taskbarDate').textContent = now.toLocaleDateString([], { month: 'short', day: 'numeric' });
   }
 
   function getCurrentUser() {
@@ -698,10 +758,92 @@
     document.getElementById('startUserName').textContent = user.displayName || user.username || 'Guest';
   }
 
-  // --- Window Management ---
-  function createBuiltinGameHub(x = 80, y = 60, w = 1000, h = 700) {
-    const id = nextWindowId++;
+  function applyWorkspace() {
+    document.body.classList.remove('workspace-games', 'workspace-learning', 'workspace-personal');
+    document.body.classList.add(`workspace-${currentWorkspace}`);
+    localStorage.setItem('fanter_workspace', currentWorkspace);
+  }
+
+  function applyWallpaper() {
+    const bgDiv = document.getElementById('desktopBg');
+    if (currentWallpaper && currentWallpaper.startsWith('data:')) {
+      bgDiv.style.backgroundImage = `url(${currentWallpaper})`;
+      bgDiv.style.backgroundSize = 'cover';
+      bgDiv.style.backgroundPosition = 'center';
+    } else {
+      bgDiv.style.backgroundImage = '';
+    }
+  }
+
+  // --- Desktop Icons ---
+  function loadDesktopIcons() {
+    const saved = localStorage.getItem('fanter_desktop_icons');
+    if (saved) {
+      desktopIcons = JSON.parse(saved);
+    } else {
+      desktopIcons = [...DEFAULT_DESKTOP_ICONS];
+    }
+    renderDesktopIcons();
+  }
+
+  function saveDesktopIcons() {
+    const iconsToSave = desktopIcons.map(icon => ({ id: icon.id, icon: icon.icon, label: icon.label, x: icon.x, y: icon.y }));
+    localStorage.setItem('fanter_desktop_icons', JSON.stringify(iconsToSave));
+  }
+
+  function renderDesktopIcons() {
+    const container = document.getElementById('desktopIcons');
+    container.innerHTML = desktopIcons.map(icon => `
+      <div class="desktop-icon" data-id="${icon.id}" style="left: ${icon.x}px; top: ${icon.y}px;">
+        <div class="icon">${icon.icon}</div>
+        <div class="label">${icon.label}</div>
+        <div class="delete-btn" data-id="${icon.id}">✕</div>
+      </div>
+    `).join('');
     
+    document.querySelectorAll('.desktop-icon').forEach(el => {
+      const iconId = el.dataset.id;
+      el.addEventListener('dblclick', () => {
+        const app = APPS.find(a => a.id === iconId);
+        if (app) launchApp(app);
+      });
+      const deleteBtn = el.querySelector('.delete-btn');
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          desktopIcons = desktopIcons.filter(i => i.id !== iconId);
+          saveDesktopIcons();
+          renderDesktopIcons();
+        });
+      }
+      el.addEventListener('mousedown', (e) => {
+        if (e.target === deleteBtn) return;
+        dragIcon = { element: el, id: iconId, startX: e.clientX, startY: e.clientY, originalX: parseInt(el.style.left), originalY: parseInt(el.style.top) };
+        el.classList.add('dragging');
+        e.preventDefault();
+      });
+    });
+  }
+
+  // --- Window Management ---
+  function launchApp(app) {
+    const existing = windows.find(w => w.app?.id === app.id);
+    if (existing) {
+      if (existing.minimized) toggleMinimize(existing.id);
+      focusWindow(existing.id);
+      return;
+    }
+    if (app.isBuiltin) {
+      createGameHubWindow();
+    } else if (app.isEmulator) {
+      createEmulatorWindow();
+    } else {
+      createWindow(app);
+    }
+  }
+
+  function createGameHubWindow(x = 80, y = 60, w = 1100, h = 750) {
+    const id = nextWindowId++;
     const win = document.createElement('div');
     win.className = 'window';
     win.id = `window-${id}`;
@@ -719,29 +861,24 @@
           <button class="window-control close" data-action="close">✕</button>
         </div>
       </div>
-      <div class="window-content" id="gamehub-content-${id}">
-        <div class="game-hub-inner">
-          <div class="search-bar">
-            <input type="text" id="gameSearch-${id}" placeholder="Search games...">
-          </div>
-          <div class="category-filters" id="categoryFilters-${id}"></div>
-          <div class="game-grid" id="gameGrid-${id}"></div>
-          <div class="footer-credit">
-            a site created by abcatlmfao · parcoil network
-          </div>
+      <div class="window-content" id="gamehub-content-${id}" style="padding: 20px; overflow-y: auto;">
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+          <input type="text" id="gameSearch-${id}" placeholder="Search games..." style="flex:1; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 30px; color: white;">
+          <button id="randomGameBtn-${id}" style="padding: 12px 20px; background: var(--accent); border: none; border-radius: 30px; color: white; cursor: pointer;">🎲 Random</button>
+        </div>
+        <div class="category-filters" id="categoryFilters-${id}" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;"></div>
+        <div class="game-grid" id="gameGrid-${id}" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px;"></div>
+        <div style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 11px; border-top: 1px solid var(--border); margin-top: 20px;">
+          a site created by abcatlmfao · parcoil network
         </div>
       </div>
-      <div class="resize-handle"></div>
     `;
     
     document.body.appendChild(win);
-    
-    windows.push({ id, element: win, app: APPS.find(a => a.id === 'gamehub'), minimized: false, maximized: false, x, y, w, h, isBuiltin: true });
+    windows.push({ id, element: win, app: APPS.find(a => a.id === 'gamehub'), minimized: false, maximized: false, x, y, w, h });
     focusWindow(id);
     setupWindowEvents(win, id);
     updateTaskbar();
-    
-    // Initialize Game Hub content
     initGameHubContent(id);
     return id;
   }
@@ -750,62 +887,113 @@
     const searchInput = document.getElementById(`gameSearch-${windowId}`);
     const categoryContainer = document.getElementById(`categoryFilters-${windowId}`);
     const gridContainer = document.getElementById(`gameGrid-${windowId}`);
+    const randomBtn = document.getElementById(`randomGameBtn-${windowId}`);
     
     const categories = ['all', 'action', 'puzzle', 'racing', 'sports', 'adventure', 'platformer', 'strategy', 'horror', 'arcade', 'simulation', 'sandbox'];
     const categoryNames = { all: '🎮 All', action: '⚔️ Action', puzzle: '🧩 Puzzle', racing: '🏎️ Racing', sports: '⚽ Sports', adventure: '🗺️ Adventure', platformer: '🏃 Platformer', strategy: '♟️ Strategy', horror: '👻 Horror', arcade: '🕹️ Arcade', simulation: '🏭 Simulation', sandbox: '🎨 Sandbox' };
     
-    function renderGameGrid() {
-      if (!gridContainer) return;
+    let currentCat = 'all';
+    
+    function renderGames() {
+      if (!gridContainer || !gamesData.length) return;
       let filtered = gamesData;
-      if (currentCategory !== 'all') filtered = filtered.filter(g => g.category === currentCategory);
-      const searchTerm = searchInput?.value.toLowerCase() || '';
-      if (searchTerm) filtered = filtered.filter(g => g.name.toLowerCase().includes(searchTerm));
+      if (currentCat !== 'all') filtered = filtered.filter(g => g.category === currentCat);
+      const term = searchInput?.value.toLowerCase() || '';
+      if (term) filtered = filtered.filter(g => g.name.toLowerCase().includes(term));
       
       gridContainer.innerHTML = filtered.map(game => `
-        <div class="game-card" data-game="${escapeHtml(game.name)}" data-url="${escapeHtml(game.url)}">
-          <img src="${game.image}" alt="${escapeHtml(game.name)}" loading="lazy">
-          <div class="game-card-info">
-            <div class="game-card-name">${escapeHtml(game.name.length > 20 ? game.name.slice(0,18)+'...' : game.name)}</div>
-            <div class="game-card-category">${game.category || 'game'}</div>
+        <div style="background: rgba(255,255,255,0.05); border-radius: 12px; overflow: hidden; cursor: pointer; transition: all 0.2s;" data-game='${JSON.stringify(game)}'>
+          <img src="${game.image}" alt="${escapeHtml(game.name)}" style="width:100%; aspect-ratio:16/9; object-fit:cover;">
+          <div style="padding: 10px;">
+            <div style="font-size: 13px; font-weight: 500;">${escapeHtml(game.name.length > 20 ? game.name.slice(0,18)+'...' : game.name)}</div>
+            <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">${game.category || 'game'}</div>
           </div>
         </div>
       `).join('');
       
-      gridContainer.querySelectorAll('.game-card').forEach(card => {
+      gridContainer.querySelectorAll('[data-game]').forEach(card => {
         card.addEventListener('click', () => {
-          const gameName = card.dataset.game;
-          const gameUrl = card.dataset.url;
-          const game = gamesData.find(g => g.name === gameName);
-          if (game) {
-            trackPlayedGame(gameName);
-            window.open(`play.html?gameurl=${encodeURIComponent(gameUrl)}&game=${encodeURIComponent(gameName)}`, '_blank');
-          }
+          const game = JSON.parse(card.dataset.game);
+          playGame(game);
+        });
+        card.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          const game = JSON.parse(card.dataset.game);
+          showGameContextMenu(e.clientX, e.clientY, game);
         });
       });
     }
     
-    function renderCategoryFilters() {
+    function renderCategories() {
       if (!categoryContainer) return;
       categoryContainer.innerHTML = categories.map(cat => `
-        <div class="cat-chip ${currentCategory === cat ? 'active' : ''}" data-cat="${cat}">${categoryNames[cat] || cat}</div>
+        <div class="cat-chip" data-cat="${cat}" style="padding: 6px 14px; background: ${currentCat === cat ? 'var(--accent)' : 'rgba(255,255,255,0.05)'}; border-radius: 20px; font-size: 12px; cursor: pointer;">${categoryNames[cat] || cat}</div>
       `).join('');
       categoryContainer.querySelectorAll('.cat-chip').forEach(chip => {
         chip.addEventListener('click', () => {
-          currentCategory = chip.dataset.cat;
-          renderCategoryFilters();
-          renderGameGrid();
+          currentCat = chip.dataset.cat;
+          renderCategories();
+          renderGames();
         });
       });
     }
     
-    if (searchInput) searchInput.addEventListener('input', () => renderGameGrid());
-    renderCategoryFilters();
-    renderGameGrid();
+    if (searchInput) searchInput.addEventListener('input', () => renderGames());
+    if (randomBtn) randomBtn.addEventListener('click', () => {
+      if (gamesData.length) {
+        const randomGame = gamesData[Math.floor(Math.random() * gamesData.length)];
+        playGame(randomGame);
+      }
+    });
+    renderCategories();
+    renderGames();
   }
 
-  function createWindow(app, x = 120, y = 80, w = 900, h = 650) {
-    if (app.isBuiltin) return createBuiltinGameHub(x, y, w, h);
+  function createEmulatorWindow(x = 100, y = 80, w = 600, h = 500) {
+    const id = nextWindowId++;
+    const win = document.createElement('div');
+    win.className = 'window';
+    win.id = `window-${id}`;
+    win.style.left = `${x}px`;
+    win.style.top = `${y}px`;
+    win.style.width = `${w}px`;
+    win.style.height = `${h}px`;
     
+    win.innerHTML = `
+      <div class="window-header">
+        <div class="window-title"><span>🕹️</span><span>Emulators</span></div>
+        <div class="window-controls">
+          <button class="window-control minimize" data-action="minimize">─</button>
+          <button class="window-control maximize" data-action="maximize">□</button>
+          <button class="window-control close" data-action="close">✕</button>
+        </div>
+      </div>
+      <div class="window-content" style="padding: 20px;">
+        <div style="display: grid; gap: 12px;">
+          ${EMULATORS.map(emu => `
+            <div class="emulator-item" data-url="${emu.url}" style="display: flex; align-items: center; gap: 16px; padding: 14px; background: rgba(255,255,255,0.05); border-radius: 14px; cursor: pointer;">
+              <span style="font-size: 32px;">${emu.icon}</span>
+              <div style="flex: 1;"><div style="font-weight: 500;">${emu.name}</div><div style="font-size: 11px; color: var(--text-muted);">Click to launch</div></div>
+              <span style="font-size: 20px;">▶</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(win);
+    windows.push({ id, element: win, app: APPS.find(a => a.id === 'emulators'), minimized: false, maximized: false, x, y, w, h });
+    focusWindow(id);
+    setupWindowEvents(win, id);
+    updateTaskbar();
+    
+    win.querySelectorAll('.emulator-item').forEach(el => {
+      el.addEventListener('click', () => window.open(el.dataset.url, '_blank'));
+    });
+    return id;
+  }
+
+  function createWindow(app, x = 150, y = 100, w = 900, h = 650) {
     const id = nextWindowId++;
     const isExternal = app.external;
     const url = app.url;
@@ -828,12 +1016,8 @@
         </div>
       </div>
       <div class="window-content">
-        ${isExternal ? 
-          `<iframe src="${url}" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-top-navigation"></iframe>` :
-          `<iframe src="${url}" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-top-navigation"></iframe>`
-        }
+        <iframe src="${url}" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-top-navigation"></iframe>
       </div>
-      <div class="resize-handle"></div>
     `;
     
     document.body.appendChild(win);
@@ -846,20 +1030,17 @@
 
   function setupWindowEvents(win, id) {
     const header = win.querySelector('.window-header');
-    const resizeHandle = win.querySelector('.resize-handle');
     const minimizeBtn = win.querySelector('[data-action="minimize"]');
     const maximizeBtn = win.querySelector('[data-action="maximize"]');
     const closeBtn = win.querySelector('[data-action="close"]');
     
-    win.addEventListener('mousedown', (e) => {
-      if (e.target === resizeHandle || e.target.closest('.resize-handle')) return;
-      focusWindow(id);
-    });
+    win.addEventListener('mousedown', () => focusWindow(id));
     
     let dragStart = null;
     header.addEventListener('mousedown', (e) => {
       if (e.target.closest('.window-controls')) return;
       dragStart = { x: e.clientX, y: e.clientY, left: parseInt(win.style.left), top: parseInt(win.style.top) };
+      dragWindow = { id, startX: e.clientX, startY: e.clientY, originalLeft: parseInt(win.style.left), originalTop: parseInt(win.style.top) };
       document.addEventListener('mousemove', onDrag);
       document.addEventListener('mouseup', stopDrag);
     });
@@ -870,42 +1051,14 @@
       const dy = e.clientY - dragStart.y;
       win.style.left = `${dragStart.left + dx}px`;
       win.style.top = `${dragStart.top + dy}px`;
-      const wData = windows.find(w => w.id === id);
-      if (wData && !wData.maximized) { wData.x = dragStart.left + dx; wData.y = dragStart.top + dy; }
     }
     
-    function stopDrag() { dragStart = null; document.removeEventListener('mousemove', onDrag); document.removeEventListener('mouseup', stopDrag); }
-    
-    let resizeActive = false;
-    resizeHandle.addEventListener('mousedown', (e) => {
-      e.stopPropagation();
-      resizeActive = true;
-      resizeWindow = id;
-      resizeStartX = e.clientX;
-      resizeStartY = e.clientY;
-      const wData = windows.find(w => w.id === id);
-      if (wData) { resizeStartW = wData.w; resizeStartH = wData.h; }
-      document.addEventListener('mousemove', onResize);
-      document.addEventListener('mouseup', stopResize);
-    });
-    
-    function onResize(e) {
-      if (!resizeActive) return;
-      const dx = e.clientX - resizeStartX;
-      const dy = e.clientY - resizeStartY;
-      const newW = Math.max(400, resizeStartW + dx);
-      const newH = Math.max(300, resizeStartH + dy);
-      win.style.width = `${newW}px`;
-      win.style.height = `${newH}px`;
-      const wData = windows.find(w => w.id === resizeWindow);
-      if (wData && !wData.maximized) { wData.w = newW; wData.h = newH; }
-    }
-    
-    function stopResize() { resizeActive = false; resizeWindow = null; document.removeEventListener('mousemove', onResize); document.removeEventListener('mouseup', stopResize); }
+    function stopDrag() { dragStart = null; dragWindow = null; document.removeEventListener('mousemove', onDrag); document.removeEventListener('mouseup', stopDrag); }
     
     minimizeBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleMinimize(id); });
     maximizeBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleMaximize(id); });
     closeBtn.addEventListener('click', (e) => { e.stopPropagation(); closeWindow(id); });
+    header.addEventListener('dblclick', () => toggleMaximize(id));
   }
 
   function focusWindow(id) {
@@ -989,26 +1142,93 @@
     });
   }
 
-  // --- Desktop Icons ---
-  function renderDesktopIcons() {
-    const container = document.getElementById('desktopIcons');
-    container.innerHTML = DESKTOP_ICONS.map(icon => {
-      const app = APPS.find(a => a.id === icon.id);
-      return `<div class="desktop-icon" data-app-id="${icon.id}"><div class="icon">${icon.icon}</div><div class="label">${icon.label}</div></div>`;
-    }).join('');
-    container.querySelectorAll('.desktop-icon').forEach(el => {
-      el.addEventListener('dblclick', () => {
-        const appId = el.dataset.appId;
-        const app = APPS.find(a => a.id === appId);
-        if (app) {
-          const existing = windows.find(w => w.app.id === appId);
-          if (existing) {
-            if (existing.minimized) toggleMinimize(existing.id);
-            focusWindow(existing.id);
-          } else { createWindow(app); }
-        }
+  // --- Game Functions ---
+  function playGame(game) {
+    trackPlayedGame(game.name);
+    updateRecentGames(game);
+    window.open(`play.html?gameurl=${encodeURIComponent(game.url)}&game=${encodeURIComponent(game.name)}`, '_blank');
+  }
+
+  function trackPlayedGame(name) {
+    let plays = JSON.parse(localStorage.getItem('gamePlayCounts') || '{}');
+    plays[name] = (plays[name] || 0) + 1;
+    localStorage.setItem('gamePlayCounts', JSON.stringify(plays));
+    const user = getCurrentUser();
+    if (user && user.username !== 'Guest') {
+      user.coins = (user.coins || 0) + 0.05;
+      localStorage.setItem('fanter_currentUser', JSON.stringify(user));
+    }
+  }
+
+  function updateRecentGames(game) {
+    recentGames = [game, ...recentGames.filter(g => g.name !== game.name)].slice(0, 10);
+    localStorage.setItem('fanter_recent_games', JSON.stringify(recentGames.map(g => ({ name: g.name, image: g.image, category: g.category }))));
+    renderRecentGames();
+  }
+
+  function renderRecentGames() {
+    const container = document.getElementById('recentList');
+    if (!container) return;
+    if (!recentGames.length) {
+      container.innerHTML = '<div style="color: var(--text-muted); font-size: 11px;">play a game to see it here</div>';
+      return;
+    }
+    container.innerHTML = recentGames.map(game => `
+      <div class="recent-game" data-game='${JSON.stringify(game)}'>
+        <div class="recent-game-icon">🎮</div>
+        <div class="recent-game-name">${escapeHtml(game.name.length > 10 ? game.name.slice(0,8)+'..' : game.name)}</div>
+      </div>
+    `).join('');
+    container.querySelectorAll('.recent-game').forEach(el => {
+      el.addEventListener('click', () => {
+        const game = JSON.parse(el.dataset.game);
+        playGame(game);
       });
     });
+  }
+
+  // --- Context Menus ---
+  function showDesktopContextMenu(x, y) {
+    const menu = document.getElementById('contextMenu');
+    menu.style.left = `${x}px`;
+    menu.style.top = `${y}px`;
+    menu.classList.add('visible');
+    const closeMenu = () => { menu.classList.remove('visible'); document.removeEventListener('click', closeMenu); };
+    setTimeout(() => document.addEventListener('click', closeMenu), 10);
+  }
+
+  function showGameContextMenu(x, y, game) {
+    const menu = document.getElementById('contextMenu');
+    menu.style.left = `${x}px`;
+    menu.style.top = `${y}px`;
+    menu.classList.add('visible');
+    const pinItem = document.getElementById('ctxPinGame');
+    const originalText = pinItem.innerHTML;
+    pinItem.innerHTML = `📌 Pin "${game.name.slice(0,20)}" to Desktop`;
+    pinItem.onclick = () => {
+      if (!desktopIcons.some(i => i.id === `game_${game.name}`)) {
+        desktopIcons.push({
+          id: `game_${game.name}`,
+          icon: '🎮',
+          label: game.name.length > 12 ? game.name.slice(0,10)+'..' : game.name,
+          x: 100,
+          y: 100,
+          isGame: true,
+          gameData: game
+        });
+        saveDesktopIcons();
+        renderDesktopIcons();
+        showNotification(`Pinned "${game.name}" to desktop`);
+      }
+      menu.classList.remove('visible');
+    };
+    const closeMenu = () => {
+      pinItem.innerHTML = originalText;
+      pinItem.onclick = null;
+      menu.classList.remove('visible');
+      document.removeEventListener('click', closeMenu);
+    };
+    setTimeout(() => document.addEventListener('click', closeMenu), 10);
   }
 
   // --- Start Menu ---
@@ -1027,14 +1247,8 @@
       el.addEventListener('click', () => {
         const appId = el.dataset.appId;
         const app = APPS.find(a => a.id === appId);
-        if (app) {
-          const existing = windows.find(w => w.app.id === appId);
-          if (existing) {
-            if (existing.minimized) toggleMinimize(existing.id);
-            focusWindow(existing.id);
-          } else { createWindow(app); }
-          toggleStartMenu();
-        }
+        if (app) launchApp(app);
+        toggleStartMenu();
       });
     });
   }
@@ -1049,9 +1263,11 @@
   function updateBootResults(query) {
     const container = document.getElementById('bootResults');
     let results = query ? gamesData.filter(g => g.name.toLowerCase().includes(query.toLowerCase())).slice(0, 10) : gamesData.slice(0, 8);
+    if (query.toLowerCase() === 'konami') showNotification('🔮 KONAMI CODE! ↑↑↓↓←→←→BA');
+    if (query.toLowerCase() === 'matrix') showNotification('💊 Welcome to the Matrix...');
     currentBootResults = results;
     selectedBootIndex = results.length > 0 ? 0 : -1;
-    if (results.length === 0) { container.innerHTML = '<div style="padding: 20px; text-align: center; color: rgba(255,255,255,0.4);">no games found</div>'; return; }
+    if (results.length === 0) { container.innerHTML = '<div style="padding: 20px; text-align: center;">no games found</div>'; return; }
     container.innerHTML = results.map((game, idx) => `
       <div class="boot-result ${idx === selectedBootIndex ? 'selected' : ''}" data-index="${idx}">
         <div class="boot-result-icon">🎮</div>
@@ -1062,11 +1278,7 @@
       el.addEventListener('click', () => {
         const idx = parseInt(el.dataset.index);
         const game = currentBootResults[idx];
-        if (game) {
-          trackPlayedGame(game.name);
-          window.open(`play.html?gameurl=${encodeURIComponent(game.url)}&game=${encodeURIComponent(game.name)}`, '_blank');
-          toggleBootMenu();
-        }
+        if (game) { playGame(game); toggleBootMenu(); }
       });
     });
   }
@@ -1077,14 +1289,32 @@
     if (bootMenuOpen) { document.getElementById('bootSearch').focus(); updateBootResults(''); }
   }
 
-  function trackPlayedGame(name) {
-    gamePlayCounts[name] = (gamePlayCounts[name] || 0) + 1;
-    localStorage.setItem('gamePlayCounts', JSON.stringify(gamePlayCounts));
-    const user = getCurrentUser();
-    if (user && user.username !== 'Guest') {
-      user.coins = (user.coins || 0) + 0.05;
-      localStorage.setItem('fanter_currentUser', JSON.stringify(user));
-    }
+  // --- Other Features ---
+  function takeScreenshot() {
+    const flash = document.getElementById('screenshotFlash');
+    flash.style.opacity = '0.3';
+    setTimeout(() => flash.style.opacity = '0', 200);
+    showNotification('📸 Screenshot saved!');
+  }
+
+  function uploadWallpaper() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          currentWallpaper = ev.target.result;
+          localStorage.setItem('fanter_wallpaper', currentWallpaper);
+          applyWallpaper();
+          showNotification('Wallpaper changed!');
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    input.click();
   }
 
   // --- Load Games ---
@@ -1093,54 +1323,102 @@
       const res = await fetch('./config/games.json');
       gamesData = await res.json();
       console.log(`✅ Loaded ${gamesData.length} games`);
+      const savedRecent = localStorage.getItem('fanter_recent_games');
+      if (savedRecent) {
+        const recentNames = JSON.parse(savedRecent);
+        recentGames = recentNames.map(r => gamesData.find(g => g.name === r.name)).filter(g => g);
+      }
+      renderRecentGames();
     } catch(e) { console.error('Failed to load games:', e); gamesData = []; }
   }
 
-  // --- Taskbar auto-hide ---
+  // --- Settings Load ---
+  function loadSettings() {
+    const savedWorkspace = localStorage.getItem('fanter_workspace');
+    if (savedWorkspace) currentWorkspace = savedWorkspace;
+    applyWorkspace();
+    const savedWallpaper = localStorage.getItem('fanter_wallpaper');
+    if (savedWallpaper) currentWallpaper = savedWallpaper;
+    applyWallpaper();
+  }
+
+  // --- Taskbar Auto-hide ---
   let taskbarTimeout;
   const taskbarEl = document.getElementById('taskbar');
   function showTaskbar() { taskbarEl.classList.add('visible'); clearTimeout(taskbarTimeout); taskbarTimeout = setTimeout(() => taskbarEl.classList.remove('visible'), 2500); }
   document.addEventListener('mousemove', showTaskbar);
   showTaskbar();
 
-  // --- UI Event Listeners ---
+  // --- Event Listeners ---
   document.getElementById('startBtn').addEventListener('click', toggleStartMenu);
   document.getElementById('startSearch').addEventListener('input', (e) => renderStartApps(e.target.value));
   document.getElementById('bootSearch').addEventListener('input', (e) => updateBootResults(e.target.value));
   document.getElementById('bootSearch').addEventListener('keydown', (e) => {
     if (e.key === 'ArrowDown') { e.preventDefault(); if (selectedBootIndex < currentBootResults.length - 1) { selectedBootIndex++; updateBootResults(document.getElementById('bootSearch').value); } }
     else if (e.key === 'ArrowUp') { e.preventDefault(); if (selectedBootIndex > 0) { selectedBootIndex--; updateBootResults(document.getElementById('bootSearch').value); } }
-    else if (e.key === 'Enter') { e.preventDefault(); if (currentBootResults[selectedBootIndex]) { const game = currentBootResults[selectedBootIndex]; trackPlayedGame(game.name); window.open(`play.html?gameurl=${encodeURIComponent(game.url)}&game=${encodeURIComponent(game.name)}`, '_blank'); toggleBootMenu(); } }
+    else if (e.key === 'Enter') { e.preventDefault(); if (currentBootResults[selectedBootIndex]) { playGame(currentBootResults[selectedBootIndex]); toggleBootMenu(); } }
   });
-
-  document.getElementById('notifBtn').addEventListener('click', () => {
-    document.getElementById('notificationCenter').classList.toggle('open');
+  
+  document.getElementById('datetimeBtn').addEventListener('click', () => document.getElementById('quickSettings').classList.toggle('open'));
+  document.getElementById('screenshotBtn').addEventListener('click', takeScreenshot);
+  document.getElementById('notesBtn').addEventListener('click', () => {
+    const widget = document.getElementById('notesWidget');
+    widget.style.display = widget.style.display === 'none' ? 'block' : 'none';
   });
-
-  document.getElementById('workspaceBtn').addEventListener('click', () => {
-    const workspaces = ['🌿 workspace 1', '✨ workspace 2', '🎮 workspace 3'];
-    const current = document.getElementById('workspaceIndicator').textContent;
-    const next = workspaces[(workspaces.indexOf(current) + 1) % workspaces.length];
-    document.getElementById('workspaceIndicator').textContent = next;
-    showNotification(`switched to ${next}`);
+  document.getElementById('closeNotes').addEventListener('click', () => document.getElementById('notesWidget').style.display = 'none');
+  document.getElementById('notesText').addEventListener('input', () => localStorage.setItem('fanter_notes', document.getElementById('notesText').value));
+  document.getElementById('calculatorBtn').addEventListener('click', () => {
+    const calc = document.getElementById('calculatorWindow');
+    calc.style.display = calc.style.display === 'none' ? 'flex' : 'none';
   });
-
+  document.getElementById('closeCalcBtn').addEventListener('click', () => document.getElementById('calculatorWindow').style.display = 'none');
+  
+  // Calculator
+  let calcExpression = '';
+  function updateCalcDisplay() { document.getElementById('calcDisplay').innerText = calcExpression || '0'; }
+  document.querySelectorAll('.calc-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const val = btn.dataset.val;
+      if (val === 'C') { calcExpression = ''; }
+      else if (val === '⌫') { calcExpression = calcExpression.slice(0, -1); }
+      else if (val === '=') { try { calcExpression = eval(calcExpression).toString(); } catch(e) { calcExpression = 'Error'; } }
+      else { calcExpression += val; }
+      updateCalcDisplay();
+    });
+  });
+  
+  // Quick settings
+  document.getElementById('qsWallpaper').addEventListener('click', uploadWallpaper);
+  document.getElementById('qsWorkspace').addEventListener('click', () => {
+    const workspaces = ['games', 'learning', 'personal'];
+    currentWorkspace = workspaces[(workspaces.indexOf(currentWorkspace) + 1) % workspaces.length];
+    applyWorkspace();
+    document.getElementById('quickSettings').classList.remove('open');
+  });
+  document.getElementById('qsShortcuts').addEventListener('click', () => document.getElementById('shortcutsModal').classList.add('open'));
+  document.getElementById('qsSettings').addEventListener('click', () => window.location.href = 'settings.html');
+  document.getElementById('closeShortcuts').addEventListener('click', () => document.getElementById('shortcutsModal').classList.remove('open'));
+  
+  // Context menu
+  document.getElementById('ctxChangeWallpaper').addEventListener('click', uploadWallpaper);
+  document.getElementById('ctxRefresh').addEventListener('click', () => location.reload());
+  document.getElementById('ctxWorkspaceGames').addEventListener('click', () => { currentWorkspace = 'games'; applyWorkspace(); });
+  document.getElementById('ctxWorkspaceLearning').addEventListener('click', () => { currentWorkspace = 'learning'; applyWorkspace(); });
+  document.getElementById('ctxWorkspacePersonal').addEventListener('click', () => { currentWorkspace = 'personal'; applyWorkspace(); });
+  document.getElementById('ctxSettings').addEventListener('click', () => window.location.href = 'settings.html');
+  document.getElementById('desktopBg').addEventListener('contextmenu', (e) => { e.preventDefault(); showDesktopContextMenu(e.clientX, e.clientY); });
+  
+  // Keyboard shortcuts
   document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); toggleBootMenu(); }
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'S') { e.preventDefault(); takeScreenshot(); }
+    if ((e.ctrlKey || e.metaKey) && e.key === '/') { e.preventDefault(); document.getElementById('shortcutsModal').classList.add('open'); }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'w') { e.preventDefault(); if (activeWindowId) closeWindow(activeWindowId); }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'm') { e.preventDefault(); if (activeWindowId) toggleMinimize(activeWindowId); }
     if (e.key === 'Escape') { if (bootMenuOpen) toggleBootMenu(); if (startMenuOpen) toggleStartMenu(); }
   });
-
-  document.addEventListener('click', (e) => {
-    if (startMenuOpen && !e.target.closest('.start-menu') && !e.target.closest('.start-btn')) toggleStartMenu();
-    if (bootMenuOpen && !e.target.closest('.boot-menu')) toggleBootMenu();
-    if (!e.target.closest('.notification-center') && !e.target.closest('#notifBtn')) {
-      document.getElementById('notificationCenter').classList.remove('open');
-    }
-  });
-
-  function closeNotifications() { document.getElementById('notificationCenter').classList.remove('open'); }
-
-  // --- Safety Key ---
+  
+  // Safety Key
   let lastKey = '', lastKeyTime = 0;
   document.addEventListener('keydown', (e) => {
     const safetyKey = localStorage.getItem('safetyKey');
@@ -1149,21 +1427,26 @@
     lastKey = e.key; lastKeyTime = Date.now();
   });
 
+  // Load saved notes
+  const savedNotes = localStorage.getItem('fanter_notes');
+  if (savedNotes) document.getElementById('notesText').value = savedNotes;
+
   // --- Init ---
   async function init() {
-    await loadGames();
-    renderDesktopIcons();
+    loadSettings();
+    loadDesktopIcons();
     updateUserDisplay();
     updateClock();
     setInterval(updateClock, 1000);
     setInterval(updateUserDisplay, 3000);
+    await loadGames();
     setTimeout(() => {
       const gameHub = APPS.find(a => a.id === 'gamehub');
-      if (gameHub) createWindow(gameHub, 60, 50, 1100, 750);
-      showNotification('🎉 welcome to fanterOS! double-click icons or use start menu');
+      if (gameHub) createGameHubWindow(60, 50, 1100, 750);
+      showNotification('🎉 Welcome to fanterOS! Right-click desktop for options');
     }, 300);
   }
-
+  
   init();
 </script>
 </body>
