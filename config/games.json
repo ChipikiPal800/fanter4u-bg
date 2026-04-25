@@ -848,4 +848,37 @@
     "releaseDate": "tmrw",
     "developer": "??"
   }
+   {
+    "name": "inscryption",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRc0wPlmKDZcL6oA0jyNOqQHf1bq_5O13hOPA&s",
+    "url": "https://chipikipal800.github.io/InscryptionWebport/",
+    "new": true,
+    "category": "puzzle",
+    "desc": "REALLYYY FUN kinda like buckshot roulette + balatro?? ",
+    "loadTime": "3-4 minutes",
+    "releaseDate": "tmrw",
+    "developer": "reeyuki"
+  },
+   {
+    "name": "plauge inc evolved",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfgv6Tr5bfqRSmtXfKSXPhOF_8lJ-T77hRwA&s",
+    "url": "https://chipikipal800.github.io/PlagueIncEvolved/",
+    "new": true,
+    "category": "arcade",
+    "desc": "REALLYYY FUN, develop diaseses, kill people, repeat. AMAZING",
+    "loadTime": "35-50 seconds",
+    "releaseDate": "tmrw",
+    "developer": "reeyuki"
+  },
+   {
+    "name": "whos your daddy?",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdySaTz-S1A5PdxNtVSDxTNxe5oMqjCcs2pQ&s",
+    "url": "https://chipikipal800.github.io/daddygame/",
+    "new": true,
+    "category": "multiplayer",
+    "desc": "hella fun with friends bro",
+    "loadTime": "5-10 seconds",
+    "releaseDate": "tmrw",
+    "developer": "reeyuki"
+  }
 ]
