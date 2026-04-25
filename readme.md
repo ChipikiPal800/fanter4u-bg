@@ -1,7 +1,7 @@
 fanter ubg
 
 
-388 games currently, ~314 are NES / GBA that nobody is gonna play sadly
+2420 games, about 97% are from emulators lolz
 
 
 fork or clone the repo 
