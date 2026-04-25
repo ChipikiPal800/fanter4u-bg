@@ -149,34 +149,38 @@
       border-color: #ffcc00;
     }
     
-    /* ===== NEW: EMULATORS MENU BUTTON ===== */
+    /* ===== EMULATORS MENU BUTTON (LEFT SIDE) ===== */
     .emulators-menu-container {
       position: fixed;
-      top: 140px;
+      top: 50%;
       left: 20px;
+      transform: translateY(-50%);
       z-index: 100;
       display: flex;
       flex-direction: column;
-      align-items: flex-end;
-      gap: 10px;
+      align-items: flex-start;
+      gap: 12px;
     }
     
     .emulators-toggle-btn {
       background: linear-gradient(135deg, #9f5ae3, #7a3ac0);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(159, 90, 227, 0.5);
-      border-radius: 15px;
+      border-radius: 20px;
       color: white;
-      font-size: 20px;
+      font-size: 18px;
       font-weight: bold;
-      width: 44px;
-      height: 44px;
+      width: 60px;
+      height: 60px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       transition: all 0.3s ease;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      letter-spacing: 4px;
     }
     
     .emulators-toggle-btn:hover {
@@ -190,24 +194,26 @@
       border-color: #ffcc00;
     }
     
-    /* EMULATORS SIDEBAR */
+    /* EMULATORS SIDEBAR - LEFT SIDE, 35% LARGER */
     .emulators-sidebar {
       position: fixed;
-      top: 80px;
-      right: -260px;
-      width: 260px;
+      top: 0;
+      left: -400px;
+      width: 400px;
+      height: 100vh;
       background: rgba(25, 20, 45, 0.97);
       backdrop-filter: blur(15px);
-      border: 1px solid rgba(159, 90, 227, 0.5);
-      border-radius: 20px 0 0 20px;
-      padding: 20px 15px;
+      border-right: 1px solid rgba(159, 90, 227, 0.5);
+      border-radius: 0 20px 20px 0;
+      padding: 25px 20px;
       z-index: 101;
-      transition: right 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-      box-shadow: -5px 5px 20px rgba(0, 0, 0, 0.4);
+      transition: left 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.4);
+      overflow-y: auto;
     }
     
     .emulators-sidebar.open {
-      right: 0;
+      left: 0;
     }
     
     .emulators-overlay {
@@ -230,28 +236,33 @@
     }
     
     .emulators-header {
-      font-size: 18px;
+      font-size: 22px;
       font-weight: bold;
       color: #ffcc00;
-      padding: 8px 12px;
-      margin-bottom: 12px;
-      border-bottom: 1px solid rgba(159, 90, 227, 0.5);
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid rgba(159, 90, 227, 0.5);
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
     
+    .emulators-header span {
+      font-size: 28px;
+    }
+    
+    /* LARGER EMULATOR ITEMS */
     .emulator-item {
       display: flex;
       align-items: center;
-      gap: 15px;
-      padding: 12px 18px;
-      margin: 5px 0;
-      background: rgba(255, 255, 255, 0.03);
+      gap: 18px;
+      padding: 16px 20px;
+      margin: 8px 0;
+      background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(159, 90, 227, 0.3);
-      border-radius: 12px;
+      border-radius: 16px;
       color: white;
-      font-size: 15px;
+      font-size: 17px;
       cursor: pointer;
       transition: all 0.2s ease;
     }
@@ -259,27 +270,34 @@
     .emulator-item:hover {
       background: rgba(159, 90, 227, 0.3);
       border-color: #ffcc00;
-      transform: translateX(-5px);
+      transform: translateX(8px);
     }
     
     .emulator-icon {
-      font-size: 24px;
-      min-width: 36px;
+      font-size: 32px;
+      min-width: 55px;
       text-align: center;
     }
     
     .emulator-label {
-      font-weight: 500;
+      font-weight: 600;
       flex: 1;
+      font-size: 16px;
+      letter-spacing: 0.5px;
+      white-space: normal;
+      word-break: break-word;
+      line-height: 1.3;
     }
     
     .emulator-badge {
       background: rgba(255, 204, 0, 0.2);
       border: 1px solid rgba(255, 204, 0, 0.3);
       border-radius: 20px;
-      padding: 2px 8px;
-      font-size: 9px;
+      padding: 4px 12px;
+      font-size: 11px;
       color: #ffcc00;
+      font-weight: bold;
+      white-space: nowrap;
     }
     
     /* ===== FAV BUTTON BOTTOM RIGHT ===== */
@@ -309,8 +327,8 @@
     .sidebar-menu {
       position: fixed;
       top: 80px;
-      right: -260px;
-      width: 260px;
+      right: -300px;
+      width: 300px;
       background: rgba(15, 20, 40, 0.97);
       backdrop-filter: blur(15px);
       border: 1px solid rgba(45, 90, 227, 0.5);
@@ -405,6 +423,7 @@
     /* ===== MAIN CONTENT ===== */
     .main-container {
       padding-top: 20px;
+      padding-left: 90px;
     }
     
     .center {
@@ -591,11 +610,37 @@
       #gamesContainer {
         grid-template-columns: repeat(3, 1fr);
       }
+      .main-container {
+        padding-left: 20px;
+      }
+      .emulators-sidebar {
+        width: 320px;
+        left: -320px;
+      }
     }
     
     @media (max-width: 600px) {
       #gamesContainer {
         grid-template-columns: repeat(2, 1fr);
+      }
+      .emulators-toggle-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 14px;
+      }
+      .emulators-sidebar {
+        width: 280px;
+        left: -280px;
+      }
+      .emulator-item {
+        padding: 12px 16px;
+      }
+      .emulator-label {
+        font-size: 14px;
+      }
+      .emulator-icon {
+        font-size: 26px;
+        min-width: 45px;
       }
     }
     
@@ -801,60 +846,59 @@
     <div class="menu-toggle-btn" id="menuToggleBtn" onclick="toggleMenu()">≡</div>
   </div>
 
- 
+  <!-- EMULATORS MENU BUTTON - LEFT SIDE -->
   <div class="emulators-menu-container">
-    <div class="emulators-toggle-btn" id="emulatorsToggleBtn" onclick="toggleEmulators()">emulators</div>
+    <div class="emulators-toggle-btn" id="emulatorsToggleBtn" onclick="toggleEmulators()">EMULATORS</div>
   </div>
   
-  <!-- all the like umm bro i forgot umm BRO oh yea emulators  -->
+  <!-- EMULATORS SIDEBAR - LEFT SIDE WITH LARGER ITEMS -->
   <div class="emulators-sidebar" id="emulatorsSidebar">
     <div class="emulators-header">
       <span>🎮</span> EMULATORS
     </div>
     <div class="emulator-item" onclick="window.open('https://chipikipal800.github.io/MKGBA2.0/', '_blank')">
- 
-      <span class="emulator-label">game boy advance 2</span>
+      <span class="emulator-icon">🎮</span>
+      <span class="emulator-label">Game Boy Advance 2</span>
       <span class="emulator-badge">GBA</span>
     </div>
 
-    
-     <div class="emulator-item" onclick="window.open('https://chipikipal800.github.io/nes-emulator-/', '_blank')">
-      
-      <span class="emulator-label">nintendo entertainment system</span>
+    <div class="emulator-item" onclick="window.open('https://chipikipal800.github.io/nes-emulator-/', '_blank')">
+      <span class="emulator-icon">📺</span>
+      <span class="emulator-label">Nintendo Entertainment System</span>
       <span class="emulator-badge">NES</span>
     </div>
 
     <div class="emulator-item" onclick="window.open('https://chipikipal800.github.io/Sega-Genesis-Emulator-/', '_blank')">
-     
-      <span class="emulator-label">sega genesis</span>
+      <span class="emulator-icon">🌀</span>
+      <span class="emulator-label">Sega Genesis</span>
       <span class="emulator-badge">GEN</span>
     </div>
 
-     <div class="emulator-item" onclick="window.open('https://chipikipal800.github.io/n64-emulator/', '_blank')">
-     
-      <span class="emulator-label">nintendo 64</span>
+    <div class="emulator-item" onclick="window.open('https://chipikipal800.github.io/n64-emulator/', '_blank')">
+      <span class="emulator-icon">🎮</span>
+      <span class="emulator-label">Nintendo 64</span>
       <span class="emulator-badge">N64</span>
     </div>
 
-     <div class="emulator-item" onclick="window.open('https://chipikipal800.github.io/Virtual-boy-emulator-/', '_blank')">
-     
-      <span class="emulator-label"> nintendo virtual boy</span>
+    <div class="emulator-item" onclick="window.open('https://chipikipal800.github.io/Virtual-boy-emulator-/', '_blank')">
+      <span class="emulator-icon">🕶️</span>
+      <span class="emulator-label">Nintendo Virtual Boy</span>
       <span class="emulator-badge">VB</span>
     </div>
 
-      <div class="emulator-item" onclick="window.open('https://chipikipal800.github.io/atari7800-emulatorwroms/', '_blank')">
-     
-      <span class="emulator-label">atari 7800</span>
-      <span class="emulator-badge">cx78+</span>
+    <div class="emulator-item" onclick="window.open('https://chipikipal800.github.io/atari7800-emulatorwroms/', '_blank')">
+      <span class="emulator-icon">🎮</span>
+      <span class="emulator-label">Atari 7800</span>
+      <span class="emulator-badge">CX78+</span>
     </div>
 
-     <div class="emulator-item" onclick="window.open('https://chipikipal800.github.io/Atari-2600-emulator-/', '_blank')">
-     
-      <span class="emulator-label">atari 2600</span>
-      <span class="emulator-badge">cx2600</span>
+    <div class="emulator-item" onclick="window.open('https://chipikipal800.github.io/Atari-2600-emulator-/', '_blank')">
+      <span class="emulator-icon">🕹️</span>
+      <span class="emulator-label">Atari 2600</span>
+      <span class="emulator-badge">CX2600</span>
     </div>
-    
   </div>
+  
   <div class="emulators-overlay" id="emulatorsOverlay" onclick="toggleEmulators()"></div>
 
   <!-- FAV BUTTON - Bottom Right -->
@@ -969,7 +1013,7 @@ document.getElementById('menuOverlay').addEventListener('click', function() {
   document.getElementById('menuToggleBtn').classList.remove('active');
 });
 
-// ==================== EMULATORS MENU TOGGLE (NEW) ====================
+// ==================== EMULATORS MENU TOGGLE ====================
 function toggleEmulators() {
   const menu = document.getElementById('emulatorsSidebar');
   const overlay = document.getElementById('emulatorsOverlay');
