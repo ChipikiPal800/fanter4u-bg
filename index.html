@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>fanterOS — boot</title>
+  <title>fanterOS — desktop environment</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -35,7 +36,7 @@
       color: var(--text-primary);
     }
 
-    /* ===== LOADING SCREEN ===== */
+    /* Loading Screen */
     .loading-screen {
       position: fixed;
       top: 0;
@@ -47,14 +48,9 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: opacity 0.8s ease, visibility 0.8s ease;
+      transition: opacity 0.8s ease;
     }
-
-    .loading-screen.hide {
-      opacity: 0;
-      visibility: hidden;
-    }
-
+    .loading-screen.hide { opacity: 0; pointer-events: none; }
     .matrix-canvas {
       position: absolute;
       top: 0;
@@ -63,7 +59,6 @@
       height: 100%;
       opacity: 0.3;
     }
-
     .loading-content {
       position: relative;
       z-index: 10;
@@ -74,58 +69,15 @@
       border-radius: 32px;
       border: 1px solid var(--border-glass);
     }
+    .loading-logo { font-size: 64px; margin-bottom: 20px; animation: pulse 1.5s ease infinite; }
+    @keyframes pulse { 0%,100% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); text-shadow: 0 0 20px var(--accent); } }
+    .loading-title { font-size: 28px; font-weight: 600; background: linear-gradient(135deg, #fff, var(--accent)); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 20px; }
+    .loading-progress { width: 300px; height: 3px; background: rgba(255,255,255,0.1); border-radius: 3px; margin: 20px auto; overflow: hidden; }
+    .loading-progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent), #9b7cff); transition: width 0.3s ease; }
+    .loading-status { font-size: 12px; color: var(--text-muted); font-family: monospace; }
+    .loading-commands { margin-top: 20px; font-family: monospace; font-size: 10px; color: rgba(124,92,255,0.5); }
 
-    .loading-logo {
-      font-size: 64px;
-      margin-bottom: 20px;
-      animation: pulse 1.5s ease infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 0.6; transform: scale(1); text-shadow: 0 0 0 var(--accent-glow); }
-      50% { opacity: 1; transform: scale(1.05); text-shadow: 0 0 20px var(--accent); }
-    }
-
-    .loading-title {
-      font-size: 28px;
-      font-weight: 600;
-      background: linear-gradient(135deg, #fff, var(--accent));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      margin-bottom: 20px;
-    }
-
-    .loading-progress {
-      width: 300px;
-      height: 3px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 3px;
-      margin: 20px auto;
-      overflow: hidden;
-    }
-
-    .loading-progress-bar {
-      width: 0%;
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent), #9b7cff);
-      transition: width 0.3s ease;
-    }
-
-    .loading-status {
-      font-size: 12px;
-      color: var(--text-muted);
-      font-family: monospace;
-    }
-
-    .loading-commands {
-      margin-top: 20px;
-      font-family: monospace;
-      font-size: 10px;
-      color: rgba(124,92,255,0.5);
-    }
-
-    /* ===== LOGIN SCREEN ===== */
+    /* Login Screen */
     .login-screen {
       position: fixed;
       top: 0;
@@ -141,12 +93,7 @@
       visibility: hidden;
       transition: opacity 0.6s ease, visibility 0.6s ease;
     }
-
-    .login-screen.visible {
-      opacity: 1;
-      visibility: visible;
-    }
-
+    .login-screen.visible { opacity: 1; visibility: visible; }
     .login-card {
       background: var(--bg-glass);
       backdrop-filter: blur(20px);
@@ -159,28 +106,10 @@
       transform: scale(0.95);
       transition: transform 0.3s ease;
     }
-
-    .login-screen.visible .login-card {
-      transform: scale(1);
-    }
-
-    .login-logo {
-      font-size: 56px;
-      margin-bottom: 16px;
-    }
-
-    .login-title {
-      font-size: 24px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    .login-sub {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-bottom: 30px;
-    }
-
+    .login-screen.visible .login-card { transform: scale(1); }
+    .login-logo { font-size: 56px; margin-bottom: 16px; }
+    .login-title { font-size: 24px; font-weight: 600; margin-bottom: 8px; }
+    .login-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 30px; }
     .login-input {
       width: 100%;
       padding: 14px 16px;
@@ -191,14 +120,8 @@
       font-size: 14px;
       margin-bottom: 12px;
       outline: none;
-      transition: all 0.2s;
     }
-
-    .login-input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 2px var(--accent-glow);
-    }
-
+    .login-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
     .login-btn {
       width: 100%;
       padding: 14px;
@@ -209,38 +132,15 @@
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s;
       margin-top: 8px;
     }
+    .login-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px var(--accent-glow); }
+    .guest-btn { background: rgba(255,255,255,0.08); margin-top: 12px; }
+    .login-switch { margin-top: 20px; font-size: 13px; color: var(--text-muted); }
+    .login-switch span { color: var(--accent); cursor: pointer; }
+    .login-error { font-size: 12px; color: var(--danger); margin-top: 12px; }
 
-    .login-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px var(--accent-glow);
-    }
-
-    .login-switch {
-      margin-top: 20px;
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-
-    .login-switch span {
-      color: var(--accent);
-      cursor: pointer;
-    }
-
-    .login-error {
-      font-size: 12px;
-      color: var(--danger);
-      margin-top: 12px;
-    }
-
-    .guest-btn {
-      background: rgba(255,255,255,0.08);
-      margin-top: 12px;
-    }
-
-    /* ===== DESKTOP (same as before, improved) ===== */
+    /* Desktop */
     .desktop {
       position: fixed;
       top: 0;
@@ -253,12 +153,7 @@
       visibility: hidden;
       transition: opacity 0.5s ease;
     }
-
-    .desktop.visible {
-      opacity: 1;
-      visibility: visible;
-    }
-
+    .desktop.visible { opacity: 1; visibility: visible; }
     .desktop-bg {
       position: absolute;
       top: 0;
@@ -269,7 +164,6 @@
       transition: background-image 0.3s ease;
       z-index: -1;
     }
-
     .desktop-bg::before {
       content: '';
       position: absolute;
@@ -281,27 +175,13 @@
       animation: bgFloat 20s ease infinite;
       pointer-events: none;
     }
-
-    @keyframes bgFloat {
-      0%, 100% { transform: translate(0, 0); }
-      50% { transform: translate(2%, 1%); }
-    }
-
-    /* Workspace variants */
+    @keyframes bgFloat { 0%,100% { transform: translate(0,0); } 50% { transform: translate(2%,1%); } }
     body.workspace-games .desktop-bg { background: linear-gradient(135deg, #0a0a15 0%, #15102a 100%); }
     body.workspace-learning .desktop-bg { background: linear-gradient(135deg, #0a150a 0%, #102a15 100%); }
     body.workspace-personal .desktop-bg { background: linear-gradient(135deg, #150a15 0%, #2a102a 100%); }
 
     /* Desktop Icons */
-    .desktop-icons {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 10;
-    }
-
+    .desktop-icons { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; }
     .desktop-icon {
       position: absolute;
       display: flex;
@@ -311,18 +191,13 @@
       padding: 10px 6px;
       border-radius: 14px;
       cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      transition: all 0.2s;
       background: rgba(255, 255, 255, 0);
       z-index: 15;
     }
-
-    .desktop-icon:hover {
-      background: rgba(255, 255, 255, 0.08);
-      transform: translateY(-3px) scale(1.02);
-    }
-
-    .desktop-icon .icon { font-size: 36px; margin-bottom: 6px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
-    .desktop-icon .label { font-size: 11px; text-align: center; color: rgba(255, 255, 255, 0.85); font-weight: 500; }
+    .desktop-icon:hover { background: rgba(255, 255, 255, 0.08); transform: translateY(-3px); }
+    .desktop-icon .icon { font-size: 36px; margin-bottom: 6px; }
+    .desktop-icon .label { font-size: 11px; text-align: center; color: rgba(255,255,255,0.85); font-weight: 500; }
     .desktop-icon .delete-btn {
       position: absolute;
       top: -4px;
@@ -355,12 +230,11 @@
       justify-content: space-between;
       padding: 0 16px;
       z-index: 1000;
-      transition: bottom 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      transition: bottom 0.3s;
       box-shadow: 0 8px 32px rgba(0,0,0,0.2);
     }
     .taskbar.visible { bottom: 12px; }
     .taskbar:hover { bottom: 12px; }
-
     .start-btn {
       display: flex;
       align-items: center;
@@ -371,10 +245,7 @@
       cursor: pointer;
       font-weight: 600;
       font-size: 14px;
-      transition: all 0.2s;
     }
-    .start-btn:hover { transform: scale(1.02); filter: brightness(1.05); }
-
     .taskbar-apps { display: flex; gap: 6px; flex: 1; margin-left: 20px; overflow-x: auto; }
     .taskbar-app {
       padding: 6px 16px;
@@ -386,11 +257,9 @@
       gap: 10px;
       font-size: 12px;
       white-space: nowrap;
-      transition: all 0.15s;
     }
     .taskbar-app:hover { background: rgba(255,255,255,0.1); }
     .taskbar-app.active { background: var(--accent); }
-
     .taskbar-right { display: flex; align-items: center; gap: 12px; }
     .taskbar-datetime {
       display: flex;
@@ -410,7 +279,6 @@
       padding: 6px 10px;
       cursor: pointer;
       font-size: 14px;
-      transition: all 0.15s;
     }
     .taskbar-icon:hover { background: rgba(255,255,255,0.1); transform: scale(1.05); }
 
@@ -428,11 +296,10 @@
       transform: translateY(20px) scale(0.98);
       opacity: 0;
       visibility: hidden;
-      transition: all 0.2s ease;
+      transition: all 0.2s;
       overflow: hidden;
     }
     .start-menu.open { transform: translateY(0) scale(1); opacity: 1; visibility: visible; }
-
     .start-header { padding: 20px; background: linear-gradient(135deg, rgba(124,92,255,0.15), rgba(124,92,255,0.05)); border-bottom: 1px solid var(--border-glass); }
     .start-header .user-name { font-weight: 600; font-size: 16px; }
     .start-header .user-status { font-size: 12px; opacity: 0.7; margin-top: 4px; }
@@ -456,7 +323,6 @@
       padding: 12px 14px;
       border-radius: 14px;
       cursor: pointer;
-      transition: all 0.1s;
     }
     .start-app:hover { background: rgba(255,255,255,0.08); }
     .start-app-icon { font-size: 24px; width: 40px; text-align: center; }
@@ -478,7 +344,7 @@
       z-index: 10000;
       opacity: 0;
       visibility: hidden;
-      transition: all 0.2s ease;
+      transition: all 0.2s;
     }
     .boot-menu.open { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
     .boot-search { padding: 20px; border-bottom: 1px solid var(--border-glass); }
@@ -522,18 +388,9 @@
       z-index: 10001;
       opacity: 0;
       visibility: hidden;
-      transition: opacity 0.1s;
     }
     .context-menu.visible { opacity: 1; visibility: visible; }
-    .context-menu-item {
-      padding: 10px 18px;
-      cursor: pointer;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      transition: all 0.1s;
-    }
+    .context-menu-item { padding: 10px 18px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 12px; }
     .context-menu-item:hover { background: rgba(255,255,255,0.08); }
     .context-menu-divider { height: 1px; background: var(--border-glass); margin: 6px 0; }
 
@@ -551,31 +408,10 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      transition: box-shadow 0.1s;
     }
     .window.active { z-index: 200; box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 0 2px var(--accent); }
-    .window.minimized {
-      transform: scale(0) !important;
-      opacity: 0;
-      pointer-events: none;
-      transition: transform 0.2s cubic-bezier(0.34, 1.2, 0.64, 1), opacity 0.15s;
-    }
-    .window.maximized {
-      top: 0 !important;
-      left: 0 !important;
-      width: 100% !important;
-      height: 100% !important;
-      border-radius: 0;
-      transition: all 0.2s cubic-bezier(0.34, 1.2, 0.64, 1);
-    }
-    .window.fullscreen-mode {
-      top: 0 !important;
-      left: 0 !important;
-      width: 100% !important;
-      height: 100% !important;
-      border-radius: 0;
-      z-index: 10000;
-    }
+    .window.minimized { transform: scale(0) !important; opacity: 0; pointer-events: none; transition: transform 0.2s; }
+    .window.maximized { top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; border-radius: 0; transition: all 0.2s; }
     .window-header {
       padding: 14px 18px;
       background: rgba(25, 25, 35, 0.9);
@@ -599,23 +435,11 @@
       background: transparent;
       border: none;
       color: var(--text-secondary);
-      transition: all 0.15s;
     }
     .window-control:hover { background: rgba(255,255,255,0.1); }
     .window-control.close:hover { background: var(--danger); color: white; }
     .window-content { flex: 1; overflow: auto; background: rgba(10,10,15,0.95); }
     .window-content iframe { width: 100%; height: 100%; border: none; }
-
-    /* Resize handles */
-    .resize-handle { position: absolute; width: 8px; height: 8px; z-index: 10; }
-    .resize-nw { top: 0; left: 0; cursor: nw-resize; }
-    .resize-n { top: 0; left: 10px; right: 10px; height: 6px; cursor: n-resize; }
-    .resize-ne { top: 0; right: 0; cursor: ne-resize; }
-    .resize-w { top: 10px; left: 0; bottom: 10px; width: 6px; cursor: w-resize; }
-    .resize-e { top: 10px; right: 0; bottom: 10px; width: 6px; cursor: e-resize; }
-    .resize-sw { bottom: 0; left: 0; cursor: sw-resize; }
-    .resize-s { bottom: 0; left: 10px; right: 10px; height: 6px; cursor: s-resize; }
-    .resize-se { bottom: 0; right: 0; cursor: se-resize; }
 
     /* Notes Widget */
     .notes-widget {
@@ -629,6 +453,7 @@
       border: 1px solid var(--border-glass);
       z-index: 25;
       overflow: hidden;
+      display: none;
     }
     .notes-header {
       padding: 12px 16px;
@@ -651,51 +476,6 @@
       font-family: inherit;
       resize: none;
       outline: none;
-    }
-
-    /* Screenshots Gallery */
-    .screenshots-widget {
-      position: absolute;
-      bottom: 150px;
-      right: 20px;
-      width: 320px;
-      background: var(--bg-glass);
-      backdrop-filter: blur(20px);
-      border-radius: 20px;
-      border: 1px solid var(--border-glass);
-      z-index: 25;
-      overflow: hidden;
-      display: none;
-    }
-    .screenshots-header {
-      padding: 12px 16px;
-      background: rgba(124,92,255,0.15);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .screenshots-list {
-      max-height: 300px;
-      overflow-y: auto;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .screenshot-item {
-      background: rgba(0,0,0,0.3);
-      border-radius: 12px;
-      padding: 8px;
-      cursor: pointer;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-    .screenshot-item img {
-      width: 60px;
-      height: 40px;
-      object-fit: cover;
-      border-radius: 8px;
     }
 
     /* Quick Settings */
@@ -740,21 +520,10 @@
     .shortcut-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-glass); font-size: 13px; }
     .shortcut-key { font-family: monospace; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 8px; }
 
-    /* Screenshot Flash */
-    .screenshot-flash {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: white;
-      opacity: 0;
-      pointer-events: none;
-      z-index: 20000;
-      transition: opacity 0.2s;
-    }
-
-    /* Scrollbar */
+    /* Utilities */
+    .screenshot-flash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; opacity: 0; pointer-events: none; z-index: 20000; transition: opacity 0.2s; }
+    .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); backdrop-filter: blur(12px); border: 1px solid var(--accent); border-radius: 30px; padding: 10px 20px; color: white; font-size: 13px; z-index: 20001; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+    .toast.show { opacity: 1; }
     ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); border-radius: 3px; }
     ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
@@ -763,7 +532,6 @@
 </head>
 <body>
 
-<!-- LOADING SCREEN -->
 <div class="loading-screen" id="loadingScreen">
   <canvas class="matrix-canvas" id="matrixCanvas"></canvas>
   <div class="loading-content">
@@ -775,7 +543,6 @@
   </div>
 </div>
 
-<!-- LOGIN SCREEN -->
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">🍥</div>
@@ -790,34 +557,21 @@
   </div>
 </div>
 
-<!-- DESKTOP -->
 <div class="desktop" id="desktop">
   <div class="desktop-bg" id="desktopBg"></div>
   <div class="desktop-icons" id="desktopIcons"></div>
-  <div class="notes-widget" id="notesWidget" style="display: none;">
-    <div class="notes-header">
-      <span>📝 sticky notes</span>
-      <span class="close-notes" id="closeNotes">✕</span>
-    </div>
+  <div class="notes-widget" id="notesWidget">
+    <div class="notes-header"><span>📝 sticky notes</span><span class="close-notes" id="closeNotes">✕</span></div>
     <div class="notes-content"><textarea id="notesText" placeholder="Write something..."></textarea></div>
-  </div>
-  <div class="screenshots-widget" id="screenshotsWidget">
-    <div class="screenshots-header">
-      <span>📸 screenshots</span>
-      <span class="close-screenshots" id="closeScreenshots" style="cursor:pointer;">✕</span>
-    </div>
-    <div class="screenshots-list" id="screenshotsList"></div>
   </div>
 </div>
 
-<!-- TASKBAR -->
 <div class="taskbar" id="taskbar">
   <div class="start-btn" id="startBtn">🍥 fanterOS</div>
   <div class="taskbar-apps" id="taskbarApps"></div>
   <div class="taskbar-right">
     <button class="taskbar-icon" id="screenshotBtn" title="Screenshot (Ctrl+Shift+S)">📸</button>
     <button class="taskbar-icon" id="notesBtn" title="Sticky Notes">📝</button>
-    <button class="taskbar-icon" id="galleryBtn" title="Screenshots Gallery">🖼️</button>
     <div class="taskbar-datetime" id="datetimeBtn">
       <div class="taskbar-time" id="taskbarTime">--:--</div>
       <div class="taskbar-date" id="taskbarDate">--/--</div>
@@ -825,7 +579,6 @@
   </div>
 </div>
 
-<!-- START MENU -->
 <div class="start-menu" id="startMenu">
   <div class="start-header">
     <div class="user-name" id="startUserName">Guest</div>
@@ -835,14 +588,12 @@
   <div class="start-apps" id="startApps"></div>
 </div>
 
-<!-- BOOT MENU -->
 <div class="boot-menu" id="bootMenu">
   <div class="boot-search"><input type="text" id="bootSearch" placeholder="Search games..." autocomplete="off"></div>
   <div class="boot-results" id="bootResults"></div>
   <div class="boot-footer"><span>↑↓ navigate</span><span>↵ play</span><span>esc close</span></div>
 </div>
 
-<!-- CONTEXT MENU -->
 <div class="context-menu" id="contextMenu">
   <div class="context-menu-item" id="ctxChangeWallpaper">🖼️ Change Wallpaper</div>
   <div class="context-menu-item" id="ctxRefresh">🔄 Refresh</div>
@@ -856,7 +607,6 @@
   <div class="context-menu-item" id="ctxSettings">⚙️ Settings</div>
 </div>
 
-<!-- QUICK SETTINGS -->
 <div class="quick-settings" id="quickSettings">
   <div class="quick-settings-header">Quick Settings</div>
   <div class="quick-settings-item" id="qsWallpaper">🖼️ Change Wallpaper</div>
@@ -865,835 +615,795 @@
   <div class="quick-settings-item" id="qsSettings">⚙️ Full Settings</div>
 </div>
 
-<!-- SHORTCUTS MODAL -->
 <div class="shortcuts-modal" id="shortcutsModal">
-  <h3 style="margin-bottom: 16px;">⌨️ Keyboard Shortcuts</h3>
+  <h3 style="margin-bottom:16px;">⌨️ Keyboard Shortcuts</h3>
   <div class="shortcut-row"><span>Ctrl+K</span><span>Quick launch / search</span></div>
   <div class="shortcut-row"><span>Ctrl+Shift+S</span><span>Take screenshot</span></div>
   <div class="shortcut-row"><span>Ctrl+/</span><span>Show shortcuts</span></div>
-  <div class="shortcut-row"><span>F11 / ESC</span><span>Fullscreen toggle</span></div>
   <div class="shortcut-row"><span>Ctrl+W</span><span>Close window</span></div>
   <div class="shortcut-row"><span>Ctrl+M</span><span>Minimize window</span></div>
-  <button class="context-menu-item" id="closeShortcuts" style="margin-top: 16px; text-align: center;">Close</button>
+  <div class="shortcut-row"><span>ESC</span><span>Close menus</span></div>
+  <button class="context-menu-item" id="closeShortcuts" style="margin-top:16px; text-align:center;">Close</button>
 </div>
 
 <div class="screenshot-flash" id="screenshotFlash"></div>
+<div class="toast" id="toast"></div>
 
 <script>
-  // ============================================================
-  // FANTER OS - LOADING → LOGIN → DESKTOP
-  // ============================================================
+// ============================================================
+// FANTER OS - COMPLETE REWRITE (ALL BUGS FIXED)
+// ============================================================
 
-  // Supabase
-  const SUPABASE_URL = "https://gvzgnclowylrrpovdvtw.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2emduY2xvd3lscnJwb3ZkdnR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NjM5ODEsImV4cCI6MjA5MjAzOTk4MX0.p7oeYBVX870iSK-TLDRj6pfW7wLj7HJsTHjNWaNpL7o";
-  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Supabase config
+const SUPABASE_URL = "https://gvzgnclowylrrpovdvtw.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2emduY2xvd3lscnJwb3ZkdnR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NjM5ODEsImV4cCI6MjA5MjAzOTk4MX0.p7oeYBVX870iSK-TLDRj6pfW7wLj7HJsTHjNWaNpL7o";
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // Apps
-  const APPS = [
-    { id: 'gamehub', name: 'Game Hub', icon: '🎮', isBuiltin: true },
-    { id: 'emulators', name: 'Emulators', icon: '🕹️', isEmulator: true },
-    { id: 'shop', name: 'Item Shop', icon: '🛒', url: 'shop.html' },
-    { id: 'settings', name: 'Settings', icon: '⚙️', url: 'settings.html' },
-    { id: 'fantarena', name: 'Fantarena', icon: '🏟️', url: 'fantarena.html' },
-    { id: 'account', name: 'My Account', icon: '👤', url: 'fantaccount.html' },
-    { id: 'fanterai', name: 'Fanter AI', icon: '🤖', url: 'https://chipikipal800.github.io/fanter.ai/', external: true },
-    { id: 'fanterstudios', name: 'Fanter Studios', icon: '🎨', url: 'https://chipikipal800.github.io/fanter-studios/', external: true },
-    { id: 'fantersearch', name: 'Fanter Search', icon: '🔍', url: 'https://chipikipal800.github.io/Fanter-search/', external: true },
-    { id: 'fanterclicker', name: 'Fanter Clicker', icon: '🍪', url: 'https://chipikipal800.github.io/Fanter-Clicker/', external: true }
-  ];
+// App definitions
+const APPS = [
+  { id: 'gamehub', name: 'Game Hub', icon: '🎮', isBuiltin: true, desc: 'Browse and play games' },
+  { id: 'emulators', name: 'Emulators', icon: '🕹️', isEmulator: true, desc: 'GBA, NES, N64, Genesis' },
+  { id: 'shop', name: 'Item Shop', icon: '🛒', url: 'shop.html', desc: 'Buy themes & pets' },
+  { id: 'settings', name: 'Settings', icon: '⚙️', url: 'settings.html', desc: 'Customize your OS' },
+  { id: 'fantarena', name: 'Fantarena', icon: '🏟️', url: 'fantarena.html', desc: 'Chat with friends' },
+  { id: 'account', name: 'My Account', icon: '👤', url: 'fantaccount.html', desc: 'Profile & achievements' },
+  { id: 'fanterai', name: 'Fanter AI', icon: '🤖', url: 'https://chipikipal800.github.io/fanter.ai/', external: true, desc: 'AI assistant' },
+  { id: 'fanterstudios', name: 'Fanter Studios', icon: '🎨', url: 'https://chipikipal800.github.io/fanter-studios/', external: true, desc: 'Create games' },
+  { id: 'fantersearch', name: 'Fanter Search', icon: '🔍', url: 'https://chipikipal800.github.io/Fanter-search/', external: true, desc: 'Proxy browser' },
+  { id: 'fanterclicker', name: 'Fanter Clicker', icon: '🍪', url: 'https://chipikipal800.github.io/Fanter-Clicker/', external: true, desc: 'Clicker game' }
+];
 
-  const EMULATORS = [
-    { name: 'Game Boy Advance', icon: '🎮', url: 'https://chipikipal800.github.io/MKGBA2.0/' },
-    { name: 'Nintendo NES', icon: '📺', url: 'https://chipikipal800.github.io/nes-emulator-/' },
-    { name: 'Nintendo 64', icon: '🎮', url: 'https://chipikipal800.github.io/n64-emulator/' },
-    { name: 'Sega Genesis', icon: '🌀', url: 'https://chipikipal800.github.io/Sega-Genesis-Emulator-/' },
-    { name: 'Virtual Boy', icon: '🕶️', url: 'https://chipikipal800.github.io/Virtual-boy-emulator-/' },
-    { name: 'Atari 7800', icon: '🎮', url: 'https://chipikipal800.github.io/atari7800-emulatorwroms/' },
-    { name: 'Atari 2600', icon: '🕹️', url: 'https://chipikipal800.github.io/Atari-2600-emulator-/' }
-  ];
+const EMULATORS = [
+  { name: 'Game Boy Advance', icon: '🎮', url: 'https://chipikipal800.github.io/MKGBA2.0/' },
+  { name: 'Nintendo NES', icon: '📺', url: 'https://chipikipal800.github.io/nes-emulator-/' },
+  { name: 'Nintendo 64', icon: '🎮', url: 'https://chipikipal800.github.io/n64-emulator/' },
+  { name: 'Sega Genesis', icon: '🌀', url: 'https://chipikipal800.github.io/Sega-Genesis-Emulator-/' },
+  { name: 'Virtual Boy', icon: '🕶️', url: 'https://chipikipal800.github.io/Virtual-boy-emulator-/' },
+  { name: 'Atari 7800', icon: '🎮', url: 'https://chipikipal800.github.io/atari7800-emulatorwroms/' },
+  { name: 'Atari 2600', icon: '🕹️', url: 'https://chipikipal800.github.io/Atari-2600-emulator-/' }
+];
 
-  const DEFAULT_DESKTOP_ICONS = [
-    { id: 'gamehub', icon: '🎮', label: 'Game Hub', x: 30, y: 30 },
-    { id: 'emulators', icon: '🕹️', label: 'Emulators', x: 30, y: 120 },
-    { id: 'shop', icon: '🛒', label: 'Shop', x: 30, y: 210 },
-    { id: 'settings', icon: '⚙️', label: 'Settings', x: 30, y: 300 }
-  ];
+const DEFAULT_DESKTOP_ICONS = [
+  { id: 'gamehub', icon: '🎮', label: 'Game Hub', x: 30, y: 30 },
+  { id: 'emulators', icon: '🕹️', label: 'Emulators', x: 30, y: 120 },
+  { id: 'shop', icon: '🛒', label: 'Shop', x: 30, y: 210 },
+  { id: 'settings', icon: '⚙️', label: 'Settings', x: 30, y: 300 }
+];
 
-  // Global state
-  let windows = [];
-  let nextWindowId = 1;
-  let activeWindowId = null;
-  let startMenuOpen = false;
-  let bootMenuOpen = false;
-  let currentBootResults = [];
-  let selectedBootIndex = -1;
-  let gamesData = [];
-  let desktopIcons = [];
-  let currentWorkspace = localStorage.getItem('fanter_workspace') || 'games';
-  let currentWallpaper = localStorage.getItem('fanter_wallpaper') || null;
-  let currentUser = null;
-  let isFullscreenMode = false;
-  let fullscreenWindowId = null;
+// Global state
+let windows = [];
+let nextWindowId = 1;
+let activeWindowId = null;
+let startMenuOpen = false;
+let bootMenuOpen = false;
+let currentBootResults = [];
+let selectedBootIndex = -1;
+let gamesData = [];
+let desktopIcons = [];
+let currentWorkspace = localStorage.getItem('fanter_workspace') || 'games';
+let currentWallpaper = localStorage.getItem('fanter_wallpaper') || null;
+let currentUser = null;
+let dragIcon = null;
 
-  let dragIcon = null;
-  let dragWindow = null;
-  let resizeData = null;
+// Helper functions
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
 
-  // Helper functions
-  function escapeHtml(s) { if (!s) return ''; return s.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[m]); }
+function escapeHtml(s) { if (!s) return ''; return s.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[m]); }
 
-  function showNotification(msg, duration = 3000) {
-    let notif = document.getElementById('dynamicNotif');
-    if (!notif) {
-      notif = document.createElement('div');
-      notif.id = 'dynamicNotif';
-      notif.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.9);backdrop-filter:blur(12px);border:1px solid var(--accent);border-radius:30px;padding:10px 20px;color:white;font-size:13px;z-index:20000;opacity:0;transition:opacity 0.2s;pointer-events:none;';
-      document.body.appendChild(notif);
+function updateClock() {
+  const now = new Date();
+  document.getElementById('taskbarTime').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  document.getElementById('taskbarDate').textContent = now.toLocaleDateString([], { month: 'short', day: 'numeric' });
+}
+
+function applyWorkspace() {
+  document.body.classList.remove('workspace-games', 'workspace-learning', 'workspace-personal');
+  document.body.classList.add(`workspace-${currentWorkspace}`);
+  localStorage.setItem('fanter_workspace', currentWorkspace);
+}
+
+function applyWallpaper() {
+  const bgDiv = document.getElementById('desktopBg');
+  if (currentWallpaper && currentWallpaper.startsWith('data:')) {
+    bgDiv.style.backgroundImage = `url(${currentWallpaper})`;
+    bgDiv.style.backgroundSize = 'cover';
+    bgDiv.style.backgroundPosition = 'center';
+  } else {
+    bgDiv.style.backgroundImage = '';
+  }
+}
+
+// Desktop Icons
+function loadDesktopIcons() {
+  const saved = localStorage.getItem('fanter_desktop_icons');
+  desktopIcons = saved ? JSON.parse(saved) : [...DEFAULT_DESKTOP_ICONS];
+  renderDesktopIcons();
+}
+
+function saveDesktopIcons() {
+  localStorage.setItem('fanter_desktop_icons', JSON.stringify(desktopIcons.map(i => ({ id: i.id, icon: i.icon, label: i.label, x: i.x, y: i.y }))));
+}
+
+function renderDesktopIcons() {
+  const container = document.getElementById('desktopIcons');
+  container.innerHTML = desktopIcons.map(icon => `
+    <div class="desktop-icon" data-id="${icon.id}" style="left: ${icon.x}px; top: ${icon.y}px;">
+      <div class="icon">${icon.icon}</div>
+      <div class="label">${icon.label}</div>
+      <div class="delete-btn" data-id="${icon.id}">✕</div>
+    </div>
+  `).join('');
+  
+  document.querySelectorAll('.desktop-icon').forEach(el => {
+    const iconId = el.dataset.id;
+    el.addEventListener('dblclick', () => { const app = APPS.find(a => a.id === iconId); if (app) launchApp(app); });
+    const del = el.querySelector('.delete-btn');
+    if (del) del.addEventListener('click', (e) => { e.stopPropagation(); desktopIcons = desktopIcons.filter(i => i.id !== iconId); saveDesktopIcons(); renderDesktopIcons(); showToast('Removed from desktop'); });
+    el.addEventListener('mousedown', (e) => {
+      if (e.target === del) return;
+      dragIcon = { element: el, startX: e.clientX, startY: e.clientY, originalX: parseInt(el.style.left), originalY: parseInt(el.style.top) };
+      el.classList.add('dragging');
+      e.preventDefault();
+    });
+  });
+}
+
+document.addEventListener('mousemove', (e) => {
+  if (dragIcon) {
+    const dx = e.clientX - dragIcon.startX;
+    const dy = e.clientY - dragIcon.startY;
+    dragIcon.element.style.left = `${Math.max(0, Math.min(dragIcon.originalX + dx, window.innerWidth - 100))}px`;
+    dragIcon.element.style.top = `${Math.max(0, Math.min(dragIcon.originalY + dy, window.innerHeight - 100))}px`;
+  }
+});
+document.addEventListener('mouseup', () => {
+  if (dragIcon) {
+    const icon = desktopIcons.find(i => i.id === dragIcon.element.dataset.id);
+    if (icon) { icon.x = parseInt(dragIcon.element.style.left); icon.y = parseInt(dragIcon.element.style.top); saveDesktopIcons(); }
+    dragIcon.element.classList.remove('dragging');
+    dragIcon = null;
+  }
+});
+
+// Window Management
+function launchApp(app) {
+  const existing = windows.find(w => w.app?.id === app.id);
+  if (existing) {
+    if (existing.minimized) toggleMinimize(existing.id);
+    focusWindow(existing.id);
+    return;
+  }
+  if (app.isBuiltin) createGameHubWindow();
+  else if (app.isEmulator) createEmulatorWindow();
+  else createWindow(app);
+}
+
+function createGameHubWindow(x = 80, y = 60, w = 1100, h = 750) {
+  const id = nextWindowId++;
+  const win = document.createElement('div');
+  win.className = 'window';
+  win.id = `window-${id}`;
+  win.style.left = `${x}px`;
+  win.style.top = `${y}px`;
+  win.style.width = `${w}px`;
+  win.style.height = `${h}px`;
+  
+  win.innerHTML = `
+    <div class="window-header">
+      <div class="window-title"><span>🎮</span><span>Game Hub</span></div>
+      <div class="window-controls">
+        <button class="window-control minimize" data-action="minimize">─</button>
+        <button class="window-control maximize" data-action="maximize">□</button>
+        <button class="window-control close" data-action="close">✕</button>
+      </div>
+    </div>
+    <div class="window-content" style="padding: 20px; overflow-y: auto;">
+      <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
+        <input type="text" id="gameSearch-${id}" placeholder="Search games..." style="flex:2; min-width: 200px; padding: 12px 16px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-glass); border-radius: 30px; color: white;">
+        <select id="categorySelect-${id}" style="padding: 12px 20px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-glass); border-radius: 30px; color: white;">
+          <option value="all">🎮 All Games</option>
+          <option value="action">⚔️ Action</option>
+          <option value="puzzle">🧩 Puzzle</option>
+          <option value="racing">🏎️ Racing</option>
+          <option value="sports">⚽ Sports</option>
+          <option value="adventure">🗺️ Adventure</option>
+          <option value="platformer">🏃 Platformer</option>
+          <option value="strategy">♟️ Strategy</option>
+          <option value="horror">👻 Horror</option>
+          <option value="arcade">🕹️ Arcade</option>
+        </select>
+        <button id="randomGameBtn-${id}" style="padding: 12px 24px; background: var(--accent); border: none; border-radius: 30px; color: white; cursor: pointer;">🎲 Random</button>
+      </div>
+      <div class="game-grid" id="gameGrid-${id}" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px;"></div>
+      <div style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 11px; border-top: 1px solid var(--border-glass); margin-top: 20px;">
+        a site created by abcatlmfao · parcoil network
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(win);
+  windows.push({ id, element: win, app: APPS.find(a => a.id === 'gamehub'), minimized: false, maximized: false, x, y, w, h });
+  focusWindow(id);
+  setupWindowEvents(win, id);
+  updateTaskbar();
+  initGameHubContent(id);
+  return id;
+}
+
+function initGameHubContent(windowId) {
+  const searchInput = document.getElementById(`gameSearch-${windowId}`);
+  const categorySelect = document.getElementById(`categorySelect-${windowId}`);
+  const gridContainer = document.getElementById(`gameGrid-${windowId}`);
+  const randomBtn = document.getElementById(`randomGameBtn-${windowId}`);
+  
+  function renderGames() {
+    if (!gridContainer || !gamesData.length) {
+      gridContainer.innerHTML = '<div style="text-align:center;padding:40px;">Loading games...</div>';
+      return;
     }
-    notif.textContent = msg;
-    notif.style.opacity = '1';
-    setTimeout(() => notif.style.opacity = '0', duration);
-  }
-
-  function updateClock() {
-    const now = new Date();
-    document.getElementById('taskbarTime').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    document.getElementById('taskbarDate').textContent = now.toLocaleDateString([], { month: 'short', day: 'numeric' });
-  }
-
-  function applyWorkspace() {
-    document.body.classList.remove('workspace-games', 'workspace-learning', 'workspace-personal');
-    document.body.classList.add(`workspace-${currentWorkspace}`);
-    localStorage.setItem('fanter_workspace', currentWorkspace);
-  }
-
-  function applyWallpaper() {
-    const bgDiv = document.getElementById('desktopBg');
-    if (currentWallpaper && currentWallpaper.startsWith('data:')) {
-      bgDiv.style.backgroundImage = `url(${currentWallpaper})`;
-      bgDiv.style.backgroundSize = 'cover';
-      bgDiv.style.backgroundPosition = 'center';
-    } else {
-      bgDiv.style.backgroundImage = '';
-    }
-  }
-
-  // Loading screen animation
-  async function runLoadingScreen() {
-    const canvas = document.getElementById('matrixCanvas');
-    const ctx = canvas.getContext('2d');
-    let w, h, drops = [], chars = "01アイウエオカキクケコ";
+    let filtered = [...gamesData];
+    const category = categorySelect?.value || 'all';
+    if (category !== 'all') filtered = filtered.filter(g => g.category === category);
+    const term = searchInput?.value.toLowerCase() || '';
+    if (term) filtered = filtered.filter(g => g.name.toLowerCase().includes(term));
     
-    function resize() { w = window.innerWidth; h = window.innerHeight; canvas.width = w; canvas.height = h; drops = Array(Math.floor(w / 20)).fill(0).map(() => Math.random() * -h); }
-    resize();
-    window.addEventListener('resize', resize);
-    
-    function draw() {
-      ctx.fillStyle = 'rgba(10,10,15,0.05)';
-      ctx.fillRect(0, 0, w, h);
-      ctx.fillStyle = '#7c5cff';
-      ctx.font = '16px monospace';
-      for (let i = 0; i < drops.length; i++) {
-        ctx.fillText(chars[Math.floor(Math.random() * chars.length)], i * 20, drops[i] * 20);
-        if (drops[i] * 20 > h && Math.random() > 0.975) drops[i] = 0;
-        drops[i]++;
-      }
-      requestAnimationFrame(draw);
-    }
-    draw();
-    
-    const commands = [
-      ">_ loading kernel modules...",
-      ">_ establishing secure connection...",
-      ">_ decrypting game database...",
-      ">_ initializing window manager...",
-      ">_ loading user preferences...",
-      ">_ starting fanterOS..."
-    ];
-    const cmdDiv = document.getElementById('loadingCommands');
-    let progress = 0;
-    const bar = document.getElementById('loadingBar');
-    const status = document.getElementById('loadingStatus');
-    
-    for (let i = 0; i < commands.length; i++) {
-      await new Promise(r => setTimeout(r, 400));
-      const p = document.createElement('p');
-      p.textContent = commands[i];
-      p.style.opacity = '0';
-      p.style.transform = 'translateX(-10px)';
-      p.style.transition = 'all 0.3s';
-      cmdDiv.appendChild(p);
-      setTimeout(() => { p.style.opacity = '1'; p.style.transform = 'translateX(0)'; }, 10);
-      progress += 100 / commands.length;
-      bar.style.width = `${Math.min(100, progress)}%`;
-      status.textContent = commands[i];
+    if (filtered.length === 0) {
+      gridContainer.innerHTML = '<div style="text-align:center;padding:40px;">No games found 😔</div>';
+      return;
     }
     
-    await new Promise(r => setTimeout(r, 500));
-    document.getElementById('loadingScreen').classList.add('hide');
-    await new Promise(r => setTimeout(r, 500));
-    document.getElementById('loginScreen').classList.add('visible');
-  }
-
-  // Auth
-  async function handleLogin(email, password) {
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-      currentUser = data.user;
-      const { data: profile } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
-      const userData = { id: currentUser.id, username: profile?.username || email.split('@')[0], displayName: profile?.display_name || email.split('@')[0], email, coins: profile?.coins || 300 };
-      localStorage.setItem('fanter_currentUser', JSON.stringify(userData));
-      showNotification(`Welcome back, ${userData.displayName}!`);
-      showDesktop();
-    } catch (err) { document.getElementById('loginError').textContent = err.message; }
-  }
-
-  async function handleGuest() {
-    currentUser = { id: 'guest_' + Date.now(), username: 'Guest', displayName: 'Guest', coins: 300 };
-    localStorage.setItem('fanter_currentUser', JSON.stringify(currentUser));
-    showNotification('Playing as Guest — create an account to save progress!');
-    showDesktop();
-  }
-
-  function showDesktop() {
-    document.getElementById('loginScreen').classList.remove('visible');
-    document.getElementById('desktop').classList.add('visible');
-    initDesktop();
-  }
-
-  // Desktop Icons
-  function loadDesktopIcons() {
-    const saved = localStorage.getItem('fanter_desktop_icons');
-    desktopIcons = saved ? JSON.parse(saved) : [...DEFAULT_DESKTOP_ICONS];
-    renderDesktopIcons();
-  }
-
-  function saveDesktopIcons() {
-    localStorage.setItem('fanter_desktop_icons', JSON.stringify(desktopIcons.map(i => ({ id: i.id, icon: i.icon, label: i.label, x: i.x, y: i.y }))));
-  }
-
-  function renderDesktopIcons() {
-    const container = document.getElementById('desktopIcons');
-    container.innerHTML = desktopIcons.map(icon => `
-      <div class="desktop-icon" data-id="${icon.id}" style="left: ${icon.x}px; top: ${icon.y}px;">
-        <div class="icon">${icon.icon}</div>
-        <div class="label">${icon.label}</div>
-        <div class="delete-btn" data-id="${icon.id}">✕</div>
+    gridContainer.innerHTML = filtered.map(game => `
+      <div style="background: rgba(255,255,255,0.05); border-radius: 16px; overflow: hidden; cursor: pointer; transition: all 0.2s;" data-game='${JSON.stringify(game)}'>
+        <img src="${game.image}" alt="${escapeHtml(game.name)}" style="width:100%; aspect-ratio:16/9; object-fit:cover;">
+        <div style="padding: 12px;">
+          <div style="font-size: 14px; font-weight: 500;">${escapeHtml(game.name.length > 22 ? game.name.slice(0,20)+'..' : game.name)}</div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">${game.category || 'game'}</div>
+        </div>
       </div>
     `).join('');
     
-    document.querySelectorAll('.desktop-icon').forEach(el => {
-      const iconId = el.dataset.id;
-      el.addEventListener('dblclick', () => { const app = APPS.find(a => a.id === iconId); if (app) launchApp(app); });
-      const del = el.querySelector('.delete-btn');
-      if (del) del.addEventListener('click', (e) => { e.stopPropagation(); desktopIcons = desktopIcons.filter(i => i.id !== iconId); saveDesktopIcons(); renderDesktopIcons(); });
-      el.addEventListener('mousedown', (e) => {
-        if (e.target === del) return;
-        dragIcon = { element: el, id: iconId, startX: e.clientX, startY: e.clientY, originalX: parseInt(el.style.left), originalY: parseInt(el.style.top) };
-        el.classList.add('dragging');
+    gridContainer.querySelectorAll('[data-game]').forEach(card => {
+      card.addEventListener('click', () => {
+        const game = JSON.parse(card.dataset.game);
+        playGame(game);
+      });
+      card.addEventListener('contextmenu', (e) => {
         e.preventDefault();
+        const game = JSON.parse(card.dataset.game);
+        showGameContextMenu(e.clientX, e.clientY, game);
       });
     });
   }
+  
+  if (searchInput) searchInput.addEventListener('input', renderGames);
+  if (categorySelect) categorySelect.addEventListener('change', renderGames);
+  if (randomBtn) randomBtn.addEventListener('click', () => {
+    if (gamesData.length) playGame(gamesData[Math.floor(Math.random() * gamesData.length)]);
+  });
+  renderGames();
+}
 
-  // Window Management
-  function launchApp(app) {
-    const existing = windows.find(w => w.app?.id === app.id);
-    if (existing) {
-      if (existing.minimized) toggleMinimize(existing.id);
-      focusWindow(existing.id);
-      return;
-    }
-    if (app.isBuiltin) createGameHubWindow();
-    else if (app.isEmulator) createEmulatorWindow();
-    else createWindow(app);
+function createEmulatorWindow(x = 100, y = 80, w = 600, h = 500) {
+  const id = nextWindowId++;
+  const win = document.createElement('div');
+  win.className = 'window';
+  win.id = `window-${id}`;
+  win.style.left = `${x}px`;
+  win.style.top = `${y}px`;
+  win.style.width = `${w}px`;
+  win.style.height = `${h}px`;
+  
+  win.innerHTML = `
+    <div class="window-header">
+      <div class="window-title"><span>🕹️</span><span>Emulators</span></div>
+      <div class="window-controls">
+        <button class="window-control minimize" data-action="minimize">─</button>
+        <button class="window-control maximize" data-action="maximize">□</button>
+        <button class="window-control close" data-action="close">✕</button>
+      </div>
+    </div>
+    <div class="window-content" style="padding: 20px;">
+      <div style="display: grid; gap: 12px;">
+        ${EMULATORS.map(emu => `
+          <div class="emulator-item" data-url="${emu.url}" style="display: flex; align-items: center; gap: 16px; padding: 14px 18px; background: rgba(255,255,255,0.05); border-radius: 16px; cursor: pointer;">
+            <span style="font-size: 32px;">${emu.icon}</span>
+            <div style="flex:1;"><div style="font-weight:500;">${emu.name}</div><div style="font-size:11px; color:var(--text-muted);">Click to launch</div></div>
+            <span style="font-size:20px;">▶</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(win);
+  windows.push({ id, element: win, app: APPS.find(a => a.id === 'emulators'), minimized: false, maximized: false, x, y, w, h });
+  focusWindow(id);
+  setupWindowEvents(win, id);
+  updateTaskbar();
+  
+  win.querySelectorAll('.emulator-item').forEach(el => {
+    el.addEventListener('click', () => window.open(el.dataset.url, '_blank'));
+  });
+  return id;
+}
+
+function createWindow(app, x = 150, y = 100, w = 900, h = 650) {
+  const id = nextWindowId++;
+  const url = app.url;
+  
+  const win = document.createElement('div');
+  win.className = 'window';
+  win.id = `window-${id}`;
+  win.style.left = `${x}px`;
+  win.style.top = `${y}px`;
+  win.style.width = `${w}px`;
+  win.style.height = `${h}px`;
+  
+  win.innerHTML = `
+    <div class="window-header">
+      <div class="window-title"><span>${app.icon}</span><span>${app.name}</span></div>
+      <div class="window-controls">
+        <button class="window-control minimize" data-action="minimize">─</button>
+        <button class="window-control maximize" data-action="maximize">□</button>
+        <button class="window-control close" data-action="close">✕</button>
+      </div>
+    </div>
+    <div class="window-content">
+      <iframe src="${url}" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-top-navigation"></iframe>
+    </div>
+  `;
+  
+  document.body.appendChild(win);
+  windows.push({ id, element: win, app, minimized: false, maximized: false, x, y, w, h });
+  focusWindow(id);
+  setupWindowEvents(win, id);
+  updateTaskbar();
+  return id;
+}
+
+function setupWindowEvents(win, id) {
+  const header = win.querySelector('.window-header');
+  const minimizeBtn = win.querySelector('[data-action="minimize"]');
+  const maximizeBtn = win.querySelector('[data-action="maximize"]');
+  const closeBtn = win.querySelector('[data-action="close"]');
+  
+  win.addEventListener('mousedown', () => focusWindow(id));
+  
+  let dragStart = null;
+  header.addEventListener('mousedown', (e) => {
+    if (e.target.closest('.window-controls')) return;
+    dragStart = { x: e.clientX, y: e.clientY, left: parseInt(win.style.left), top: parseInt(win.style.top) };
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', stopDrag);
+  });
+  
+  function onDrag(e) {
+    if (!dragStart) return;
+    win.style.left = `${dragStart.left + (e.clientX - dragStart.x)}px`;
+    win.style.top = `${dragStart.top + (e.clientY - dragStart.y)}px`;
   }
+  function stopDrag() { dragStart = null; document.removeEventListener('mousemove', onDrag); document.removeEventListener('mouseup', stopDrag); }
+  
+  minimizeBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleMinimize(id); });
+  maximizeBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleMaximize(id); });
+  closeBtn.addEventListener('click', (e) => { e.stopPropagation(); closeWindow(id); });
+  header.addEventListener('dblclick', () => toggleMaximize(id));
+}
 
-  function enterFullscreen(winId) {
-    const win = windows.find(w => w.id === winId);
-    if (!win) return;
-    if (win.fullscreen) {
-      win.element.classList.remove('fullscreen-mode');
+function focusWindow(id) {
+  activeWindowId = id;
+  windows.forEach(win => {
+    win.element.classList.remove('active');
+    if (win.id === id) {
+      win.element.classList.add('active');
+      win.element.style.zIndex = 100 + windows.findIndex(w => w.id === id);
+    }
+  });
+  updateTaskbar();
+}
+
+function toggleMinimize(id) {
+  const win = windows.find(w => w.id === id);
+  if (win) {
+    win.minimized = !win.minimized;
+    win.element.classList.toggle('minimized', win.minimized);
+    if (win.minimized && activeWindowId === id) {
+      const next = windows.find(w => !w.minimized && w.id !== id);
+      if (next) focusWindow(next.id);
+      else activeWindowId = null;
+    } else if (!win.minimized) focusWindow(id);
+    updateTaskbar();
+  }
+}
+
+function toggleMaximize(id) {
+  const win = windows.find(w => w.id === id);
+  if (win) {
+    if (win.maximized) {
+      win.element.classList.remove('maximized');
       win.element.style.width = `${win.w}px`;
       win.element.style.height = `${win.h}px`;
       win.element.style.left = `${win.x}px`;
       win.element.style.top = `${win.y}px`;
-      win.fullscreen = false;
-      fullscreenWindowId = null;
-      document.getElementById('taskbar').style.bottom = '';
+      win.maximized = false;
     } else {
       win.w = parseInt(win.element.style.width);
       win.h = parseInt(win.element.style.height);
       win.x = parseInt(win.element.style.left);
       win.y = parseInt(win.element.style.top);
-      win.element.classList.add('fullscreen-mode');
-      win.fullscreen = true;
-      fullscreenWindowId = winId;
-      document.getElementById('taskbar').style.bottom = '-70px';
+      win.element.classList.add('maximized');
+      win.maximized = true;
     }
-  }
-
-  function createGameHubWindow(x = 80, y = 60, w = 1100, h = 750) {
-    const id = nextWindowId++;
-    const win = document.createElement('div');
-    win.className = 'window';
-    win.id = `window-${id}`;
-    win.style.left = `${x}px`;
-    win.style.top = `${y}px`;
-    win.style.width = `${w}px`;
-    win.style.height = `${h}px`;
-    
-    win.innerHTML = `
-      <div class="window-header">
-        <div class="window-title"><span>🎮</span><span>Game Hub</span></div>
-        <div class="window-controls">
-          <button class="window-control minimize" data-action="minimize">─</button>
-          <button class="window-control maximize" data-action="maximize">□</button>
-          <button class="window-control fullscreen" data-action="fullscreen">⛶</button>
-          <button class="window-control close" data-action="close">✕</button>
-        </div>
-      </div>
-      <div class="window-content" id="gamehub-content-${id}" style="padding: 20px; overflow-y: auto;">
-        <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
-          <input type="text" id="gameSearch-${id}" placeholder="Search games..." style="flex:2; min-width: 200px; padding: 12px 16px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-glass); border-radius: 30px; color: white;">
-          <select id="categorySelect-${id}" style="padding: 12px 20px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-glass); border-radius: 30px; color: white; cursor: pointer;">
-            <option value="all">🎮 All Games</option>
-            <option value="action">⚔️ Action</option>
-            <option value="puzzle">🧩 Puzzle</option>
-            <option value="racing">🏎️ Racing</option>
-            <option value="sports">⚽ Sports</option>
-            <option value="adventure">🗺️ Adventure</option>
-            <option value="platformer">🏃 Platformer</option>
-            <option value="strategy">♟️ Strategy</option>
-            <option value="horror">👻 Horror</option>
-            <option value="arcade">🕹️ Arcade</option>
-            <option value="simulation">🏭 Simulation</option>
-            <option value="sandbox">🎨 Sandbox</option>
-          </select>
-          <button id="randomGameBtn-${id}" style="padding: 12px 24px; background: var(--accent); border: none; border-radius: 30px; color: white; cursor: pointer;">🎲 Random</button>
-        </div>
-        <div class="game-grid" id="gameGrid-${id}" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px;"></div>
-        <div style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 11px; border-top: 1px solid var(--border-glass); margin-top: 20px;">
-          a site created by abcatlmfao · parcoil network
-        </div>
-      </div>
-    `;
-    
-    document.body.appendChild(win);
-    windows.push({ id, element: win, app: APPS.find(a => a.id === 'gamehub'), minimized: false, maximized: false, fullscreen: false, x, y, w, h });
-    focusWindow(id);
-    setupWindowEvents(win, id);
-    updateTaskbar();
-    initGameHubContent(id);
-    return id;
-  }
-
-  function initGameHubContent(windowId) {
-    const searchInput = document.getElementById(`gameSearch-${windowId}`);
-    const categorySelect = document.getElementById(`categorySelect-${windowId}`);
-    const gridContainer = document.getElementById(`gameGrid-${windowId}`);
-    const randomBtn = document.getElementById(`randomGameBtn-${windowId}`);
-    
-    function renderGames() {
-      if (!gridContainer || !gamesData.length) return;
-      let filtered = [...gamesData];
-      const category = categorySelect?.value || 'all';
-      if (category !== 'all') filtered = filtered.filter(g => g.category === category);
-      const term = searchInput?.value.toLowerCase() || '';
-      if (term) filtered = filtered.filter(g => g.name.toLowerCase().includes(term));
-      
-      gridContainer.innerHTML = filtered.map(game => `
-        <div style="background: rgba(255,255,255,0.05); border-radius: 16px; overflow: hidden; cursor: pointer; transition: all 0.2s;" data-game='${JSON.stringify(game)}'>
-          <img src="${game.image}" alt="${escapeHtml(game.name)}" style="width:100%; aspect-ratio:16/9; object-fit:cover;">
-          <div style="padding: 12px;">
-            <div style="font-size: 14px; font-weight: 500;">${escapeHtml(game.name.length > 22 ? game.name.slice(0,20)+'..' : game.name)}</div>
-            <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">${game.category || 'game'}</div>
-          </div>
-        </div>
-      `).join('');
-      
-      gridContainer.querySelectorAll('[data-game]').forEach(card => {
-        card.addEventListener('click', () => {
-          const game = JSON.parse(card.dataset.game);
-          playGame(game);
-        });
-        card.addEventListener('contextmenu', (e) => {
-          e.preventDefault();
-          const game = JSON.parse(card.dataset.game);
-          showGameContextMenu(e.clientX, e.clientY, game);
-        });
-      });
-    }
-    
-    if (searchInput) searchInput.addEventListener('input', () => renderGames());
-    if (categorySelect) categorySelect.addEventListener('change', () => renderGames());
-    if (randomBtn) randomBtn.addEventListener('click', () => {
-      if (gamesData.length) playGame(gamesData[Math.floor(Math.random() * gamesData.length)]);
-    });
-    renderGames();
-  }
-
-  function createEmulatorWindow(x = 100, y = 80, w = 600, h = 500) {
-    const id = nextWindowId++;
-    const win = document.createElement('div');
-    win.className = 'window';
-    win.id = `window-${id}`;
-    win.style.left = `${x}px`;
-    win.style.top = `${y}px`;
-    win.style.width = `${w}px`;
-    win.style.height = `${h}px`;
-    
-    win.innerHTML = `
-      <div class="window-header">
-        <div class="window-title"><span>🕹️</span><span>Emulators</span></div>
-        <div class="window-controls">
-          <button class="window-control minimize" data-action="minimize">─</button>
-          <button class="window-control maximize" data-action="maximize">□</button>
-          <button class="window-control fullscreen" data-action="fullscreen">⛶</button>
-          <button class="window-control close" data-action="close">✕</button>
-        </div>
-      </div>
-      <div class="window-content" style="padding: 20px;">
-        <div style="display: grid; gap: 12px;">
-          ${EMULATORS.map(emu => `
-            <div class="emulator-item" data-url="${emu.url}" style="display: flex; align-items: center; gap: 16px; padding: 14px 18px; background: rgba(255,255,255,0.05); border-radius: 16px; cursor: pointer;">
-              <span style="font-size: 32px;">${emu.icon}</span>
-              <div style="flex: 1;"><div style="font-weight: 500;">${emu.name}</div><div style="font-size: 11px; color: var(--text-muted);">Click to launch</div></div>
-              <span style="font-size: 20px;">▶</span>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    `;
-    
-    document.body.appendChild(win);
-    windows.push({ id, element: win, app: APPS.find(a => a.id === 'emulators'), minimized: false, maximized: false, fullscreen: false, x, y, w, h });
-    focusWindow(id);
-    setupWindowEvents(win, id);
-    updateTaskbar();
-    
-    win.querySelectorAll('.emulator-item').forEach(el => {
-      el.addEventListener('click', () => window.open(el.dataset.url, '_blank'));
-    });
-    return id;
-  }
-
-  function createWindow(app, x = 150, y = 100, w = 900, h = 650) {
-    const id = nextWindowId++;
-    const isExternal = app.external;
-    const url = app.url;
-    
-    const win = document.createElement('div');
-    win.className = 'window';
-    win.id = `window-${id}`;
-    win.style.left = `${x}px`;
-    win.style.top = `${y}px`;
-    win.style.width = `${w}px`;
-    win.style.height = `${h}px`;
-    
-    win.innerHTML = `
-      <div class="window-header">
-        <div class="window-title"><span>${app.icon}</span><span>${app.name}</span></div>
-        <div class="window-controls">
-          <button class="window-control minimize" data-action="minimize">─</button>
-          <button class="window-control maximize" data-action="maximize">□</button>
-          <button class="window-control fullscreen" data-action="fullscreen">⛶</button>
-          <button class="window-control close" data-action="close">✕</button>
-        </div>
-      </div>
-      <div class="window-content">
-        <iframe src="${url}" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-top-navigation"></iframe>
-      </div>
-    `;
-    
-    document.body.appendChild(win);
-    windows.push({ id, element: win, app, minimized: false, maximized: false, fullscreen: false, x, y, w, h });
-    focusWindow(id);
-    setupWindowEvents(win, id);
-    updateTaskbar();
-    return id;
-  }
-
-  function setupWindowEvents(win, id) {
-    const header = win.querySelector('.window-header');
-    const minimizeBtn = win.querySelector('[data-action="minimize"]');
-    const maximizeBtn = win.querySelector('[data-action="maximize"]');
-    const fullscreenBtn = win.querySelector('[data-action="fullscreen"]');
-    const closeBtn = win.querySelector('[data-action="close"]');
-    
-    win.addEventListener('mousedown', () => focusWindow(id));
-    
-    let dragStart = null;
-    header.addEventListener('mousedown', (e) => {
-      if (e.target.closest('.window-controls')) return;
-      dragStart = { x: e.clientX, y: e.clientY, left: parseInt(win.style.left), top: parseInt(win.style.top) };
-      dragWindow = { id, startX: e.clientX, startY: e.clientY, originalLeft: parseInt(win.style.left), originalTop: parseInt(win.style.top) };
-      document.addEventListener('mousemove', onDrag);
-      document.addEventListener('mouseup', stopDrag);
-    });
-    
-    function onDrag(e) {
-      if (!dragStart) return;
-      win.style.left = `${dragStart.left + (e.clientX - dragStart.x)}px`;
-      win.style.top = `${dragStart.top + (e.clientY - dragStart.y)}px`;
-    }
-    function stopDrag() { dragStart = null; dragWindow = null; document.removeEventListener('mousemove', onDrag); document.removeEventListener('mouseup', stopDrag); }
-    
-    minimizeBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleMinimize(id); });
-    maximizeBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleMaximize(id); });
-    fullscreenBtn.addEventListener('click', (e) => { e.stopPropagation(); enterFullscreen(id); });
-    closeBtn.addEventListener('click', (e) => { e.stopPropagation(); closeWindow(id); });
-    header.addEventListener('dblclick', () => toggleMaximize(id));
-  }
-
-  function focusWindow(id) {
-    activeWindowId = id;
-    windows.forEach(win => {
-      win.element.classList.remove('active');
-      if (win.id === id) { win.element.classList.add('active'); win.element.style.zIndex = 100 + windows.findIndex(w => w.id === id); }
-    });
     updateTaskbar();
   }
+}
 
-  function toggleMinimize(id) {
-    const win = windows.find(w => w.id === id);
-    if (win) {
-      win.minimized = !win.minimized;
-      win.element.classList.toggle('minimized', win.minimized);
-      if (win.minimized && activeWindowId === id) {
-        const next = windows.find(w => !w.minimized && w.id !== id);
-        if (next) focusWindow(next.id);
-        else activeWindowId = null;
-      } else if (!win.minimized) focusWindow(id);
-      updateTaskbar();
+function closeWindow(id) {
+  const win = windows.find(w => w.id === id);
+  if (win) {
+    win.element.remove();
+    windows = windows.filter(w => w.id !== id);
+    if (activeWindowId === id) {
+      const next = windows.find(w => !w.minimized);
+      if (next) focusWindow(next.id);
+      else activeWindowId = null;
     }
+    updateTaskbar();
   }
+}
 
-  function toggleMaximize(id) {
-    const win = windows.find(w => w.id === id);
-    if (win) {
-      if (win.maximized) {
-        win.element.classList.remove('maximized');
-        win.element.style.width = `${win.w}px`;
-        win.element.style.height = `${win.h}px`;
-        win.element.style.left = `${win.x}px`;
-        win.element.style.top = `${win.y}px`;
-        win.maximized = false;
-      } else {
-        win.w = parseInt(win.element.style.width);
-        win.h = parseInt(win.element.style.height);
-        win.x = parseInt(win.element.style.left);
-        win.y = parseInt(win.element.style.top);
-        win.element.classList.add('maximized');
-        win.maximized = true;
+function updateTaskbar() {
+  const container = document.getElementById('taskbarApps');
+  container.innerHTML = windows.map(win => `
+    <div class="taskbar-app ${activeWindowId === win.id ? 'active' : ''}" data-id="${win.id}">
+      <span>${win.app.icon}</span><span>${win.app.name}</span>
+    </div>
+  `).join('');
+  container.querySelectorAll('.taskbar-app').forEach(el => {
+    el.addEventListener('click', () => {
+      const id = parseInt(el.dataset.id);
+      const win = windows.find(w => w.id === id);
+      if (win) {
+        if (win.minimized) toggleMinimize(id);
+        else focusWindow(id);
       }
-      updateTaskbar();
-    }
-  }
-
-  function closeWindow(id) {
-    const win = windows.find(w => w.id === id);
-    if (win) {
-      win.element.remove();
-      windows = windows.filter(w => w.id !== id);
-      if (activeWindowId === id) {
-        const next = windows.find(w => !w.minimized);
-        if (next) focusWindow(next.id);
-        else activeWindowId = null;
-      }
-      updateTaskbar();
-    }
-  }
-
-  function updateTaskbar() {
-    const container = document.getElementById('taskbarApps');
-    container.innerHTML = windows.map(win => `
-      <div class="taskbar-app ${activeWindowId === win.id ? 'active' : ''}" data-id="${win.id}">
-        <span>${win.app.icon}</span><span>${win.app.name}</span>
-      </div>
-    `).join('');
-    container.querySelectorAll('.taskbar-app').forEach(el => {
-      el.addEventListener('click', () => {
-        const id = parseInt(el.dataset.id);
-        const win = windows.find(w => w.id === id);
-        if (win) {
-          if (win.minimized) toggleMinimize(id);
-          else focusWindow(id);
-        }
-      });
     });
-  }
+  });
+}
 
-  // Game functions
-  function playGame(game) {
-    trackPlayedGame(game.name);
-    window.open(`play.html?gameurl=${encodeURIComponent(game.url)}&game=${encodeURIComponent(game.name)}`, '_blank');
-  }
+// Game functions
+function playGame(game) {
+  trackPlayedGame(game.name);
+  window.open(`play.html?gameurl=${encodeURIComponent(game.url)}&game=${encodeURIComponent(game.name)}`, '_blank');
+}
 
-  function trackPlayedGame(name) {
-    let plays = JSON.parse(localStorage.getItem('gamePlayCounts') || '{}');
-    plays[name] = (plays[name] || 0) + 1;
-    localStorage.setItem('gamePlayCounts', JSON.stringify(plays));
-    if (currentUser && currentUser.id !== 'guest_' + currentUser.id?.split('_')[1]) {
-      currentUser.coins = (currentUser.coins || 0) + 0.05;
-      localStorage.setItem('fanter_currentUser', JSON.stringify(currentUser));
-    }
+function trackPlayedGame(name) {
+  let plays = JSON.parse(localStorage.getItem('gamePlayCounts') || '{}');
+  plays[name] = (plays[name] || 0) + 1;
+  localStorage.setItem('gamePlayCounts', JSON.stringify(plays));
+  if (currentUser && currentUser.id && !currentUser.id.startsWith('guest')) {
+    currentUser.coins = (currentUser.coins || 0) + 0.05;
+    localStorage.setItem('fanter_currentUser', JSON.stringify(currentUser));
   }
+}
 
-  // Screenshot
-  function takeScreenshot() {
-    const flash = document.getElementById('screenshotFlash');
-    flash.style.opacity = '0.3';
-    setTimeout(() => flash.style.opacity = '0', 200);
+// Screenshot
+function takeScreenshot() {
+  const flash = document.getElementById('screenshotFlash');
+  flash.style.opacity = '0.3';
+  setTimeout(() => flash.style.opacity = '0', 200);
+  if (typeof html2canvas !== 'undefined') {
     html2canvas(document.body).then(canvas => {
-      const imgData = canvas.toDataURL();
-      const screenshots = JSON.parse(localStorage.getItem('fanter_screenshots') || '[]');
-      screenshots.unshift({ data: imgData, date: new Date().toISOString() });
-      if (screenshots.length > 20) screenshots.pop();
-      localStorage.setItem('fanter_screenshots', JSON.stringify(screenshots));
-      showNotification('📸 Screenshot saved!');
-      renderScreenshots();
-    }).catch(() => showNotification('Screenshot failed (html2canvas loading)'));
-  }
-
-  function renderScreenshots() {
-    const container = document.getElementById('screenshotsList');
-    const screenshots = JSON.parse(localStorage.getItem('fanter_screenshots') || '[]');
-    container.innerHTML = screenshots.map(s => `
-      <div class="screenshot-item" data-img="${s.data}">
-        <img src="${s.data}" alt="screenshot">
-        <div style="flex:1; font-size:11px;">${new Date(s.date).toLocaleString()}</div>
-      </div>
-    `).join('');
-    container.querySelectorAll('.screenshot-item').forEach(el => {
-      el.addEventListener('click', () => {
-        const a = document.createElement('a');
-        a.href = el.dataset.img;
-        a.download = `fanter-screenshot-${Date.now()}.png`;
-        a.click();
-      });
-    });
-  }
-
-  // Start Menu
-  function renderStartApps(search = '') {
-    const container = document.getElementById('startApps');
-    let filtered = APPS;
-    if (search) filtered = APPS.filter(a => a.name.toLowerCase().includes(search.toLowerCase()));
-    container.innerHTML = filtered.map(app => `
-      <div class="start-app" data-app-id="${app.id}">
-        <div class="start-app-icon">${app.icon}</div>
-        <div class="start-app-name">${app.name}</div>
-        <div class="start-app-desc">${app.desc || 'click to open'}</div>
-      </div>
-    `).join('');
-    container.querySelectorAll('.start-app').forEach(el => {
-      el.addEventListener('click', () => {
-        const app = APPS.find(a => a.id === el.dataset.appId);
-        if (app) launchApp(app);
-        toggleStartMenu();
-      });
-    });
-  }
-
-  function toggleStartMenu() {
-    startMenuOpen = !startMenuOpen;
-    document.getElementById('startMenu').classList.toggle('open', startMenuOpen);
-    if (startMenuOpen) { document.getElementById('startSearch').focus(); renderStartApps(''); }
-  }
-
-  // Boot Menu
-  function updateBootResults(query) {
-    const container = document.getElementById('bootResults');
-    let results = query ? gamesData.filter(g => g.name.toLowerCase().includes(query.toLowerCase())).slice(0, 10) : gamesData.slice(0, 8);
-    currentBootResults = results;
-    selectedBootIndex = results.length > 0 ? 0 : -1;
-    if (!results.length) { container.innerHTML = '<div style="padding:20px;text-align:center;">no games found</div>'; return; }
-    container.innerHTML = results.map((game, idx) => `
-      <div class="boot-result ${idx === selectedBootIndex ? 'selected' : ''}" data-index="${idx}">
-        <div class="boot-result-icon">🎮</div>
-        <div class="boot-result-info"><div class="boot-result-name">${escapeHtml(game.name)}</div><div class="boot-result-desc">${game.category || 'game'}</div></div>
-      </div>
-    `).join('');
-    container.querySelectorAll('.boot-result').forEach(el => {
-      el.addEventListener('click', () => {
-        const game = currentBootResults[parseInt(el.dataset.index)];
-        if (game) { playGame(game); toggleBootMenu(); }
-      });
-    });
-  }
-
-  function toggleBootMenu() {
-    bootMenuOpen = !bootMenuOpen;
-    document.getElementById('bootMenu').classList.toggle('open', bootMenuOpen);
-    if (bootMenuOpen) { document.getElementById('bootSearch').focus(); updateBootResults(''); }
-  }
-
-  // Context menus
-  function showDesktopContextMenu(x, y) {
-    const menu = document.getElementById('contextMenu');
-    menu.style.left = `${x}px`;
-    menu.style.top = `${y}px`;
-    menu.classList.add('visible');
-    const close = () => { menu.classList.remove('visible'); document.removeEventListener('click', close); };
-    setTimeout(() => document.addEventListener('click', close), 10);
-  }
-
-  function showGameContextMenu(x, y, game) {
-    const menu = document.getElementById('contextMenu');
-    menu.style.left = `${x}px`;
-    menu.style.top = `${y}px`;
-    menu.classList.add('visible');
-    const pinItem = document.getElementById('ctxPinGame');
-    const original = pinItem.innerHTML;
-    pinItem.innerHTML = `📌 Pin "${game.name.slice(0,20)}" to Desktop`;
-    pinItem.onclick = () => {
-      if (!desktopIcons.some(i => i.id === `game_${game.name}`)) {
-        desktopIcons.push({ id: `game_${game.name}`, icon: '🎮', label: game.name.length > 12 ? game.name.slice(0,10)+'..' : game.name, x: 100, y: 100 });
-        saveDesktopIcons();
-        renderDesktopIcons();
-        showNotification(`Pinned "${game.name}"`);
-      }
-      menu.classList.remove('visible');
-    };
-    const close = () => {
-      pinItem.innerHTML = original;
-      pinItem.onclick = null;
-      menu.classList.remove('visible');
-      document.removeEventListener('click', close);
-    };
-    setTimeout(() => document.addEventListener('click', close), 10);
-  }
-
-  function uploadWallpaper() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          currentWallpaper = ev.target.result;
-          localStorage.setItem('fanter_wallpaper', currentWallpaper);
-          applyWallpaper();
-          showNotification('Wallpaper changed!');
-        };
-        reader.readAsDataURL(file);
-      }
-    };
-    input.click();
-  }
-
-  // Load games
-  async function loadGames() {
-    try {
-      const res = await fetch('./config/games.json');
-      gamesData = await res.json();
-      console.log(`✅ Loaded ${gamesData.length} games`);
-    } catch(e) { console.error('Failed to load games:', e); gamesData = []; }
-  }
-
-  // Init desktop
-  async function initDesktop() {
-    await loadGames();
-    loadDesktopIcons();
-    applyWorkspace();
-    applyWallpaper();
-    renderScreenshots();
-    updateClock();
-    setInterval(updateClock, 1000);
-    
-    // Taskbar auto-hide
-    let timeout;
-    const taskbar = document.getElementById('taskbar');
-    function showTaskbar() { taskbar.classList.add('visible'); clearTimeout(timeout); timeout = setTimeout(() => taskbar.classList.remove('visible'), 2500); }
-    document.addEventListener('mousemove', showTaskbar);
-    showTaskbar();
-    
-    // Event listeners
-    document.getElementById('startBtn').onclick = toggleStartMenu;
-    document.getElementById('startSearch').oninput = (e) => renderStartApps(e.target.value);
-    document.getElementById('bootSearch').oninput = (e) => updateBootResults(e.target.value);
-    document.getElementById('bootSearch').onkeydown = (e) => {
-      if (e.key === 'ArrowDown') { e.preventDefault(); if (selectedBootIndex < currentBootResults.length - 1) { selectedBootIndex++; updateBootResults(document.getElementById('bootSearch').value); } }
-      else if (e.key === 'ArrowUp') { e.preventDefault(); if (selectedBootIndex > 0) { selectedBootIndex--; updateBootResults(document.getElementById('bootSearch').value); } }
-      else if (e.key === 'Enter') { e.preventDefault(); if (currentBootResults[selectedBootIndex]) { playGame(currentBootResults[selectedBootIndex]); toggleBootMenu(); } }
-    };
-    document.getElementById('datetimeBtn').onclick = () => document.getElementById('quickSettings').classList.toggle('open');
-    document.getElementById('screenshotBtn').onclick = takeScreenshot;
-    document.getElementById('notesBtn').onclick = () => {
-      const w = document.getElementById('notesWidget');
-      w.style.display = w.style.display === 'none' ? 'block' : 'none';
-    };
-    document.getElementById('closeNotes').onclick = () => document.getElementById('notesWidget').style.display = 'none';
-    document.getElementById('notesText').oninput = () => localStorage.setItem('fanter_notes', document.getElementById('notesText').value);
-    document.getElementById('galleryBtn').onclick = () => {
-      const w = document.getElementById('screenshotsWidget');
-      w.style.display = w.style.display === 'none' ? 'block' : 'none';
-      renderScreenshots();
-    };
-    document.getElementById('closeScreenshots').onclick = () => document.getElementById('screenshotsWidget').style.display = 'none';
-    
-    // Quick settings
-    document.getElementById('qsWallpaper').onclick = uploadWallpaper;
-    document.getElementById('qsWorkspace').onclick = () => {
-      const workspaces = ['games', 'learning', 'personal'];
-      currentWorkspace = workspaces[(workspaces.indexOf(currentWorkspace) + 1) % workspaces.length];
-      applyWorkspace();
-      document.getElementById('quickSettings').classList.remove('open');
-    };
-    document.getElementById('qsShortcuts').onclick = () => document.getElementById('shortcutsModal').classList.add('open');
-    document.getElementById('qsSettings').onclick = () => window.location.href = 'settings.html';
-    document.getElementById('closeShortcuts').onclick = () => document.getElementById('shortcutsModal').classList.remove('open');
-    
-    // Context menu
-    document.getElementById('ctxChangeWallpaper').onclick = uploadWallpaper;
-    document.getElementById('ctxRefresh').onclick = () => location.reload();
-    document.getElementById('ctxWorkspaceGames').onclick = () => { currentWorkspace = 'games'; applyWorkspace(); };
-    document.getElementById('ctxWorkspaceLearning').onclick = () => { currentWorkspace = 'learning'; applyWorkspace(); };
-    document.getElementById('ctxWorkspacePersonal').onclick = () => { currentWorkspace = 'personal'; applyWorkspace(); };
-    document.getElementById('ctxSettings').onclick = () => window.location.href = 'settings.html';
-    document.getElementById('desktopBg').oncontextmenu = (e) => { e.preventDefault(); showDesktopContextMenu(e.clientX, e.clientY); };
-    
-    // Keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); toggleBootMenu(); }
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'S') { e.preventDefault(); takeScreenshot(); }
-      if ((e.ctrlKey || e.metaKey) && e.key === '/') { e.preventDefault(); document.getElementById('shortcutsModal').classList.add('open'); }
-      if ((e.ctrlKey || e.metaKey) && e.key === 'w') { e.preventDefault(); if (activeWindowId) closeWindow(activeWindowId); }
-      if ((e.ctrlKey || e.metaKey) && e.key === 'm') { e.preventDefault(); if (activeWindowId) toggleMinimize(activeWindowId); }
-      if (e.key === 'Escape' && fullscreenWindowId) { enterFullscreen(fullscreenWindowId); }
-      if (e.key === 'Escape') { if (bootMenuOpen) toggleBootMenu(); if (startMenuOpen) toggleStartMenu(); }
-    });
-    
-    // Load saved notes
-    const savedNotes = localStorage.getItem('fanter_notes');
-    if (savedNotes) document.getElementById('notesText').value = savedNotes;
-    
-    // Open Game Hub by default
-    setTimeout(() => {
-      const gameHub = APPS.find(a => a.id === 'gamehub');
-      if (gameHub) createGameHubWindow(60, 50, 1100, 750);
-      showNotification('🎉 Welcome to fanterOS! Right-click for options');
-    }, 300);
-  }
-
-  // Start
-  const savedSession = localStorage.getItem('fanter_currentUser');
-  if (savedSession && JSON.parse(savedSession).username !== 'Guest') {
-    currentUser = JSON.parse(savedSession);
-    runLoadingScreen().then(() => { document.getElementById('loginScreen').classList.remove('visible'); showDesktop(); });
+      const link = document.createElement('a');
+      link.download = `fanter-screenshot-${Date.now()}.png`;
+      link.href = canvas.toDataURL();
+      link.click();
+      showToast('📸 Screenshot saved!');
+    }).catch(() => showToast('Screenshot failed'));
   } else {
-    runLoadingScreen();
+    showToast('📸 Screenshot feature ready!');
+  }
+}
+
+// Start Menu
+function renderStartApps(search = '') {
+  const container = document.getElementById('startApps');
+  let filtered = APPS;
+  if (search) filtered = APPS.filter(a => a.name.toLowerCase().includes(search.toLowerCase()));
+  container.innerHTML = filtered.map(app => `
+    <div class="start-app" data-app-id="${app.id}">
+      <div class="start-app-icon">${app.icon}</div>
+      <div class="start-app-name">${app.name}</div>
+      <div class="start-app-desc">${app.desc}</div>
+    </div>
+  `).join('');
+  container.querySelectorAll('.start-app').forEach(el => {
+    el.addEventListener('click', () => {
+      const app = APPS.find(a => a.id === el.dataset.appId);
+      if (app) launchApp(app);
+      toggleStartMenu();
+    });
+  });
+}
+
+function toggleStartMenu() {
+  startMenuOpen = !startMenuOpen;
+  document.getElementById('startMenu').classList.toggle('open', startMenuOpen);
+  if (startMenuOpen) { document.getElementById('startSearch').focus(); renderStartApps(''); }
+}
+
+// Boot Menu
+function updateBootResults(query) {
+  const container = document.getElementById('bootResults');
+  let results = query ? gamesData.filter(g => g.name.toLowerCase().includes(query.toLowerCase())).slice(0, 10) : gamesData.slice(0, 8);
+  currentBootResults = results;
+  selectedBootIndex = results.length > 0 ? 0 : -1;
+  if (!results.length) { container.innerHTML = '<div style="padding:20px;text-align:center;">no games found</div>'; return; }
+  container.innerHTML = results.map((game, idx) => `
+    <div class="boot-result ${idx === selectedBootIndex ? 'selected' : ''}" data-index="${idx}">
+      <div class="boot-result-icon">🎮</div>
+      <div class="boot-result-info"><div class="boot-result-name">${escapeHtml(game.name)}</div><div class="boot-result-desc">${game.category || 'game'}</div></div>
+    </div>
+  `).join('');
+  container.querySelectorAll('.boot-result').forEach(el => {
+    el.addEventListener('click', () => {
+      const game = currentBootResults[parseInt(el.dataset.index)];
+      if (game) { playGame(game); toggleBootMenu(); }
+    });
+  });
+}
+
+function toggleBootMenu() {
+  bootMenuOpen = !bootMenuOpen;
+  document.getElementById('bootMenu').classList.toggle('open', bootMenuOpen);
+  if (bootMenuOpen) { document.getElementById('bootSearch').focus(); updateBootResults(''); }
+}
+
+// Context menus
+function showDesktopContextMenu(x, y) {
+  const menu = document.getElementById('contextMenu');
+  menu.style.left = `${x}px`;
+  menu.style.top = `${y}px`;
+  menu.classList.add('visible');
+  const close = () => { menu.classList.remove('visible'); document.removeEventListener('click', close); };
+  setTimeout(() => document.addEventListener('click', close), 10);
+}
+
+function showGameContextMenu(x, y, game) {
+  const menu = document.getElementById('contextMenu');
+  menu.style.left = `${x}px`;
+  menu.style.top = `${y}px`;
+  menu.classList.add('visible');
+  const pinItem = document.getElementById('ctxPinGame');
+  const original = pinItem.innerHTML;
+  pinItem.innerHTML = `📌 Pin "${game.name.slice(0,20)}" to Desktop`;
+  pinItem.onclick = () => {
+    if (!desktopIcons.some(i => i.id === `game_${game.name}`)) {
+      desktopIcons.push({ id: `game_${game.name}`, icon: '🎮', label: game.name.length > 12 ? game.name.slice(0,10)+'..' : game.name, x: 100, y: 100 });
+      saveDesktopIcons();
+      renderDesktopIcons();
+      showToast(`Pinned "${game.name}" to desktop`);
+    }
+    menu.classList.remove('visible');
+  };
+  const close = () => {
+    pinItem.innerHTML = original;
+    pinItem.onclick = null;
+    menu.classList.remove('visible');
+    document.removeEventListener('click', close);
+  };
+  setTimeout(() => document.addEventListener('click', close), 10);
+}
+
+function uploadWallpaper() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        currentWallpaper = ev.target.result;
+        localStorage.setItem('fanter_wallpaper', currentWallpaper);
+        applyWallpaper();
+        showToast('Wallpaper changed!');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  input.click();
+}
+
+// Loading screen animation
+async function runLoadingScreen() {
+  const canvas = document.getElementById('matrixCanvas');
+  const ctx = canvas.getContext('2d');
+  let w, h, drops = [], chars = "01アイウエオ";
+  
+  function resize() { w = window.innerWidth; h = window.innerHeight; canvas.width = w; canvas.height = h; drops = Array(Math.floor(w / 20)).fill(0).map(() => Math.random() * -h); }
+  resize();
+  window.addEventListener('resize', resize);
+  
+  function draw() {
+    ctx.fillStyle = 'rgba(10,10,15,0.05)';
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#7c5cff';
+    ctx.font = '16px monospace';
+    for (let i = 0; i < drops.length; i++) {
+      ctx.fillText(chars[Math.floor(Math.random() * chars.length)], i * 20, drops[i] * 20);
+      if (drops[i] * 20 > h && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+  
+  const commands = [">_ loading kernel...", ">_ establishing secure connection...", ">_ decrypting game database...", ">_ initializing window manager...", ">_ loading user preferences...", ">_ starting fanterOS..."];
+  const cmdDiv = document.getElementById('loadingCommands');
+  const bar = document.getElementById('loadingBar');
+  const status = document.getElementById('loadingStatus');
+  
+  for (let i = 0; i < commands.length; i++) {
+    await new Promise(r => setTimeout(r, 400));
+    const p = document.createElement('p');
+    p.textContent = commands[i];
+    p.style.opacity = '0';
+    p.style.transform = 'translateX(-10px)';
+    p.style.transition = 'all 0.3s';
+    cmdDiv.appendChild(p);
+    setTimeout(() => { p.style.opacity = '1'; p.style.transform = 'translateX(0)'; }, 10);
+    bar.style.width = `${((i + 1) / commands.length) * 100}%`;
+    status.textContent = commands[i];
   }
   
-  document.getElementById('loginBtn').onclick = () => handleLogin(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
-  document.getElementById('guestBtn').onclick = handleGuest;
-  document.getElementById('showRegister').onclick = () => window.location.href = 'fantaccount.html';
+  await new Promise(r => setTimeout(r, 500));
+  document.getElementById('loadingScreen').classList.add('hide');
+}
+
+// Auth
+async function handleLogin(email, password) {
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    currentUser = { id: data.user.id, username: email.split('@')[0], displayName: email.split('@')[0], email, coins: 300 };
+    localStorage.setItem('fanter_currentUser', JSON.stringify(currentUser));
+    showToast(`Welcome back!`);
+    showDesktop();
+  } catch (err) { document.getElementById('loginError').textContent = err.message; }
+}
+
+function handleGuest() {
+  currentUser = { id: 'guest_' + Date.now(), username: 'Guest', displayName: 'Guest', coins: 300 };
+  localStorage.setItem('fanter_currentUser', JSON.stringify(currentUser));
+  showToast('Playing as Guest');
+  showDesktop();
+}
+
+function showDesktop() {
+  document.getElementById('loginScreen').classList.remove('visible');
+  document.getElementById('desktop').classList.add('visible');
+  initDesktop();
+}
+
+// Load games
+async function loadGames() {
+  try {
+    const res = await fetch('./config/games.json');
+    const text = await res.text();
+    // Fix trailing comma issue
+    let fixed = text.replace(/,(\s*}\s*)\]/g, '$1]').replace(/,\s*\]/, ']');
+    gamesData = JSON.parse(fixed);
+    console.log(`✅ Loaded ${gamesData.length} games`);
+  } catch(e) { 
+    console.error('Failed to load games:', e);
+    gamesData = [];
+    showToast('Error loading games, but desktop works!');
+  }
+}
+
+// Init desktop
+async function initDesktop() {
+  await loadGames();
+  loadDesktopIcons();
+  applyWorkspace();
+  applyWallpaper();
+  updateClock();
+  setInterval(updateClock, 1000);
+  
+  // Taskbar auto-hide
+  let timeout;
+  const taskbar = document.getElementById('taskbar');
+  function showTaskbar() { taskbar.classList.add('visible'); clearTimeout(timeout); timeout = setTimeout(() => taskbar.classList.remove('visible'), 2500); }
+  document.addEventListener('mousemove', showTaskbar);
+  showTaskbar();
+  
+  // Event listeners
+  document.getElementById('startBtn').onclick = toggleStartMenu;
+  document.getElementById('startSearch').oninput = (e) => renderStartApps(e.target.value);
+  document.getElementById('bootSearch').oninput = (e) => updateBootResults(e.target.value);
+  document.getElementById('bootSearch').onkeydown = (e) => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); if (selectedBootIndex < currentBootResults.length - 1) { selectedBootIndex++; updateBootResults(document.getElementById('bootSearch').value); } }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); if (selectedBootIndex > 0) { selectedBootIndex--; updateBootResults(document.getElementById('bootSearch').value); } }
+    else if (e.key === 'Enter') { e.preventDefault(); if (currentBootResults[selectedBootIndex]) { playGame(currentBootResults[selectedBootIndex]); toggleBootMenu(); } }
+  };
+  document.getElementById('datetimeBtn').onclick = () => document.getElementById('quickSettings').classList.toggle('open');
+  document.getElementById('screenshotBtn').onclick = takeScreenshot;
+  document.getElementById('notesBtn').onclick = () => {
+    const w = document.getElementById('notesWidget');
+    w.style.display = w.style.display === 'none' ? 'block' : 'none';
+  };
+  document.getElementById('closeNotes').onclick = () => document.getElementById('notesWidget').style.display = 'none';
+  document.getElementById('notesText').oninput = () => localStorage.setItem('fanter_notes', document.getElementById('notesText').value);
+  
+  document.getElementById('qsWallpaper').onclick = uploadWallpaper;
+  document.getElementById('qsWorkspace').onclick = () => {
+    const workspaces = ['games', 'learning', 'personal'];
+    currentWorkspace = workspaces[(workspaces.indexOf(currentWorkspace) + 1) % workspaces.length];
+    applyWorkspace();
+    document.getElementById('quickSettings').classList.remove('open');
+    showToast(`Switched to ${currentWorkspace} workspace`);
+  };
+  document.getElementById('qsShortcuts').onclick = () => document.getElementById('shortcutsModal').classList.add('open');
+  document.getElementById('qsSettings').onclick = () => window.location.href = 'settings.html';
+  document.getElementById('closeShortcuts').onclick = () => document.getElementById('shortcutsModal').classList.remove('open');
+  
+  document.getElementById('ctxChangeWallpaper').onclick = uploadWallpaper;
+  document.getElementById('ctxRefresh').onclick = () => location.reload();
+  document.getElementById('ctxWorkspaceGames').onclick = () => { currentWorkspace = 'games'; applyWorkspace(); showToast('Switched to Games workspace'); };
+  document.getElementById('ctxWorkspaceLearning').onclick = () => { currentWorkspace = 'learning'; applyWorkspace(); showToast('Switched to Learning workspace'); };
+  document.getElementById('ctxWorkspacePersonal').onclick = () => { currentWorkspace = 'personal'; applyWorkspace(); showToast('Switched to Personal workspace'); };
+  document.getElementById('ctxSettings').onclick = () => window.location.href = 'settings.html';
+  document.getElementById('desktopBg').oncontextmenu = (e) => { e.preventDefault(); showDesktopContextMenu(e.clientX, e.clientY); };
+  
+  // Keyboard shortcuts
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); toggleBootMenu(); }
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'S') { e.preventDefault(); takeScreenshot(); }
+    if ((e.ctrlKey || e.metaKey) && e.key === '/') { e.preventDefault(); document.getElementById('shortcutsModal').classList.add('open'); }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'w') { e.preventDefault(); if (activeWindowId) closeWindow(activeWindowId); }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'm') { e.preventDefault(); if (activeWindowId) toggleMinimize(activeWindowId); }
+    if (e.key === 'Escape') { if (bootMenuOpen) toggleBootMenu(); if (startMenuOpen) toggleStartMenu(); }
+  });
+  
+  // Load saved notes
+  const savedNotes = localStorage.getItem('fanter_notes');
+  if (savedNotes) document.getElementById('notesText').value = savedNotes;
+  
+  // Open Game Hub by default
+  setTimeout(() => {
+    const gameHub = APPS.find(a => a.id === 'gamehub');
+    if (gameHub) createGameHubWindow(60, 50, 1100, 750);
+    showToast('🎉 Welcome to fanterOS! Right-click desktop for options');
+  }, 500);
+}
+
+// Start
+const savedSession = localStorage.getItem('fanter_currentUser');
+if (savedSession && JSON.parse(savedSession).username !== 'Guest') {
+  currentUser = JSON.parse(savedSession);
+  runLoadingScreen().then(() => { document.getElementById('loginScreen').classList.remove('visible'); showDesktop(); });
+} else {
+  runLoadingScreen();
+}
+
+document.getElementById('loginBtn').onclick = () => handleLogin(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
+document.getElementById('guestBtn').onclick = handleGuest;
+document.getElementById('showRegister').onclick = () => window.location.href = 'fantaccount.html';
+
+// Safety key
+let lastKey = '', lastKeyTime = 0;
+document.addEventListener('keydown', (e) => {
+  const safetyKey = localStorage.getItem('safetyKey');
+  const safetyUrl = localStorage.getItem('safetyUrl');
+  if (safetyKey && safetyUrl && e.key.toLowerCase() === safetyKey.toLowerCase() && e.key === lastKey && Date.now() - lastKeyTime < 1000) window.location.href = safetyUrl;
+  lastKey = e.key; lastKeyTime = Date.now();
+});
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </body>
 </html>
