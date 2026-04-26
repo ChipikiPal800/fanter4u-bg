@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>fanterOS</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Supabase loaded FIRST before any code uses it -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *{margin:0;padding:0;box-sizing:border-box;user-select:none;-webkit-user-select:none}
@@ -151,6 +152,7 @@
     .game-card-info{padding:12px}
     .game-card-title{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .game-card-category{font-size:11px;color:var(--text-muted);margin-top:4px}
+    .game-card-stats{font-size:10px;color:gray;margin-top:4px}
     
     /* Game Modal */
     .game-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);backdrop-filter:blur(12px);z-index:20000;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all 0.2s}
@@ -280,15 +282,15 @@
   <div class="context-menu-item" id="ctxWidgets">📊 Show Widgets</div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // ============================================
 // FANTER OS - COMPLETE
 // ============================================
 
+// Supabase is already loaded from CDN - use it directly
 const SUPABASE_URL = "https://gvzgnclowylrrpovdvtw.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2emduY2xvd3lscnJwb3ZkdnR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NjM5ODEsImV4cCI6MjA5MjAzOTk4MX0.p7oeYBVX870iSK-TLDRj6pfW7wLj7HJsTHjNWaNpL7o";
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let GAMES_DATA = [];
 let userRatings = JSON.parse(localStorage.getItem('userRatings') || '{}');
@@ -302,16 +304,17 @@ let currentBootResults = [];
 let selectedBootIndex = -1;
 let currentUser = null;
 let achievements = JSON.parse(localStorage.getItem('fanter_achievements') || '{}');
+let resizeData = null;
 
 // All apps
 const APPS = [
   { id: 'gamehub', name: 'Game Hub', icon: '🎮', iconUrl: 'https://png.pngtree.com/png-clipart/20200224/original/pngtree-game-control-line-icon-vector-png-image_5209084.jpg', isBuiltin: true },
-  { id: 'emulators', name: 'Emulators', icon: '🕹️', iconUrl: 'https://p7.hiclipart.com/preview/350/141/104/matsu-psx-emulator-multi-emu-playstation-super-nintendo-entertainment-system-game-boy-advance-emu.jpg', isEmulator: true },
-  { id: 'flappybird', name: 'Flappy Bird', icon: '🐦', iconUrl: 'https://somegadgetguy.com/wp-content/uploads/2014/02/flappy-bird-icon.jpg', url: 'https://chipikipal800.github.io/flappy-bird-unblocked/', external: true },
-  { id: 'game2048', name: '2048', icon: '🔢', iconUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4A1I1YQjuhK0X_ACucsDPgejmtgBCaLA1IQ&s', url: 'https://chipikipal800.github.io/2048/', external: true },
+  { id: 'emulators', name: 'Emulators', icon: '🕹️', iconUrl: '', isEmulator: true },
+  { id: 'flappybird', name: 'Flappy Bird', icon: '🐦', iconUrl: '', url: 'https://chipikipal800.github.io/flappy-bird-unblocked/', external: true },
+  { id: 'game2048', name: '2048', icon: '🔢', iconUrl: '', url: 'https://chipikipal800.github.io/2048/', external: true },
   { id: 'memorymatch', name: 'Memory Match', icon: '🃏', url: 'https://chipikipal800.github.io/Memory-Game-fend/', external: true },
-  { id: 'wordle', name: 'Wordle', icon: '📝', iconUrl: 'https://static01.nyt.com/images/2022/03/02/crosswords/alpha-wordle-icon-new/alpha-wordle-icon-new-smallSquare252-v3.png?format=pjpg&quality=75&auto=webp&disable=upscale', url: 'https://chipikipal800.github.io/wordle-unlimited/', external: true },
-  { id: 'tramrush', name: 'Tram Rush', icon: '🐍', iconUrl: 'https://www.usatoday.com/gcdn/presto/2019/04/01/USAT/9b5c7996-d594-4e96-9138-95a69b64a585-Google_Maps_Snake.png?crop=1219,1212,x272,y0', url: 'https://chipikipal800.github.io/Google_Snake_Game/', external: true },
+  { id: 'wordle', name: 'Wordle', icon: '📝', url: 'https://chipikipal800.github.io/wordle-unlimited/', external: true },
+  { id: 'tramrush', name: 'Tram Rush', icon: '🐍', url: 'https://chipikipal800.github.io/Google_Snake_Game/', external: true },
   { id: 'fanterstudios', name: 'Fanter Studios', icon: '🎬', url: 'https://chipikipal800.github.io/fanter-studios/', external: true },
   { id: 'thefactory', name: 'The Factory', icon: '🏭', appType: 'factory' },
   { id: 'thestudio', name: 'The Studio', icon: '🎨', appType: 'studio' },
@@ -323,7 +326,7 @@ const APPS = [
   { id: 'battleship', name: 'Battleship', icon: '⛴️', appType: 'battleship' },
   { id: 'hangman', name: 'Hangman', icon: '🪢', appType: 'hangman' },
   { id: 'weather', name: 'Weather', icon: '🌤️', appType: 'weather' },
-  { id: 'calculator', name: 'Calculator', icon: '🧮', iconUrl: 'https://png.pngtree.com/png-vector/20190115/ourmid/pngtree-vector-calculator-icon-png-image_319747.jpg', appType: 'calculator' },
+  { id: 'calculator', name: 'Calculator', icon: '🧮', appType: 'calculator' },
   { id: 'notes', name: 'Notes', icon: '📋', appType: 'notes' },
   { id: 'timer', name: 'Timer', icon: '⏱️', appType: 'timer' },
   { id: 'tasks', name: 'Tasks', icon: '✅', appType: 'tasks' },
@@ -497,29 +500,7 @@ function renderDesktopIcons() {
   });
 }
 
-function launchAppWithAnimation(app, iconElement) {
-  const rect = iconElement.getBoundingClientRect();
-  const startX = rect.left + rect.width/2;
-  const startY = rect.top + rect.height/2;
-  
-  const existing = windows.find(w => w.app?.id === app.id);
-  if(existing) {
-    if(existing.minimized) toggleMinimize(existing.id);
-    focusWindow(existing.id);
-    return;
-  }
-  
-  const winId = launchApp(app);
-  const win = windows.find(w => w.id === winId);
-  if(win) {
-    win.element.style.transformOrigin = `${startX}px ${startY}px`;
-    win.element.classList.add('opening');
-    setTimeout(() => win.element.classList.remove('opening'), 200);
-  }
-  return winId;
-}
-
-// ========== THE FACTORY APP (Generators) ==========
+// ========== FACTORY APP (Generators) ==========
 function createFactoryWindow() {
   const id = nextWindowId++;
   const win = document.createElement('div');
@@ -564,32 +545,14 @@ function createFactoryWindow() {
     extra.innerHTML = '';
     
     switch(type) {
-      case 'joke':
-        output.innerHTML = `<div style="font-size:16px;">😂 ${jokes[Math.floor(Math.random()*jokes.length)]}</div>`;
-        break;
-      case 'dadjoke':
-        output.innerHTML = `<div style="font-size:16px;">👨 ${dadJokes[Math.floor(Math.random()*dadJokes.length)]}</div>`;
-        break;
-      case 'quote':
-        output.innerHTML = `<div style="font-size:18px; font-style:italic;">“${quotes[Math.floor(Math.random()*quotes.length)]}”</div>`;
-        break;
-      case 'fact':
-        output.innerHTML = `<div style="font-size:15px;">📌 ${facts[Math.floor(Math.random()*facts.length)]}</div>`;
-        break;
-      case 'poetry':
-        output.innerHTML = `<div style="font-size:14px; font-style:italic; white-space:pre-line;">${poems[Math.floor(Math.random()*poems.length)]}</div>`;
-        break;
-      case 'lorem':
-        output.innerHTML = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.`;
-        break;
+      case 'joke': output.innerHTML = `<div style="font-size:16px;">😂 ${jokes[Math.floor(Math.random()*jokes.length)]}</div>`; break;
+      case 'dadjoke': output.innerHTML = `<div style="font-size:16px;">👨 ${dadJokes[Math.floor(Math.random()*dadJokes.length)]}</div>`; break;
+      case 'quote': output.innerHTML = `<div style="font-size:18px; font-style:italic;">“${quotes[Math.floor(Math.random()*quotes.length)]}”</div>`; break;
+      case 'fact': output.innerHTML = `<div style="font-size:15px;">📌 ${facts[Math.floor(Math.random()*facts.length)]}</div>`; break;
+      case 'poetry': output.innerHTML = `<div style="font-size:14px; font-style:italic; white-space:pre-line;">${poems[Math.floor(Math.random()*poems.length)]}</div>`; break;
+      case 'lorem': output.innerHTML = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.`; break;
       case 'randomizer':
-        extra.innerHTML = `
-          <div style="display:grid; gap:10px;">
-            <div><button class="calc-btn" id="rollDice-${id}">🎲 Roll Dice</button> <span id="diceResult-${id}"></span></div>
-            <div><button class="calc-btn" id="flipCoin-${id}">🪙 Flip Coin</button> <span id="coinResult-${id}"></span></div>
-            <div><input type="number" id="randomMin-${id}" placeholder="Min" style="width:80px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:8px; padding:6px; color:white;"> - <input type="number" id="randomMax-${id}" placeholder="Max" style="width:80px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:8px; padding:6px; color:white;"> <button class="calc-btn" id="randomNumber-${id}">Generate</button> <span id="randomResult-${id}"></span></div>
-          </div>
-        `;
+        extra.innerHTML = `<div style="display:grid; gap:10px;"><div><button class="calc-btn" id="rollDice-${id}">🎲 Roll Dice</button> <span id="diceResult-${id}"></span></div><div><button class="calc-btn" id="flipCoin-${id}">🪙 Flip Coin</button> <span id="coinResult-${id}"></span></div><div><input type="number" id="randomMin-${id}" placeholder="Min" style="width:80px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:8px; padding:6px; color:white;"> - <input type="number" id="randomMax-${id}" placeholder="Max" style="width:80px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:8px; padding:6px; color:white;"> <button class="calc-btn" id="randomNumber-${id}">Generate</button> <span id="randomResult-${id}"></span></div></div>`;
         document.getElementById(`rollDice-${id}`).onclick = () => document.getElementById(`diceResult-${id}`).innerHTML = `🎲 ${Math.floor(Math.random()*6)+1}`;
         document.getElementById(`flipCoin-${id}`).onclick = () => document.getElementById(`coinResult-${id}`).innerHTML = Math.random() > 0.5 ? '🪙 Heads' : '🪙 Tails';
         document.getElementById(`randomNumber-${id}`).onclick = () => {
@@ -600,19 +563,9 @@ function createFactoryWindow() {
         output.innerHTML = '<div style="color:gray;">Select an option above</div>';
         break;
       case 'urlencode':
-        extra.innerHTML = `
-          <textarea id="urlInput-${id}" placeholder="Enter text to encode/decode..." style="width:100%; padding:10px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:12px; color:white; margin-bottom:10px; height:80px;"></textarea>
-          <div style="display:flex; gap:8px;"><button class="calc-btn" id="encodeBtn-${id}">Encode</button><button class="calc-btn" id="decodeBtn-${id}">Decode</button></div>
-          <div id="urlResult-${id}" style="margin-top:10px; background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; word-break:break-all;"></div>
-        `;
-        document.getElementById(`encodeBtn-${id}`).onclick = () => {
-          const val = document.getElementById(`urlInput-${id}`).value;
-          document.getElementById(`urlResult-${id}`).innerHTML = encodeURIComponent(val);
-        };
-        document.getElementById(`decodeBtn-${id}`).onclick = () => {
-          const val = document.getElementById(`urlInput-${id}`).value;
-          try { document.getElementById(`urlResult-${id}`).innerHTML = decodeURIComponent(val); } catch(e) { document.getElementById(`urlResult-${id}`).innerHTML = 'Invalid encoded string'; }
-        };
+        extra.innerHTML = `<textarea id="urlInput-${id}" placeholder="Enter text to encode/decode..." style="width:100%; padding:10px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:12px; color:white; margin-bottom:10px; height:80px;"></textarea><div style="display:flex; gap:8px;"><button class="calc-btn" id="encodeBtn-${id}">Encode</button><button class="calc-btn" id="decodeBtn-${id}">Decode</button></div><div id="urlResult-${id}" style="margin-top:10px; background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; word-break:break-all;"></div>`;
+        document.getElementById(`encodeBtn-${id}`).onclick = () => { const val = document.getElementById(`urlInput-${id}`).value; document.getElementById(`urlResult-${id}`).innerHTML = encodeURIComponent(val); };
+        document.getElementById(`decodeBtn-${id}`).onclick = () => { const val = document.getElementById(`urlInput-${id}`).value; try { document.getElementById(`urlResult-${id}`).innerHTML = decodeURIComponent(val); } catch(e) { document.getElementById(`urlResult-${id}`).innerHTML = 'Invalid encoded string'; } };
         output.innerHTML = '<div style="color:gray;">Enter text above to encode/decode URLs</div>';
         break;
     }
@@ -623,7 +576,7 @@ function createFactoryWindow() {
   return id;
 }
 
-// ========== THE STUDIO APP (Image editors) ==========
+// ========== STUDIO APP ==========
 function createStudioWindow() {
   const id = nextWindowId++;
   const win = document.createElement('div');
@@ -653,109 +606,48 @@ function createStudioWindow() {
     const container = document.getElementById(`studioContent-${id}`);
     
     if(type === 'pixel') {
-      container.innerHTML = `
-        <div style="text-align:center;">
-          <canvas id="pixelCanvas-${id}" width="320" height="320" style="border:2px solid var(--border-glass); border-radius:12px; background:#1a1a2e; margin-bottom:12px;"></canvas>
-          <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
-            <input type="color" id="pixelColor-${id}" value="#7c5cff">
-            <button class="calc-btn" id="pixelClear-${id}">Clear</button>
-            <button class="calc-btn" id="pixelSave-${id}">Save PNG</button>
-          </div>
-          <div style="margin-top:12px; display:grid; grid-template-columns:repeat(16,1fr); gap:2px; max-width:320px; margin:12px auto;"></div>
-        </div>
-      `;
+      container.innerHTML = `<div style="text-align:center;"><canvas id="pixelCanvas-${id}" width="320" height="320" style="border:2px solid var(--border-glass); border-radius:12px; background:#1a1a2e; margin-bottom:12px;"></canvas><div style="display:flex; gap:8px; justify-content:center;"><input type="color" id="pixelColor-${id}" value="#7c5cff"><button class="calc-btn" id="pixelClear-${id}">Clear</button><button class="calc-btn" id="pixelSave-${id}">Save PNG</button></div></div>`;
       const canvas = document.getElementById(`pixelCanvas-${id}`);
       const ctx = canvas.getContext('2d');
       let drawing = false;
       const cellSize = 20;
       let color = document.getElementById(`pixelColor-${id}`).value;
-      
-      function drawGrid() {
-        ctx.fillStyle = '#1a1a2e';
-        ctx.fillRect(0, 0, 320, 320);
-        for(let i = 0; i < 16; i++) {
-          for(let j = 0; j < 16; j++) {
-            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-            ctx.strokeRect(i*cellSize, j*cellSize, cellSize, cellSize);
-          }
-        }
-      }
+      function drawGrid() { ctx.fillStyle = '#1a1a2e'; ctx.fillRect(0,0,320,320); for(let i=0;i<16;i++) for(let j=0;j<16;j++) ctx.strokeRect(i*cellSize,j*cellSize,cellSize,cellSize); }
       drawGrid();
-      
-      canvas.addEventListener('mousedown', (e) => {
-        drawing = true;
-        const rect = canvas.getBoundingClientRect();
-        const x = Math.floor((e.clientX - rect.left) / cellSize);
-        const y = Math.floor((e.clientY - rect.top) / cellSize);
-        if(x >= 0 && x < 16 && y >= 0 && y < 16) {
-          ctx.fillStyle = color;
-          ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
-        }
-      });
-      canvas.addEventListener('mousemove', (e) => {
-        if(!drawing) return;
-        const rect = canvas.getBoundingClientRect();
-        const x = Math.floor((e.clientX - rect.left) / cellSize);
-        const y = Math.floor((e.clientY - rect.top) / cellSize);
-        if(x >= 0 && x < 16 && y >= 0 && y < 16) {
-          ctx.fillStyle = color;
-          ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
-        }
-      });
+      canvas.addEventListener('mousedown', (e) => { drawing = true; const rect = canvas.getBoundingClientRect(); const x = Math.floor((e.clientX - rect.left) / cellSize); const y = Math.floor((e.clientY - rect.top) / cellSize); if(x>=0 && x<16 && y>=0 && y<16) { ctx.fillStyle = color; ctx.fillRect(x*cellSize,y*cellSize,cellSize,cellSize); } });
+      canvas.addEventListener('mousemove', (e) => { if(!drawing) return; const rect = canvas.getBoundingClientRect(); const x = Math.floor((e.clientX - rect.left) / cellSize); const y = Math.floor((e.clientY - rect.top) / cellSize); if(x>=0 && x<16 && y>=0 && y<16) { ctx.fillStyle = color; ctx.fillRect(x*cellSize,y*cellSize,cellSize,cellSize); } });
       canvas.addEventListener('mouseup', () => drawing = false);
       document.getElementById(`pixelColor-${id}`).addEventListener('change', (e) => color = e.target.value);
       document.getElementById(`pixelClear-${id}`).onclick = () => drawGrid();
-      document.getElementById(`pixelSave-${id}`).onclick = () => {
-        const link = document.createElement('a');
-        link.download = 'pixelart.png';
-        link.href = canvas.toDataURL();
-        link.click();
-      };
+      document.getElementById(`pixelSave-${id}`).onclick = () => { const link = document.createElement('a'); link.download = 'pixelart.png'; link.href = canvas.toDataURL(); link.click(); };
     }
     else if(type === 'photo') {
-      container.innerHTML = `
-        <div style="text-align:center;">
-          <input type="file" id="photoUpload-${id}" accept="image/*" style="margin-bottom:12px;">
-          <canvas id="photoCanvas-${id}" width="400" height="300" style="border:2px solid var(--border-glass); border-radius:12px; background:#1a1a2e;"></canvas>
-          <div style="margin-top:12px;">
-            <label>Brightness: <input type="range" id="brightness-${id}" min="0" max="200" value="100" style="width:150px;"></label>
-            <label>Contrast: <input type="range" id="contrast-${id}" min="0" max="200" value="100" style="width:150px;"></label>
-          </div>
-        </div>
-      `;
+      container.innerHTML = `<div style="text-align:center;"><input type="file" id="photoUpload-${id}" accept="image/*" style="margin-bottom:12px;"><canvas id="photoCanvas-${id}" width="400" height="300" style="border:2px solid var(--border-glass); border-radius:12px; background:#1a1a2e;"></canvas><div style="margin-top:12px;"><label>Brightness: <input type="range" id="brightness-${id}" min="0" max="200" value="100" style="width:150px;"></label><label>Contrast: <input type="range" id="contrast-${id}" min="0" max="200" value="100" style="width:150px;"></label></div></div>`;
       const canvas = document.getElementById(`photoCanvas-${id}`);
       const ctx = canvas.getContext('2d');
       let img = null;
-      
       function applyFilters() {
         if(!img) return;
         const brightness = document.getElementById(`brightness-${id}`).value / 100;
         const contrast = document.getElementById(`contrast-${id}`).value / 100;
-        canvas.width = img.width;
-        canvas.height = img.height;
+        canvas.width = img.width; canvas.height = img.height;
         ctx.drawImage(img, 0, 0);
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
         const data = imageData.data;
-        for(let i = 0; i < data.length; i += 4) {
+        for(let i=0;i<data.length;i+=4) {
           data[i] = Math.min(255, Math.max(0, data[i] * brightness + (data[i] - 128) * contrast));
           data[i+1] = Math.min(255, Math.max(0, data[i+1] * brightness + (data[i+1] - 128) * contrast));
           data[i+2] = Math.min(255, Math.max(0, data[i+2] * brightness + (data[i+2] - 128) * contrast));
         }
         ctx.putImageData(imageData, 0, 0);
       }
-      
       document.getElementById(`photoUpload-${id}`).onchange = (e) => {
         const file = e.target.files[0];
         if(file) {
           const reader = new FileReader();
           reader.onload = (ev) => {
             img = new Image();
-            img.onload = () => {
-              canvas.width = img.width;
-              canvas.height = img.height;
-              ctx.drawImage(img, 0, 0);
-              applyFilters();
-            };
+            img.onload = () => { canvas.width = img.width; canvas.height = img.height; ctx.drawImage(img, 0, 0); applyFilters(); };
             img.src = ev.target.result;
           };
           reader.readAsDataURL(file);
@@ -765,24 +657,9 @@ function createStudioWindow() {
       document.getElementById(`contrast-${id}`).oninput = applyFilters;
     }
     else if(type === 'color') {
-      container.innerHTML = `
-        <div style="text-align:center;">
-          <input type="file" id="colorUpload-${id}" accept="image/*" style="margin-bottom:12px;">
-          <button class="calc-btn" id="randomPalette-${id}">🎨 Random Palette</button>
-          <div id="paletteResult-${id}" style="display:flex; gap:10px; justify-content:center; margin-top:16px; flex-wrap:wrap;"></div>
-        </div>
-      `;
-      
-      function displayColors(colors) {
-        const container = document.getElementById(`paletteResult-${id}`);
-        container.innerHTML = colors.map(c => `<div style="background:${c}; width:80px; height:80px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:white; text-shadow:0 0 2px black;">${c}</div>`).join('');
-      }
-      
-      document.getElementById(`randomPalette-${id}`).onclick = () => {
-        const colors = ['#' + Math.floor(Math.random()*16777215).toString(16), '#' + Math.floor(Math.random()*16777215).toString(16), '#' + Math.floor(Math.random()*16777215).toString(16), '#' + Math.floor(Math.random()*16777215).toString(16), '#' + Math.floor(Math.random()*16777215).toString(16)];
-        displayColors(colors);
-      };
-      
+      container.innerHTML = `<div style="text-align:center;"><input type="file" id="colorUpload-${id}" accept="image/*" style="margin-bottom:12px;"><button class="calc-btn" id="randomPalette-${id}">🎨 Random Palette</button><div id="paletteResult-${id}" style="display:flex; gap:10px; justify-content:center; margin-top:16px; flex-wrap:wrap;"></div></div>`;
+      function displayColors(colors) { document.getElementById(`paletteResult-${id}`).innerHTML = colors.map(c => `<div style="background:${c}; width:80px; height:80px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:white; text-shadow:0 0 2px black;">${c}</div>`).join(''); }
+      document.getElementById(`randomPalette-${id}`).onclick = () => { const colors = ['#' + Math.floor(Math.random()*16777215).toString(16), '#' + Math.floor(Math.random()*16777215).toString(16), '#' + Math.floor(Math.random()*16777215).toString(16), '#' + Math.floor(Math.random()*16777215).toString(16), '#' + Math.floor(Math.random()*16777215).toString(16)]; displayColors(colors); };
       document.getElementById(`colorUpload-${id}`).onchange = (e) => {
         const file = e.target.files[0];
         if(file) {
@@ -791,18 +668,12 @@ function createStudioWindow() {
             const img = new Image();
             img.onload = () => {
               const canvas = document.createElement('canvas');
-              canvas.width = img.width;
-              canvas.height = img.height;
+              canvas.width = img.width; canvas.height = img.height;
               const ctx = canvas.getContext('2d');
               ctx.drawImage(img, 0, 0);
-              const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+              const imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
               const colors = [];
-              for(let i = 0; i < imageData.data.length && colors.length < 5; i += Math.floor(imageData.data.length / 20)) {
-                const r = imageData.data[i];
-                const g = imageData.data[i+1];
-                const b = imageData.data[i+2];
-                colors.push(`rgb(${r},${g},${b})`);
-              }
+              for(let i=0;i<imageData.data.length && colors.length<5;i+=Math.floor(imageData.data.length/20)) { const r=imageData.data[i]; const g=imageData.data[i+1]; const b=imageData.data[i+2]; colors.push(`rgb(${r},${g},${b})`); }
               displayColors(colors);
             };
             img.src = ev.target.result;
@@ -883,13 +754,8 @@ function createIPLookupWindow() {
     try {
       const res = await fetch('https://api.ipify.org?format=json');
       const data = await res.json();
-      document.getElementById(`ipResult-${id}`).innerHTML = `
-        <div>🌐 Your IP: <strong>${data.ip}</strong></div>
-        <div style="margin-top:10px; color:gray;">(City/ISP info requires API key)</div>
-      `;
-    } catch(e) {
-      document.getElementById(`ipResult-${id}`).innerHTML = 'Error fetching IP';
-    }
+      document.getElementById(`ipResult-${id}`).innerHTML = `<div>🌐 Your IP: <strong>${data.ip}</strong></div><div style="margin-top:10px; color:gray;">(City/ISP info requires API key)</div>`;
+    } catch(e) { document.getElementById(`ipResult-${id}`).innerHTML = 'Error fetching IP'; }
   };
   return id;
 }
@@ -921,12 +787,7 @@ function createCharCounterWindow() {
     const charsNoSpace = text.replace(/\s/g, '').length;
     const words = text.trim() ? text.trim().split(/\s+/).length : 0;
     const lines = text.split(/\r?\n/).length;
-    document.getElementById(`charStats-${id}`).innerHTML = `
-      <div>📝 Characters: ${chars}</div>
-      <div>📝 No Spaces: ${charsNoSpace}</div>
-      <div>📖 Words: ${words}</div>
-      <div>📏 Lines: ${lines}</div>
-    `;
+    document.getElementById(`charStats-${id}`).innerHTML = `<div>📝 Characters: ${chars}</div><div>📝 No Spaces: ${charsNoSpace}</div><div>📖 Words: ${words}</div><div>📏 Lines: ${lines}</div>`;
   }
   document.getElementById(`charText-${id}`).oninput = updateStats;
   updateStats();
@@ -963,19 +824,7 @@ function createConverterWindow() {
     const container = document.getElementById(`converterContent-${id}`);
     
     if(mode === 'unit') {
-      container.innerHTML = `
-        <div style="margin-bottom:16px;"><input type="number" id="unitValue-${id}" placeholder="Value" style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:12px; color:white;"></div>
-        <div style="display:flex; gap:12px; margin-bottom:16px;">
-          <select id="unitFrom-${id}" style="flex:1; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:12px; color:white;">
-            <option value="m">Meters</option><option value="ft">Feet</option><option value="km">Kilometers</option><option value="mi">Miles</option>
-          </select>
-          <span>→</span>
-          <select id="unitTo-${id}" style="flex:1; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:12px; color:white;">
-            <option value="ft">Feet</option><option value="m">Meters</option><option value="mi">Miles</option><option value="km">Kilometers</option>
-          </select>
-        </div>
-        <div id="unitResult-${id}" style="background:rgba(0,0,0,0.3); padding:16px; border-radius:12px; text-align:center; font-size:18px;">0</div>
-      `;
+      container.innerHTML = `<div style="margin-bottom:16px;"><input type="number" id="unitValue-${id}" placeholder="Value" style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:12px; color:white;"></div><div style="display:flex; gap:12px; margin-bottom:16px;"><select id="unitFrom-${id}" style="flex:1; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:12px; color:white;"><option value="m">Meters</option><option value="ft">Feet</option><option value="km">Kilometers</option><option value="mi">Miles</option></select><span>→</span><select id="unitTo-${id}" style="flex:1; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:12px; color:white;"><option value="ft">Feet</option><option value="m">Meters</option><option value="mi">Miles</option><option value="km">Kilometers</option></select></div><div id="unitResult-${id}" style="background:rgba(0,0,0,0.3); padding:16px; border-radius:12px; text-align:center; font-size:18px;">0</div>`;
       function convert() {
         const val = parseFloat(document.getElementById(`unitValue-${id}`).value) || 0;
         const from = document.getElementById(`unitFrom-${id}`).value;
@@ -990,11 +839,7 @@ function createConverterWindow() {
       convert();
     }
     else if(mode === 'age') {
-      container.innerHTML = `
-        <div style="margin-bottom:16px;"><input type="date" id="birthDate-${id}" style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:12px; color:white;"></div>
-        <button id="calcAge-${id}" style="width:100%; padding:12px; background:var(--accent); border:none; border-radius:30px; color:white; cursor:pointer;">Calculate Age</button>
-        <div id="ageResult-${id}" style="margin-top:16px; background:rgba(0,0,0,0.3); padding:16px; border-radius:12px;"></div>
-      `;
+      container.innerHTML = `<div style="margin-bottom:16px;"><input type="date" id="birthDate-${id}" style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:12px; color:white;"></div><button id="calcAge-${id}" style="width:100%; padding:12px; background:var(--accent); border:none; border-radius:30px; color:white; cursor:pointer;">Calculate Age</button><div id="ageResult-${id}" style="margin-top:16px; background:rgba(0,0,0,0.3); padding:16px; border-radius:12px;"></div>`;
       document.getElementById(`calcAge-${id}`).onclick = () => {
         const birth = new Date(document.getElementById(`birthDate-${id}`).value);
         if(isNaN(birth)) { document.getElementById(`ageResult-${id}`).innerHTML = 'Enter a valid date'; return; }
@@ -1008,20 +853,8 @@ function createConverterWindow() {
       };
     }
     else if(mode === 'timezone') {
-      container.innerHTML = `
-        <div style="margin-bottom:16px;">
-          <select id="tzFrom-${id}" style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:12px; color:white; margin-bottom:12px;">
-            <option value="America/New_York">New York (EST)</option><option value="America/Los_Angeles">Los Angeles (PST)</option><option value="Europe/London">London (GMT)</option><option value="Asia/Tokyo">Tokyo (JST)</option>
-          </select>
-          <select id="tzTo-${id}" style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:12px; color:white;">
-            <option value="America/Los_Angeles">Los Angeles (PST)</option><option value="America/New_York">New York (EST)</option><option value="Europe/London">London (GMT)</option><option value="Asia/Tokyo">Tokyo (JST)</option>
-          </select>
-        </div>
-        <button id="convertTZ-${id}" style="width:100%; padding:12px; background:var(--accent); border:none; border-radius:30px; color:white; cursor:pointer;">Convert Time</button>
-        <div id="tzResult-${id}" style="margin-top:16px; background:rgba(0,0,0,0.3); padding:16px; border-radius:12px;"></div>
-      `;
+      container.innerHTML = `<div style="margin-bottom:16px;"><select id="tzFrom-${id}" style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:12px; color:white; margin-bottom:12px;"><option value="America/New_York">New York (EST)</option><option value="America/Los_Angeles">Los Angeles (PST)</option><option value="Europe/London">London (GMT)</option><option value="Asia/Tokyo">Tokyo (JST)</option></select><select id="tzTo-${id}" style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:12px; color:white;"><option value="America/Los_Angeles">Los Angeles (PST)</option><option value="America/New_York">New York (EST)</option><option value="Europe/London">London (GMT)</option><option value="Asia/Tokyo">Tokyo (JST)</option></select></div><button id="convertTZ-${id}" style="width:100%; padding:12px; background:var(--accent); border:none; border-radius:30px; color:white; cursor:pointer;">Convert Time</button><div id="tzResult-${id}" style="margin-top:16px; background:rgba(0,0,0,0.3); padding:16px; border-radius:12px;"></div>`;
       document.getElementById(`convertTZ-${id}`).onclick = () => {
-        const from = document.getElementById(`tzFrom-${id}`).value;
         const to = document.getElementById(`tzTo-${id}`).value;
         const now = new Date();
         const options = { timeZone: to, hour: '2-digit', minute: '2-digit', hour12: true };
@@ -1151,15 +984,11 @@ function createBattleshipWindow() {
   }
   
   function checkWin(board) {
-    for(let i = 0; i < size; i++) {
-      for(let j = 0; j < size; j++) {
-        if(board[i][j] === 'ship') return false;
-      }
-    }
+    for(let i=0;i<size;i++) for(let j=0;j<size;j++) if(board[i][j] === 'ship') return false;
     return true;
   }
   
-  function playerMove(row, col) {
+  function playerMove(row,col) {
     if(!gameActive || currentTurn !== 'player' || playerShots[row][col]) return;
     playerShots[row][col] = true;
     if(enemyBoard[row][col] === 'ship') {
@@ -1182,8 +1011,8 @@ function createBattleshipWindow() {
   
   function enemyMove() {
     if(!gameActive || currentTurn !== 'enemy') return;
-    let row, col;
-    do { row = Math.floor(Math.random() * size); col = Math.floor(Math.random() * size); } while(enemyShots[row][col]);
+    let row,col;
+    do { row = Math.floor(Math.random()*size); col = Math.floor(Math.random()*size); } while(enemyShots[row][col]);
     enemyShots[row][col] = true;
     if(playerBoard[row][col] === 'ship') {
       playerBoard[row][col] = 'hit';
@@ -1207,7 +1036,7 @@ function createBattleshipWindow() {
     const cellSize = 250 / size;
     const col = Math.floor((e.clientX - rect.left) / cellSize);
     const row = Math.floor((e.clientY - rect.top) / cellSize);
-    if(row >= 0 && row < size && col >= 0 && col < size) playerMove(row, col);
+    if(row >=0 && row < size && col >=0 && col < size) playerMove(row,col);
   });
   
   document.getElementById(`resetBattleship-${id}`).onclick = () => { initBoards(); document.getElementById(`battleshipStatus-${id}`).innerHTML = 'New game! Place your shots.'; };
@@ -1256,7 +1085,6 @@ function createHangmanWindow() {
     document.getElementById(`hangmanWord-${id}`).innerHTML = displayWord;
     document.getElementById(`hangmanGuesses-${id}`).innerHTML = `Wrong guesses (${wrongGuesses}/6): ${guessed.filter(l => !currentWord.includes(l)).join(', ')}`;
     document.getElementById(`hangmanMessage-${id}`).innerHTML = wrongGuesses >= 6 ? '💀 Game Over! You lose.' : (displayWord.replace(/ /g, '') === currentWord ? '🎉 Congratulations! You win!' : '');
-    
     const keyboard = document.getElementById(`hangmanKeyboard-${id}`);
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     keyboard.innerHTML = letters.map(l => `<button class="calc-btn" data-letter="${l}" style="padding:8px; ${guessed.includes(l) ? 'opacity:0.5;' : ''}" ${guessed.includes(l) || wrongGuesses >= 6 || displayWord.replace(/ /g, '') === currentWord ? 'disabled' : ''}>${l}</button>`).join('');
@@ -1316,7 +1144,7 @@ function createGameHubWindow() {
     if (cat !== 'all') filtered = filtered.filter(g => g.category === cat);
     const term = searchInput?.value.toLowerCase() || '';
     if (term) filtered = filtered.filter(g => g.name.toLowerCase().includes(term));
-    grid.innerHTML = filtered.map(game => `<div class="game-card" data-game='${JSON.stringify(game)}'><img src="${game.image}" onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'"><div class="game-card-info"><div class="game-card-title">${game.name}</div><div class="game-card-category">${game.category}</div><div style="font-size:10px; color:gray;">⏱️ ${Math.floor(gamePlayTime[game.name] || 0)}h played</div></div></div>`).join('');
+    grid.innerHTML = filtered.map(game => `<div class="game-card" data-game='${JSON.stringify(game)}'><img src="${game.image}" onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'"><div class="game-card-info"><div class="game-card-title">${game.name}</div><div class="game-card-category">${game.category}</div><div class="game-card-stats">⏱️ ${Math.floor(gamePlayTime[game.name] || 0)}h played</div></div></div>`).join('');
     grid.querySelectorAll('.game-card').forEach(card => {
       card.addEventListener('click', () => {
         const game = JSON.parse(card.dataset.game);
@@ -1387,7 +1215,6 @@ function createAppWindow(app, x=150, y=100, w=500, h=400) {
   if(app.id === 'chess') return createChessWindow();
   if(app.id === 'battleship') return createBattleshipWindow();
   if(app.id === 'hangman') return createHangmanWindow();
-  if(app.id === 'weather') return createWeatherWindow();
   
   const id = nextWindowId++;
   const win = document.createElement('div');
@@ -1398,19 +1225,13 @@ function createAppWindow(app, x=150, y=100, w=500, h=400) {
   
   switch(app.appType) {
     case 'calculator':
-      content = `<div style="background:rgba(0,0,0,0.3); border-radius:16px; padding:20px; text-align:right; font-size:32px; font-family:monospace;" id="calcDisplay-${id}">0</div>
-      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px;">
-        ${['7','8','9','/','4','5','6','*','1','2','3','-','0','.','=','+'].map(v => `<button class="calc-btn" data-val="${v}">${v}</button>`).join('')}
-        <button class="calc-btn" data-val="C" style="grid-column:span2; background:var(--danger);">C</button>
-        <button class="calc-btn" data-val="⌫" style="background:var(--warning);">⌫</button>
-      </div>`;
+      content = `<div style="background:rgba(0,0,0,0.3); border-radius:16px; padding:20px; text-align:right; font-size:32px; font-family:monospace;" id="calcDisplay-${id}">0</div><div style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px;">${['7','8','9','/','4','5','6','*','1','2','3','-','0','.','=','+'].map(v => `<button class="calc-btn" data-val="${v}">${v}</button>`).join('')}<button class="calc-btn" data-val="C" style="grid-column:span2; background:var(--danger);">C</button><button class="calc-btn" data-val="⌫" style="background:var(--warning);">⌫</button></div>`;
       break;
     case 'notes':
       content = `<textarea id="notesApp-${id}" style="width:100%; height:100%; background:rgba(0,0,0,0.3); border:none; color:white; padding:12px; resize:none;" placeholder="Write your notes..."></textarea>`;
       break;
     case 'timer':
-      content = `<div style="text-align:center; padding:20px;"><div style="font-size:48px; font-family:monospace;" id="timerDisplay-${id}">25:00</div>
-      <div style="display:flex; gap:10px; justify-content:center; margin-top:20px;"><button class="calc-btn" id="timerStart-${id}">Start</button><button class="calc-btn" id="timerPause-${id}">Pause</button><button class="calc-btn" id="timerReset-${id}">Reset</button></div></div>`;
+      content = `<div style="text-align:center; padding:20px;"><div style="font-size:48px; font-family:monospace;" id="timerDisplay-${id}">25:00</div><div style="display:flex; gap:10px; justify-content:center; margin-top:20px;"><button class="calc-btn" id="timerStart-${id}">Start</button><button class="calc-btn" id="timerPause-${id}">Pause</button><button class="calc-btn" id="timerReset-${id}">Reset</button></div></div>`;
       break;
     case 'tasks':
       content = `<div style="display:flex; gap:8px; margin-bottom:16px;"><input type="text" id="taskInput-${id}" placeholder="New task..." style="flex:1; padding:10px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:12px; color:white;"><button class="calc-btn" id="addTask-${id}">Add</button></div><div id="taskList-${id}" style="display:flex; flex-direction:column; gap:8px;"></div>`;
@@ -1422,8 +1243,7 @@ function createAppWindow(app, x=150, y=100, w=500, h=400) {
       content = `<div style="text-align:center; padding:40px;"><div style="font-size:64px; margin-bottom:20px;">🎱</div><input type="text" id="eightballQuestion-${id}" placeholder="Ask a question..." style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:12px; color:white; margin-bottom:16px;"><button class="calc-btn" id="askEightball-${id}">Ask</button><div id="eightballAnswer-${id}" style="margin-top:20px; font-size:18px;"></div></div>`;
       break;
     case 'whiteboard':
-      content = `<canvas id="whiteboard-${id}" style="width:100%; height:300px; background:white; border-radius:12px; cursor:crosshair;"></canvas>
-      <div style="display:flex; gap:8px; margin-top:12px;"><button class="calc-btn" id="clearCanvas-${id}">Clear</button><button class="calc-btn" id="saveCanvas-${id}">Save</button><input type="color" id="penColor-${id}" value="#000000"></div>`;
+      content = `<canvas id="whiteboard-${id}" style="width:100%; height:300px; background:white; border-radius:12px; cursor:crosshair;"></canvas><div style="display:flex; gap:8px; margin-top:12px;"><button class="calc-btn" id="clearCanvas-${id}">Clear</button><button class="calc-btn" id="saveCanvas-${id}">Save</button><input type="color" id="penColor-${id}" value="#000000"></div>`;
       break;
     case 'browser':
       content = `<iframe src="https://www.google.com" style="width:100%; height:100%; border:none;"></iframe>`;
@@ -1531,40 +1351,6 @@ function createAppWindow(app, x=150, y=100, w=500, h=400) {
   return id;
 }
 
-function createWeatherWindow() {
-  const id = nextWindowId++;
-  const win = document.createElement('div');
-  win.className = 'window';
-  win.id = `window-${id}`;
-  win.style.cssText = `left:150px; top:100px; width:500px; height:450px;`;
-  win.innerHTML = `
-    <div class="window-header"><div class="window-title"><span>🌤️</span><span>Weather</span></div><div class="window-controls"><button class="window-control minimize">─</button><button class="window-control maximize">□</button><button class="window-control close">✕</button></div></div>
-    <div class="window-content"><div><input type="text" id="weatherCity-${id}" placeholder="Enter city..." style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:12px; color:white; margin-bottom:12px;"><button id="weatherGet-${id}" style="width:100%; padding:12px; background:var(--accent); border:none; border-radius:30px; color:white; cursor:pointer;">Get Weather</button><div id="weatherResult-${id}" style="margin-top:16px; background:rgba(0,0,0,0.3); padding:16px; border-radius:12px;"></div></div></div>
-  `;
-  document.body.appendChild(win);
-  windows.push({ id, element: win, app: APPS.find(a => a.id === 'weather'), minimized: false, maximized: false, x:150, y:100, w:500, h:450 });
-  focusWindow(id);
-  setupWindowEvents(win, id);
-  addResizeHandles(win, id);
-  updateTaskbar();
-  
-  document.getElementById(`weatherGet-${id}`).onclick = async () => {
-    const city = document.getElementById(`weatherCity-${id}`).value;
-    if(!city) return;
-    try {
-      const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1`);
-      const geoData = await geoRes.json();
-      if(!geoData.results) { document.getElementById(`weatherResult-${id}`).innerHTML = 'City not found'; return; }
-      const { latitude, longitude, name } = geoData.results[0];
-      const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`);
-      const weatherData = await weatherRes.json();
-      const temp = Math.round(weatherData.current_weather.temperature);
-      document.getElementById(`weatherResult-${id}`).innerHTML = `<div style="text-align:center;"><div style="font-size:48px;">${temp}°F</div><div>${name}</div></div>`;
-    } catch(e) { document.getElementById(`weatherResult-${id}`).innerHTML = 'Error fetching weather'; }
-  };
-  return id;
-}
-
 function addResizeHandles(win, id) {
   const handles = ['n','s','w','e','nw','ne','sw','se'];
   handles.forEach(dir => {
@@ -1629,6 +1415,23 @@ function closeWindowWithAnimation(id) {
   }
 }
 
+function launchAppWithAnimation(app, iconElement) {
+  const rect = iconElement.getBoundingClientRect();
+  const existing = windows.find(w => w.app?.id === app.id);
+  if(existing) {
+    if(existing.minimized) toggleMinimize(existing.id);
+    focusWindow(existing.id);
+    return;
+  }
+  const winId = launchApp(app);
+  const win = windows.find(w => w.id === winId);
+  if(win) {
+    win.element.style.transformOrigin = `${rect.left + rect.width/2}px ${rect.top + rect.height/2}px`;
+    win.element.classList.add('opening');
+    setTimeout(() => win.element.classList.remove('opening'), 200);
+  }
+}
+
 function focusWindow(id) {
   activeWindowId = id;
   windows.forEach(win => {
@@ -1677,8 +1480,6 @@ function updateTaskbar() {
 }
 
 function launchApp(app) {
-  const existing = windows.find(w => w.app?.id === app.id);
-  if(existing) { if(existing.minimized) toggleMinimize(existing.id); focusWindow(existing.id); return existing.id; }
   if(app.isBuiltin) return createGameHubWindow();
   else if(app.isEmulator) return createEmulatorWindow();
   else if(app.appType) return createAppWindow(app);
@@ -1832,7 +1633,7 @@ async function initDesktop() {
     if((e.ctrlKey || e.metaKey) && e.key === 'm') { e.preventDefault(); if(activeWindowId) toggleMinimize(activeWindowId); }
   });
   
-  showToast('🎉 Welcome to fanterOS! Right-click desktop for sum options :3');
+  showToast('🎉 Welcome to fanterOS! Right-click desktop for options');
 }
 
 document.getElementById('loginBtn').onclick = handleLogin;
