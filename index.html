@@ -10,10 +10,21 @@
     :root{--accent:#7c5cff;--bg-glass:rgba(15,15,25,0.85);--border-glass:rgba(255,255,255,0.08);--text-primary:#f0f0ff;--text-secondary:#a0a0c0;--text-muted:#606080;--danger:#ff5e5e;--success:#4cd964;--warning:#ffcc00}
     body{font-family:'Inter',sans-serif;background:#0a0a0f;height:100vh;overflow:hidden;color:var(--text-primary)}
     
+    /* Glassmorphism base */
+    .window, .taskbar, .start-menu, .boot-menu, .context-menu, .widget, .recent-apps-row, .sound-control, .quick-settings, .widgets-panel {
+      backdrop-filter: blur(12px);
+      background: var(--bg-glass);
+    }
+    
+    /* Fullscreen removes glass */
+    .window.maximized {
+      backdrop-filter: none;
+      background: rgba(18,18,26,0.98);
+    }
+    
     @keyframes slideUp{0%{transform:translateY(20px);opacity:0}100%{transform:translateY(0);opacity:1}}
     @keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
-    @keyframes fadeOut{0%{opacity:1}100%{opacity:0}}
-    @keyframes windowPop{0%{transform:scale(0.3) translateY(50px);opacity:0}100%{transform:scale(1) translateY(0);opacity:1}}
+    @keyframes windowPop{0%{transform:scale(0.3) translateY(50px);opacity:0}80%{transform:scale(1.02)}100%{transform:scale(1) translateY(0);opacity:1}}
     @keyframes windowCloseAnim{0%{transform:scale(1);opacity:1}100%{transform:scale(0.2) translateY(100px);opacity:0}}
     @keyframes fullscreenEnter{0%{transform:scale(0.95);opacity:0}100%{transform:scale(1);opacity:1}}
     @keyframes fadeInIcons{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
@@ -21,8 +32,32 @@
     .fade-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:19999;opacity:0;pointer-events:none;transition:opacity 2s ease}
     .fade-overlay.active{opacity:1;pointer-events:all}
     
+    /* Marquee selection */
+    .marquee-selection {
+      position: absolute;
+      border: 2px solid var(--accent);
+      background: rgba(124,92,255,0.1);
+      pointer-events: none;
+      z-index: 10000;
+      display: none;
+    }
+    
+    /* Wallpaper presets */
+    .wallpaper-solace{background-image:url('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/ee4c29a6-9564-4bee-befd-79a0597c29ca/dhsrl04-16049839-0c0f-4077-977f-09a992ec4b07.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiIvZi9lZTRjMjlhNi05NTY0LTRiZWUtYmVmZC03OWEwNTk3YzI5Y2EvZGhzcmwwNC0xNjA0OTgzOS0wYzBmLTQwNzctOTc3Zi0wOWE5OTJlYzRiMDcuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.XIZi3LNLcPUgY_lP-4R7TJ2r6klMfpBRxT7-cMHGvic')}
+    .wallpaper-land{background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7c-QOc5ISuGZ6bmIzNAuOQiz9ngy_UbXvbg&s')}
+    .wallpaper-flow{background-image:url('https://i.redd.it/wallpaper-pack-more-in-the-desc-v0-fqzef996ntt81.png?width=6016&format=png&auto=webp&s=194a7425819ef5c1166f88eefeb67f9a758916d4')}
+    .wallpaper-liney{background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV-Ul-Y4fhrjfWEFkbxZoQk-jEFZjTv5bRog&s')}
+    .wallpaper-reflection{background-image:url('https://i.redd.it/2cpsrvjldn3a1.jpg')}
+    .wallpaper-swirl{background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQUDodvPd3LCZWdy6YzSHRxdSzu3Wn6cNsUew&s')}
+    .wallpaper-morning{background-image:url('https://thumbs.dreamstime.com/b/ethereal-celestial-sunset-sky-grass-silhouette-flaring-light-mystical-landscape-illustration-captures-profound-451909202.jpg')}
+    .wallpaper-minecraftian{background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSt2kxzqFZR9IrVdWL04CFvDdkI-8hMLz3RSg&s')}
+    .wallpaper-jump{background-image:url('https://images.pexels.com/photos/15591636/pexels-photo-15591636/free-photo-of-silhouette-of-a-person-sitting-at-the-edge-of-a-rock-at-sunset.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500')}
+    .wallpaper-oldenlake{background-image:url('https://images.pexels.com/photos/28318336/pexels-photo-28318336.jpeg?cs=srgb&dl=pexels-ruben-reijgwart-820557011-28318336.jpg&fm=jpg')}
+    .wallpaper-minecraftian2{background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0lUjm8dqO71I0BPnui_mG01bUuNjp0-lu7g&s')}
+    .wallpaper-liquid{background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf0ro4HGLM_R577boLd8zMnKibbJAeADUxOw&s')}
+    
     /* Login Screen */
-    .login-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:url('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/ee4c29a6-9564-4bee-befd-79a0597c29ca/dhsrl04-16049839-0c0f-4077-977f-09a992ec4b07.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiIvZi9lZTRjMjlhNi05NTY0LTRiZWUtYmVmZC03OWEwNTk3YzI5Y2EvZGhzcmwwNC0xNjA0OTgzOS0wYzBmLTQwNzctOTc3Zi0wOWE5OTJlYzRiMDcuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.XIZi3LNLcPUgY_lP-4R7TJ2r6klMfpBRxT7-cMHGvic') center/cover no-repeat;z-index:10000;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity 0.6s ease}
+    .login-screen{position:fixed;top:0;left:0;width:100%;height:100%;background-size:cover;background-position:center;z-index:10000;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity 0.6s ease}
     .login-screen::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px)}
     .login-screen.visible{opacity:1;visibility:visible}
     .login-card{position:relative;z-index:10;background:var(--bg-glass);backdrop-filter:blur(20px);border:1px solid var(--border-glass);border-radius:32px;padding:40px;width:400px;text-align:center;animation:slideUp 0.4s ease}
@@ -40,249 +75,208 @@
     /* Desktop */
     .desktop{position:fixed;top:0;left:0;width:100%;height:100%;opacity:0;visibility:hidden;transition:opacity 2s ease;z-index:1}
     .desktop.visible{opacity:1;visibility:visible}
-    .desktop-bg{position:absolute;top:0;left:0;width:100%;height:100%;background:url('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/ee4c29a6-9564-4bee-befd-79a0597c29ca/dhsrl04-16049839-0c0f-4077-977f-09a992ec4b07.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiIvZi9lZTRjMjlhNi05NTY0LTRiZWUtYmVmZC03OWEwNTk3YzI5Y2EvZGhzcmwwNC0xNjA0OTgzOS0wYzBmLTQwNzctOTc3Zi0wOWE5OTJlYzRiMDcuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.XIZi3LNLcPUgY_lP-4R7TJ2r6klMfpBRxT7-cMHGvic') center/cover no-repeat;z-index:-1}
+    .desktop-bg{position:absolute;top:0;left:0;width:100%;height:100%;background-size:cover;background-position:center;z-index:-1}
     .desktop-bg::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.3)}
     
     /* Desktop Icons */
-    .desktop-icons-left{position:absolute;top:20px;left:20px;display:flex;flex-direction:column;gap:12px;z-index:15}
-    .desktop-icons-right{position:absolute;top:20px;right:20px;display:flex;flex-direction:column;gap:12px;z-index:15}
-    .desktop-icon{display:flex;flex-direction:column;align-items:center;width:95px;padding:12px 8px;border-radius:14px;cursor:pointer;transition:all 0.2s ease;opacity:0;transform:translateY(20px);animation:fadeInIcons 0.4s ease forwards;position:relative}
-    .desktop-icon:hover{background:rgba(255,255,255,0.15);transform:translateY(-3px)}
-    .desktop-icon .icon{font-size:42px;margin-bottom:8px;position:relative}
-    .desktop-icon .icon img{width:42px;height:42px;border-radius:14px;object-fit:cover}
-    .desktop-icon .label{font-size:12px;text-align:center;color:white;font-weight:500}
+    .desktop-icons-left, .desktop-icons-right{position:absolute;top:0;left:0;width:100%;height:100%;z-index:15}
+    .desktop-icon{position:absolute;display:flex;flex-direction:column;align-items:center;width:85px;padding:10px 6px;border-radius:14px;cursor:pointer;transition:all 0.2s ease;background:rgba(0,0,0,0.3);backdrop-filter:blur(4px)}
+    .desktop-icon:hover{background:rgba(255,255,255,0.2);transform:translateY(-3px)}
+    .desktop-icon .icon{font-size:36px;margin-bottom:6px}
+    .desktop-icon .icon img{width:36px;height:36px;border-radius:10px;object-fit:cover}
+    .desktop-icon .label{font-size:10px;text-align:center;color:white;font-weight:500;text-shadow:0 1px 2px rgba(0,0,0,0.5)}
     .desktop-icon .unpin-btn{position:absolute;top:-8px;right:-8px;width:18px;height:18px;background:var(--danger);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:10px;color:white;cursor:pointer;z-index:20}
     .desktop-icon:hover .unpin-btn{display:flex}
     
-    /* Recent Apps Row */
-    .recent-apps-row{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);background:var(--bg-glass);backdrop-filter:blur(20px);border:1px solid var(--border-glass);border-radius:20px;padding:10px 20px;z-index:15;display:flex;gap:15px;white-space:nowrap}
-    .recent-apps-title{font-size:11px;color:var(--text-muted);padding-right:12px;border-right:1px solid var(--border-glass);display:flex;align-items:center}
-    .recent-app-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:5px 10px;border-radius:12px;transition:all 0.15s}
+    /* Recent Apps Row - integrated into taskbar area */
+    .recent-apps-row{position:absolute;bottom:60px;left:50%;transform:translateX(-50%);background:var(--bg-glass);backdrop-filter:blur(20px);border:1px solid var(--border-glass);border-radius:20px;padding:6px 16px;z-index:15;display:flex;gap:12px;white-space:nowrap;cursor:grab}
+    .recent-apps-row.dragging{cursor:grabbing;opacity:0.8}
+    .recent-apps-title{font-size:10px;color:var(--text-muted);padding-right:10px;border-right:1px solid var(--border-glass);display:flex;align-items:center}
+    .recent-app-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:4px 8px;border-radius:10px;transition:all 0.15s}
     .recent-app-item:hover{background:rgba(255,255,255,0.1);transform:translateY(-2px)}
-    .recent-app-icon{font-size:24px}
-    .recent-app-icon img{width:24px;height:24px;border-radius:6px}
-    .recent-app-name{font-size:9px;color:var(--text-secondary)}
+    .recent-app-icon{font-size:20px}
+    .recent-app-icon img{width:20px;height:20px;border-radius:5px}
+    .recent-app-name{font-size:8px;color:var(--text-secondary);max-width:50px;overflow:hidden;text-overflow:ellipsis}
     
     /* Sound Control */
-    .sound-control{position:fixed;bottom:80px;right:20px;background:var(--bg-glass);backdrop-filter:blur(20px);border:1px solid var(--border-glass);border-radius:20px;padding:8px 12px;z-index:15;display:flex;gap:8px;align-items:center;cursor:pointer}
-    .sound-control:hover{background:rgba(255,255,255,0.1)}
+    .sound-control{position:fixed;bottom:12px;right:12px;background:var(--bg-glass);backdrop-filter:blur(20px);border:1px solid var(--border-glass);border-radius:20px;padding:6px 10px;z-index:15;display:flex;gap:6px;align-items:center;cursor:pointer}
     
     /* Widgets */
-    .desktop-widgets{position:absolute;bottom:80px;left:20px;display:none;gap:12px;z-index:15}
+    .desktop-widgets{position:absolute;bottom:12px;left:12px;display:none;gap:10px;z-index:15}
     .desktop-widgets.visible{display:flex}
-    .widget{background:var(--bg-glass);backdrop-filter:blur(20px);border:1px solid var(--border-glass);border-radius:20px;padding:12px;min-width:120px;cursor:pointer;transition:all 0.2s}
-    .widget:hover{transform:translateY(-4px);background:rgba(25,25,35,0.9)}
-    .widget-title{font-size:11px;color:var(--text-muted);margin-bottom:8px}
-    .widget-time{font-size:28px;font-weight:600;font-family:monospace}
-    .widget-date{font-size:10px;color:var(--text-secondary);margin-top:4px}
-    .calendar-day{font-size:32px;font-weight:600}
-    .battery-level{font-size:28px;font-weight:600;font-family:monospace}
-    .battery-status{font-size:10px;color:var(--text-secondary);margin-top:4px}
-    .weather-temp{font-size:24px;font-weight:600}
-    .weather-condition{font-size:10px;color:var(--text-secondary)}
+    .widget{background:var(--bg-glass);backdrop-filter:blur(20px);border:1px solid var(--border-glass);border-radius:16px;padding:8px 12px;min-width:100px;cursor:grab;transition:all 0.2s}
+    .widget:hover{transform:translateY(-2px);background:rgba(25,25,35,0.95)}
+    .widget.dragging{cursor:grabbing;opacity:0.7}
+    .widget-title{font-size:9px;color:var(--text-muted);margin-bottom:4px}
+    .widget-time{font-size:22px;font-weight:600;font-family:monospace}
+    .widget-date{font-size:8px;color:var(--text-secondary);margin-top:2px}
+    .calendar-day{font-size:24px;font-weight:600}
+    .battery-level{font-size:22px;font-weight:600;font-family:monospace}
+    .battery-status{font-size:8px;color:var(--text-secondary);margin-top:2px}
+    .weather-temp{font-size:18px;font-weight:600}
+    .weather-condition{font-size:8px;color:var(--text-secondary)}
     
     /* Widgets Panel */
-    .widgets-panel{position:fixed;bottom:56px;right:12px;width:250px;background:var(--bg-glass);backdrop-filter:blur(24px);border-radius:16px;border:1px solid var(--border-glass);z-index:1002;transform:translateY(20px);opacity:0;visibility:hidden;transition:all 0.2s}
+    .widgets-panel{position:fixed;bottom:56px;right:12px;width:220px;background:var(--bg-glass);backdrop-filter:blur(24px);border-radius:14px;border:1px solid var(--border-glass);z-index:1002;transform:translateY(20px);opacity:0;visibility:hidden;transition:all 0.2s}
     .widgets-panel.open{transform:translateY(0);opacity:1;visibility:visible}
-    .widgets-panel-header{padding:12px 16px;border-bottom:1px solid var(--border-glass);font-weight:600}
-    .widgets-panel-item{padding:10px 16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+    .widgets-panel-header{padding:10px 14px;border-bottom:1px solid var(--border-glass);font-weight:600;font-size:12px}
+    .widgets-panel-item{padding:8px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:12px}
     .widgets-panel-item:hover{background:rgba(255,255,255,0.05)}
     
+    /* Wallpaper Preset Menu */
+    .wallpaper-menu{position:fixed;bottom:56px;right:12px;width:280px;background:var(--bg-glass);backdrop-filter:blur(24px);border-radius:14px;border:1px solid var(--border-glass);z-index:1002;transform:translateY(20px);opacity:0;visibility:hidden;transition:all 0.2s;max-height:400px;overflow-y:auto}
+    .wallpaper-menu.open{transform:translateY(0);opacity:1;visibility:visible}
+    .wallpaper-menu-header{padding:10px 14px;border-bottom:1px solid var(--border-glass);font-weight:600;font-size:12px}
+    .wallpaper-option{padding:8px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;font-size:12px}
+    .wallpaper-option:hover{background:rgba(255,255,255,0.05)}
+    .wallpaper-preview{width:30px;height:30px;border-radius:6px;background-size:cover;background-position:center}
+    
     /* Taskbar */
-    .taskbar{position:fixed;bottom:0;left:0;right:0;height:52px;background:var(--bg-glass);backdrop-filter:blur(20px);border-top:1px solid var(--border-glass);display:flex;align-items:center;justify-content:space-between;padding:0 12px;z-index:1000}
-    .start-btn{display:flex;align-items:center;gap:8px;padding:8px 18px;background:linear-gradient(135deg,var(--accent),#5a3cc9);border-radius:12px;cursor:pointer;font-weight:600;font-size:13px}
-    .start-btn img{width:24px;height:24px;object-fit:contain;border-radius:6px}
+    .taskbar{position:fixed;bottom:0;left:0;right:0;height:48px;background:var(--bg-glass);backdrop-filter:blur(20px);border-top:1px solid var(--border-glass);display:flex;align-items:center;justify-content:space-between;padding:0 12px;z-index:1000}
+    .start-btn{display:flex;align-items:center;gap:6px;padding:6px 14px;background:linear-gradient(135deg,var(--accent),#5a3cc9);border-radius:10px;cursor:pointer;font-weight:600;font-size:12px}
+    .start-btn img{width:20px;height:20px;object-fit:contain;border-radius:5px}
     .start-btn:hover{transform:scale(1.02)}
-    .taskbar-apps{display:flex;gap:6px;flex:1;margin:0 12px;overflow-x:auto}
-    .taskbar-app{padding:6px 14px;background:rgba(255,255,255,0.08);border-radius:10px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:12px;transition:all 0.15s}
+    .taskbar-apps{display:flex;gap:4px;flex:1;margin:0 10px;overflow-x:auto}
+    .taskbar-app{padding:5px 12px;background:rgba(255,255,255,0.08);border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:11px;transition:all 0.15s}
     .taskbar-app:hover{background:rgba(255,255,255,0.15)}
     .taskbar-app.active{background:var(--accent)}
-    .taskbar-right{display:flex;align-items:center;gap:12px}
-    .taskbar-datetime{display:flex;flex-direction:column;align-items:flex-end;padding:4px 8px;cursor:pointer;border-radius:8px}
+    .taskbar-right{display:flex;align-items:center;gap:10px}
+    .taskbar-datetime{display:flex;flex-direction:column;align-items:flex-end;padding:2px 6px;cursor:pointer;border-radius:6px}
     .taskbar-datetime:hover{background:rgba(255,255,255,0.1)}
-    .taskbar-time{font-size:12px;font-weight:500}
-    .taskbar-date{font-size:9px;color:var(--text-muted)}
+    .taskbar-time{font-size:11px;font-weight:500}
+    .taskbar-date{font-size:8px;color:var(--text-muted)}
     
     /* Start Menu */
-    .start-menu{position:fixed;bottom:56px;left:12px;width:500px;background:var(--bg-glass);backdrop-filter:blur(24px);border-radius:16px;border:1px solid var(--border-glass);z-index:1001;transform:translateY(20px) scale(0.98);opacity:0;visibility:hidden;transition:all 0.2s;overflow:hidden;max-height:600px}
+    .start-menu{position:fixed;bottom:52px;left:10px;width:450px;background:var(--bg-glass);backdrop-filter:blur(24px);border-radius:14px;border:1px solid var(--border-glass);z-index:1001;transform:translateY(20px) scale(0.98);opacity:0;visibility:hidden;transition:all 0.2s;overflow:hidden;max-height:550px}
     .start-menu.open{transform:translateY(0) scale(1);opacity:1;visibility:visible}
-    .start-header{padding:20px;background:linear-gradient(135deg,rgba(124,92,255,0.2),rgba(124,92,255,0.05));border-bottom:1px solid var(--border-glass);display:flex;align-items:center;gap:12px}
-    .start-avatar{width:52px;height:52px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden}
-    .start-avatar img{width:100%;height:100%;object-fit:cover}
+    .start-header{padding:16px;background:linear-gradient(135deg,rgba(124,92,255,0.2),rgba(124,92,255,0.05));border-bottom:1px solid var(--border-glass);display:flex;align-items:center;gap:10px}
+    .start-avatar{width:44px;height:44px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;overflow:hidden}
     .start-user-info{flex:1}
-    .start-user-name{font-weight:600;font-size:16px}
-    .start-user-email{font-size:11px;color:var(--text-muted)}
-    .start-categories{display:flex;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border-glass);overflow-x:auto}
-    .start-cat-btn{background:rgba(255,255,255,0.05);border:none;border-radius:20px;padding:6px 14px;color:white;font-size:12px;cursor:pointer;white-space:nowrap}
+    .start-user-name{font-weight:600;font-size:14px}
+    .start-user-email{font-size:9px;color:var(--text-muted)}
+    .start-categories{display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid var(--border-glass);overflow-x:auto}
+    .start-cat-btn{background:rgba(255,255,255,0.05);border:none;border-radius:16px;padding:4px 12px;color:white;font-size:11px;cursor:pointer;white-space:nowrap}
     .start-cat-btn.active{background:var(--accent)}
-    .start-search{padding:12px 16px;border-bottom:1px solid var(--border-glass)}
-    .start-search input{width:100%;padding:10px 14px;background:rgba(0,0,0,0.3);border:1px solid var(--border-glass);border-radius:12px;color:white;font-size:13px;outline:none}
-    .start-apps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:16px;max-height:350px;overflow-y:auto}
-    .start-app{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px;border-radius:12px;cursor:pointer;transition:all 0.1s;position:relative}
+    .start-search{padding:10px 12px;border-bottom:1px solid var(--border-glass)}
+    .start-search input{width:100%;padding:8px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--border-glass);border-radius:10px;color:white;font-size:12px;outline:none}
+    .start-apps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:12px;max-height:350px;overflow-y:auto}
+    .start-app{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px;border-radius:10px;cursor:pointer;transition:all 0.1s;position:relative}
     .start-app:hover{background:rgba(255,255,255,0.1);transform:translateY(-2px)}
-    .start-app-icon{font-size:32px;position:relative}
-    .start-app-icon img{width:32px;height:32px;border-radius:10px}
-    .start-app-name{font-size:12px;text-align:center;max-width:80px;overflow:hidden;text-overflow:ellipsis}
-    .start-app-pin{position:absolute;top:-4px;right:-4px;font-size:10px;background:rgba(0,0,0,0.5);border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0}
+    .start-app-icon{font-size:28px}
+    .start-app-icon img{width:28px;height:28px;border-radius:8px}
+    .start-app-name{font-size:10px;text-align:center;max-width:70px;overflow:hidden;text-overflow:ellipsis}
+    .start-app-pin{position:absolute;top:-2px;right:-2px;font-size:8px;background:rgba(0,0,0,0.5);border-radius:50%;width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0}
     .start-app:hover .start-app-pin{opacity:1}
     
     /* Boot Menu */
-    .boot-menu{position:fixed;top:20%;left:50%;transform:translate(-50%,-30%);width:650px;max-width:90vw;background:var(--bg-glass);backdrop-filter:blur(28px);border-radius:28px;border:1px solid var(--border-glass);z-index:10000;opacity:0;visibility:hidden;transition:all 0.2s}
+    .boot-menu{position:fixed;top:20%;left:50%;transform:translate(-50%,-30%);width:550px;max-width:90vw;background:var(--bg-glass);backdrop-filter:blur(28px);border-radius:24px;border:1px solid var(--border-glass);z-index:10000;opacity:0;visibility:hidden;transition:all 0.2s}
     .boot-menu.open{opacity:1;visibility:visible;transform:translate(-50%,0)}
-    .boot-search{padding:24px;border-bottom:1px solid var(--border-glass)}
-    .boot-search input{width:100%;padding:16px 20px;background:rgba(0,0,0,0.3);border:1px solid var(--border-glass);border-radius:20px;color:white;font-size:18px;outline:none}
-    .boot-results{max-height:450px;overflow-y:auto;padding:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
-    .boot-result{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:14px;cursor:pointer;background:rgba(255,255,255,0.05);transition:all 0.1s}
+    .boot-search{padding:20px;border-bottom:1px solid var(--border-glass)}
+    .boot-search input{width:100%;padding:14px 18px;background:rgba(0,0,0,0.3);border:1px solid var(--border-glass);border-radius:18px;color:white;font-size:16px;outline:none}
+    .boot-results{max-height:400px;overflow-y:auto;padding:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+    .boot-result{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;cursor:pointer;background:rgba(255,255,255,0.05);transition:all 0.1s}
     .boot-result.selected{background:var(--accent)}
     .boot-result:hover:not(.selected){background:rgba(255,255,255,0.15)}
-    .boot-result-icon{font-size:32px}
+    .boot-result-icon{font-size:28px}
     .boot-result-info{flex:1}
-    .boot-result-name{font-weight:500}
-    .boot-footer{padding:12px 20px;border-top:1px solid var(--border-glass);font-size:11px;color:var(--text-muted);display:flex;justify-content:space-between}
+    .boot-result-name{font-weight:500;font-size:13px}
+    .boot-footer{padding:10px 16px;border-top:1px solid var(--border-glass);font-size:10px;color:var(--text-muted);display:flex;justify-content:space-between}
     
     /* Window */
-    .window{position:absolute;min-width:500px;min-height:400px;background:rgba(18,18,26,0.95);border-radius:12px;border:1px solid var(--border-glass);box-shadow:0 20px 40px rgba(0,0,0,0.4);z-index:100;display:flex;flex-direction:column;overflow:hidden}
+    .window{position:absolute;min-width:450px;min-height:350px;background:rgba(18,18,26,0.95);backdrop-filter:blur(4px);border-radius:10px;border:1px solid var(--border-glass);box-shadow:0 20px 40px rgba(0,0,0,0.4);z-index:100;display:flex;flex-direction:column;overflow:hidden}
     .window.active{z-index:200;box-shadow:0 0 0 2px var(--accent)}
     .window.minimized{transform:scale(0)!important;opacity:0;pointer-events:none;transition:transform 0.2s}
     .window.maximized{top:0!important;left:0!important;width:100%!important;height:100%!important;border-radius:0;animation:fullscreenEnter 0.2s ease}
     .window.maximized .window-header{display:none}
     .window.closing{animation:windowCloseAnim 0.2s ease forwards;pointer-events:none}
     .window.opening{animation:windowPop 0.2s ease forwards}
-    .window-header{padding:14px 18px;background:rgba(25,25,35,0.95);cursor:move;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border-glass)}
-    .window-title{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:500}
-    .window-title img{width:22px;height:22px;border-radius:6px}
-    .window-controls{display:flex;gap:10px}
-    .window-control{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;cursor:pointer;font-size:14px;background:transparent;border:none;color:var(--text-secondary);transition:all 0.15s}
+    .window-header{padding:12px 14px;background:rgba(25,25,35,0.95);cursor:move;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border-glass)}
+    .window-title{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:500}
+    .window-title img{width:18px;height:18px;border-radius:5px}
+    .window-controls{display:flex;gap:8px}
+    .window-control{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;cursor:pointer;font-size:12px;background:transparent;border:none;color:var(--text-secondary);transition:all 0.15s}
     .window-control:hover{background:rgba(255,255,255,0.1);transform:scale(1.05)}
     .window-control.close:hover{background:var(--danger);color:white}
-    .window-content{flex:1;overflow:auto;background:rgba(10,10,15,0.95);padding:20px}
-    .window-content iframe{width:100%;height:100%;border:none;background:white;border-radius:8px}
-    
-    /* Calculator */
-    .calculator-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:20px}
-    .calc-btn{background:rgba(255,255,255,0.1);border:none;border-radius:14px;padding:16px;color:white;font-size:18px;cursor:pointer;transition:all 0.1s;min-width:60px}
-    .calc-btn:hover{background:var(--accent);transform:scale(1.02)}
-    .calc-mode-btn{background:rgba(255,255,255,0.05);border:1px solid var(--border-glass);border-radius:12px;padding:8px;color:white;cursor:pointer}
-    .calc-mode-btn.active{background:var(--accent);border-color:var(--accent)}
+    .window-content{flex:1;overflow:auto;background:rgba(10,10,15,0.95);padding:16px}
+    .window-content iframe{width:100%;height:100%;border:none;background:white;border-radius:6px}
     
     /* Resize handles */
     .resize-handle{position:absolute;z-index:10}
     .resize-n,.resize-s,.resize-w,.resize-e{background:transparent}
-    .resize-n{top:0;left:10px;right:10px;height:6px;cursor:n-resize}
-    .resize-s{bottom:0;left:10px;right:10px;height:6px;cursor:s-resize}
-    .resize-w{top:10px;left:0;bottom:10px;width:6px;cursor:w-resize}
-    .resize-e{top:10px;right:0;bottom:10px;width:6px;cursor:e-resize}
-    .resize-nw,.resize-ne,.resize-sw,.resize-se{width:10px;height:10px}
+    .resize-n{top:0;left:10px;right:10px;height:5px;cursor:n-resize}
+    .resize-s{bottom:0;left:10px;right:10px;height:5px;cursor:s-resize}
+    .resize-w{top:10px;left:0;bottom:10px;width:5px;cursor:w-resize}
+    .resize-e{top:10px;right:0;bottom:10px;width:5px;cursor:e-resize}
+    .resize-nw,.resize-ne,.resize-sw,.resize-se{width:8px;height:8px}
     .resize-nw{top:0;left:0;cursor:nw-resize}
     .resize-ne{top:0;right:0;cursor:ne-resize}
     .resize-sw{bottom:0;left:0;cursor:sw-resize}
     .resize-se{bottom:0;right:0;cursor:se-resize}
     
     /* Game Card */
-    .game-card{background:rgba(255,255,255,0.05);border-radius:16px;overflow:hidden;cursor:pointer;transition:all 0.2s}
-    .game-card:hover{transform:translateY(-5px);background:rgba(255,255,255,0.1)}
+    .game-card{background:rgba(255,255,255,0.05);border-radius:14px;overflow:hidden;cursor:pointer;transition:all 0.2s}
+    .game-card:hover{transform:translateY(-4px);background:rgba(255,255,255,0.1)}
     .game-card img{width:100%;aspect-ratio:16/9;object-fit:cover}
-    .game-card-info{padding:12px}
-    .game-card-title{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .game-card-category{font-size:11px;color:var(--text-muted);margin-top:4px}
-    .game-card-stats{font-size:10px;color:gray;margin-top:4px}
+    .game-card-info{padding:10px}
+    .game-card-title{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .game-card-category{font-size:9px;color:var(--text-muted);margin-top:3px}
+    .game-card-stats{font-size:8px;color:gray;margin-top:3px}
     
     /* Game Modal */
     .game-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);backdrop-filter:blur(12px);z-index:20000;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all 0.2s}
     .game-modal.open{opacity:1;visibility:visible}
-    .game-modal-content{background:linear-gradient(135deg,#1a1a2e,#0f0f1a);border-radius:24px;width:900px;max-width:90vw;max-height:85vh;overflow-y:auto;border:1px solid var(--border-glass);box-shadow:0 20px 40px rgba(0,0,0,0.3)}
-    .game-modal-header{position:relative;height:200px;overflow:hidden;border-radius:24px 24px 0 0}
+    .game-modal-content{background:linear-gradient(135deg,#1a1a2e,#0f0f1a);border-radius:20px;width:850px;max-width:90vw;max-height:85vh;overflow-y:auto;border:1px solid var(--border-glass)}
+    .game-modal-header{position:relative;height:180px;overflow:hidden}
     .game-modal-header img{width:100%;height:100%;object-fit:cover}
-    .game-modal-header .overlay{position:absolute;bottom:0;left:0;right:0;padding:20px;background:linear-gradient(transparent,rgba(0,0,0,0.9))}
-    .game-modal-header h2{font-size:28px;font-weight:700}
-    .game-modal-header .tag{display:inline-block;padding:4px 12px;background:var(--accent);border-radius:20px;font-size:12px;margin-top:8px}
-    .game-modal-body{padding:20px;display:flex;gap:20px;flex-wrap:wrap}
+    .game-modal-header .overlay{position:absolute;bottom:0;left:0;right:0;padding:16px;background:linear-gradient(transparent,rgba(0,0,0,0.9))}
+    .game-modal-header h2{font-size:24px;font-weight:700}
+    .game-modal-header .tag{display:inline-block;padding:3px 10px;background:var(--accent);border-radius:16px;font-size:10px;margin-top:6px}
+    .game-modal-body{padding:16px;display:flex;gap:16px;flex-wrap:wrap}
     .game-modal-left{flex:2}
     .game-modal-right{flex:1}
-    .game-description{color:var(--text-secondary);line-height:1.5;margin-bottom:16px;font-size:14px}
-    .game-info-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-glass);font-size:13px}
-    .game-play-btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),#5a3cc9);border:none;border-radius:40px;color:white;font-size:15px;font-weight:600;cursor:pointer;margin-top:16px;transition:all 0.2s}
+    .game-description{color:var(--text-secondary);line-height:1.4;margin-bottom:12px;font-size:12px}
+    .game-info-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border-glass);font-size:11px}
+    .game-play-btn{width:100%;padding:10px;background:linear-gradient(135deg,var(--accent),#5a3cc9);border:none;border-radius:30px;color:white;font-size:13px;font-weight:600;cursor:pointer;margin-top:12px}
     .game-play-btn:hover{transform:translateY(-2px)}
-    .close-modal{position:absolute;top:16px;right:16px;background:rgba(0,0,0,0.5);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;color:white;z-index:10}
+    .close-modal{position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.5);border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;color:white;z-index:10}
     .close-modal:hover{background:var(--danger)}
     
     /* Toast */
-    .toast-large{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.95);backdrop-filter:blur(16px);border:2px solid var(--accent);border-radius:50px;padding:14px 28px;color:white;font-size:15px;z-index:20001;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+    .toast-large{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.95);backdrop-filter:blur(16px);border:2px solid var(--accent);border-radius:40px;padding:10px 24px;color:white;font-size:13px;z-index:20001;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap}
     .toast-large.show{opacity:1}
-    .toast{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.9);border:1px solid var(--accent);border-radius:30px;padding:10px 20px;color:white;font-size:13px;z-index:20001;opacity:0;transition:opacity 0.2s;pointer-events:none}
+    .toast{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.9);border:1px solid var(--accent);border-radius:30px;padding:8px 16px;color:white;font-size:12px;z-index:20001;opacity:0;transition:opacity 0.2s;pointer-events:none}
     .toast.show{opacity:1}
     
     /* Context Menu */
-    .context-menu{position:fixed;background:var(--bg-glass);border-radius:12px;padding:8px 0;min-width:200px;z-index:10001;opacity:0;visibility:hidden}
+    .context-menu{position:fixed;background:var(--bg-glass);border-radius:10px;padding:6px 0;min-width:160px;z-index:10001;opacity:0;visibility:hidden}
     .context-menu.visible{opacity:1;visibility:visible}
-    .context-menu-item{padding:8px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:12px}
+    .context-menu-item{padding:6px 14px;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:10px}
     .context-menu-item:hover{background:rgba(255,255,255,0.1)}
-    .context-menu-divider{height:1px;background:var(--border-glass);margin:6px 0}
+    .context-menu-divider{height:1px;background:var(--border-glass);margin:5px 0}
     
     /* Achievement */
-    .achievement-popup{position:fixed;bottom:80px;right:20px;width:320px;background:linear-gradient(135deg,#1a1a2e,#0f0f1a);border-left:4px solid var(--warning);border-radius:16px;padding:14px 18px;z-index:20002;transform:translateX(420px);transition:transform 0.3s cubic-bezier(0.34,1.2,0.64,1);display:flex;gap:14px;box-shadow:0 10px 30px rgba(0,0,0,0.3)}
+    .achievement-popup{position:fixed;bottom:80px;right:20px;width:280px;background:linear-gradient(135deg,#1a1a2e,#0f0f1a);border-left:4px solid var(--warning);border-radius:12px;padding:10px 14px;z-index:20002;transform:translateX(400px);transition:transform 0.3s;display:flex;gap:10px}
     .achievement-popup.show{transform:translateX(0)}
-    .achievement-icon{font-size:36px}
+    .achievement-icon{font-size:28px}
     .achievement-text{flex:1}
-    .achievement-title{font-size:12px;color:var(--warning);font-weight:600;letter-spacing:1px}
-    .achievement-name{font-size:14px;font-weight:600;margin-top:2px}
-    .achievement-reward{font-size:11px;color:var(--success);margin-top:6px}
+    .achievement-title{font-size:10px;color:var(--warning);font-weight:600}
+    .achievement-name{font-size:12px;font-weight:600;margin-top:2px}
+    .achievement-reward{font-size:10px;color:var(--success);margin-top:3px}
     
-    ::-webkit-scrollbar{width:5px}
+    /* Calculator */
+    .calculator-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px}
+    .calc-btn{background:rgba(255,255,255,0.1);border:none;border-radius:12px;padding:12px;color:white;font-size:16px;cursor:pointer;transition:all 0.1s}
+    .calc-btn:hover{background:var(--accent);transform:scale(1.02)}
+    .calc-mode-btn{background:rgba(255,255,255,0.05);border:1px solid var(--border-glass);border-radius:10px;padding:6px;color:white;cursor:pointer;font-size:11px}
+    .calc-mode-btn.active{background:var(--accent);border-color:var(--accent)}
+    
+    ::-webkit-scrollbar{width:4px}
     ::-webkit-scrollbar-track{background:rgba(255,255,255,0.03)}
     ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15);border-radius:3px}
+    ::-webkit-scrollbar-thumb:hover{background:var(--accent)}
     
     @media (max-width:768px){.desktop-icons-left,.desktop-icons-right,.recent-apps-row,.sound-control{display:none}.window{min-width:90vw;left:5vw!important;right:5vw!important}}
-
-    /* drag recent apps */
-    
-    .recent-apps-row {
-    position: absolute;
-    bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--bg-glass);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--border-glass);
-    border-radius: 20px;
-    padding: 10px 20px;
-    z-index: 15;
-    display: flex;
-    gap: 15px;
-    white-space: nowrap;
-    cursor: grab;
-    transition: all 0.1s ease;
-}
-.recent-apps-row.dragging {
-    cursor: grabbing;
-    opacity: 0.8;
-}
-.recent-apps-row.snapping {
-    transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-}
-
-  /* dragging widgets */
-
-    .widget {
-    cursor: grab;
-    position: relative;
-}
-.widget.dragging {
-    cursor: grabbing;
-    opacity: 0.7;
-    z-index: 1000;
-}
-.widget.snapping {
-    transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-}
-    
-
-    
   </style>
-
-
-
-  
 </head>
 <body>
 
@@ -310,7 +304,7 @@
   
   <div class="recent-apps-row" id="recentAppsRow">
     <div class="recent-apps-title">🕐 RECENT</div>
-    <div id="recentAppsList" style="display:flex; gap:12px;"></div>
+    <div id="recentAppsList" style="display:flex; gap:10px;"></div>
   </div>
   
   <div class="sound-control" id="soundControl">
@@ -326,6 +320,8 @@
   </div>
 </div>
 
+<div class="marquee-selection" id="marqueeSelection"></div>
+
 <!-- Widgets Panel -->
 <div class="widgets-panel" id="widgetsPanel">
   <div class="widgets-panel-header">Widgets <span id="closeWidgetsPanel" style="float:right;cursor:pointer;">✕</span></div>
@@ -333,6 +329,23 @@
   <div class="widgets-panel-item" data-widget="calendar">📅 Calendar Widget <span id="calendarWidgetToggle">✅</span></div>
   <div class="widgets-panel-item" data-widget="weather">🌤️ Weather Widget <span id="weatherWidgetToggle">❌</span></div>
   <div class="widgets-panel-item" data-widget="battery">🔋 Battery Widget <span id="batteryWidgetToggle">❌</span></div>
+</div>
+
+<!-- Wallpaper Preset Menu -->
+<div class="wallpaper-menu" id="wallpaperMenu">
+  <div class="wallpaper-menu-header">Wallpaper Presets <span id="closeWallpaperMenu" style="float:right;cursor:pointer;">✕</span></div>
+  <div class="wallpaper-option" data-wallpaper="solace"><div class="wallpaper-preview" style="background-image:url('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/ee4c29a6-9564-4bee-befd-79a0597c29ca/dhsrl04-16049839-0c0f-4077-977f-09a992ec4b07.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiIvZi9lZTRjMjlhNi05NTY0LTRiZWUtYmVmZC03OWEwNTk3YzI5Y2EvZGhzcmwwNC0xNjA0OTgzOS0wYzBmLTQwNzctOTc3Zi0wOWE5OTJlYzRiMDcuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.XIZi3LNLcPUgY_lP-4R7TJ2r6klMfpBRxT7-cMHGvic')"></div><span>Solace (Default)</span></div>
+  <div class="wallpaper-option" data-wallpaper="land"><div class="wallpaper-preview" style="background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7c-QOc5ISuGZ6bmIzNAuOQiz9ngy_UbXvbg&s')"></div><span>Land</span></div>
+  <div class="wallpaper-option" data-wallpaper="flow"><div class="wallpaper-preview" style="background-image:url('https://i.redd.it/wallpaper-pack-more-in-the-desc-v0-fqzef996ntt81.png?width=6016&format=png&auto=webp&s=194a7425819ef5c1166f88eefeb67f9a758916d4')"></div><span>Flow</span></div>
+  <div class="wallpaper-option" data-wallpaper="liney"><div class="wallpaper-preview" style="background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV-Ul-Y4fhrjfWEFkbxZoQk-jEFZjTv5bRog&s')"></div><span>Liney</span></div>
+  <div class="wallpaper-option" data-wallpaper="reflection"><div class="wallpaper-preview" style="background-image:url('https://i.redd.it/2cpsrvjldn3a1.jpg')"></div><span>Reflection</span></div>
+  <div class="wallpaper-option" data-wallpaper="swirl"><div class="wallpaper-preview" style="background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQUDodvPd3LCZWdy6YzSHRxdSzu3Wn6cNsUew&s')"></div><span>Swirl</span></div>
+  <div class="wallpaper-option" data-wallpaper="morning"><div class="wallpaper-preview" style="background-image:url('https://thumbs.dreamstime.com/b/ethereal-celestial-sunset-sky-grass-silhouette-flaring-light-mystical-landscape-illustration-captures-profound-451909202.jpg')"></div><span>Morning</span></div>
+  <div class="wallpaper-option" data-wallpaper="minecraftian"><div class="wallpaper-preview" style="background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSt2kxzqFZR9IrVdWL04CFvDdkI-8hMLz3RSg&s')"></div><span>Minecraftian</span></div>
+  <div class="wallpaper-option" data-wallpaper="jump"><div class="wallpaper-preview" style="background-image:url('https://images.pexels.com/photos/15591636/pexels-photo-15591636/free-photo-of-silhouette-of-a-person-sitting-at-the-edge-of-a-rock-at-sunset.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500')"></div><span>Jump</span></div>
+  <div class="wallpaper-option" data-wallpaper="oldenlake"><div class="wallpaper-preview" style="background-image:url('https://images.pexels.com/photos/28318336/pexels-photo-28318336.jpeg?cs=srgb&dl=pexels-ruben-reijgwart-820557011-28318336.jpg&fm=jpg')"></div><span>Olden Lake</span></div>
+  <div class="wallpaper-option" data-wallpaper="minecraftian2"><div class="wallpaper-preview" style="background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0lUjm8dqO71I0BPnui_mG01bUuNjp0-lu7g&s')"></div><span>Minecraftian 2</span></div>
+  <div class="wallpaper-option" data-wallpaper="liquid"><div class="wallpaper-preview" style="background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf0ro4HGLM_R577boLd8zMnKibbJAeADUxOw&s')"></div><span>Liquid</span></div>
 </div>
 
 <!-- Taskbar -->
@@ -388,6 +401,8 @@
   <div class="context-menu-item" id="ctxRefresh">🔄 Refresh</div>
   <div class="context-menu-item" id="ctxWallpaper">🖼️ Change Wallpaper</div>
   <div class="context-menu-divider"></div>
+  <div class="context-menu-item" id="ctxWallpaperPresets">🎨 Wallpaper Presets</div>
+  <div class="context-menu-divider"></div>
   <div class="context-menu-item" id="ctxWidgets">📊 Show Widgets</div>
   <div class="context-menu-item" id="ctxShortcuts">⌨️ Keyboard Shortcuts</div>
 </div>
@@ -395,7 +410,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // ============================================
-// FANTER OS - COMPLETE
+// FANTER OS - COMPLETE VERSION
 // ============================================
 
 const SUPABASE_URL = "https://gvzgnclowylrrpovdvtw.supabase.co";
@@ -418,8 +433,13 @@ let pinnedApps = JSON.parse(localStorage.getItem('pinnedApps') || '[]');
 let recentApps = JSON.parse(localStorage.getItem('recentApps') || '[]');
 let soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
 let soundVolume = parseInt(localStorage.getItem('soundVolume') || '100');
+let currentCategory = 'all';
+let currentSearchTerm = '';
+let isMarqueeSelecting = false;
+let marqueeStartX = 0, marqueeStartY = 0;
+let selectedIcons = [];
 
-// -------------------- ICON MAP --------------------
+// Icon URLs
 const ICON_URLS = {
     tetris: 'https://tetris.wiki/images/thumb/5/52/Tetris_%28N3TWORK%29_icon.png/220px-Tetris_%28N3TWORK%29_icon.png',
     solitaire: 'https://play-lh.googleusercontent.com/1ywLh7-1RvXuE40IcxXL3vU4LhdkcopUOxJrrZjRlyZX-b_4zgXd2Hc5EyyWwmfruns',
@@ -427,76 +447,63 @@ const ICON_URLS = {
     minesweeper: 'https://p1.hiclipart.com/preview/249/974/567/red-circle-minesweeper-minesweeper-deluxe-minesweeper-adfree-video-games-land-mine-naval-mine-android-png-clipart.jpg',
     checkers: 'https://p7.hiclipart.com/preview/327/19/604/formula-one-racing-flags-drapeau-xe0-damier-auto-racing-checkered-flag-icon.jpg',
     sudoku: 'https://t3.ftcdn.net/jpg/02/23/28/28/360_F_223282851_HP22kLC9EjTtN9dwNgQrrwrF5cL5xSF5.jpg',
-    flashgames: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyT2jnbsFTNI1TsyzRqTvixcENBsmsN8nknw&s'
+    flashgames: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyT2jnbsFTNI1TsyzRqTvixcENBsmsN8nknw&s',
+    fantarena: 'https://cdn-icons-png.flaticon.com/512/1055/1055685.png'
 };
 
-function getIconHtml(icon, id) {
-    if (ICON_URLS[id]) {
-        return `<img src="${ICON_URLS[id]}" onerror="this.style.display='none';this.parentElement.innerHTML='${icon}'">`;
-    }
-    return icon;
-}
+// Desktop icons - default set
+let DESKTOP_ICONS_LEFT = [
+    { id: 'gamehub', icon: '🎮', label: 'Game Hub', category: 'games' },
+    { id: 'emulators', icon: '🕹️', label: 'Emulators', category: 'games' },
+    { id: 'fantersearch', icon: '🔍', label: 'Fanter Search', category: 'tools', url: 'https://chipikipal800.github.io/Fanter-search/' },
+    { id: 'settings', icon: '⚙️', label: 'Settings', category: 'system' }
+];
 
-// -------------------- SOUND EFFECTS --------------------
-let audioCtx = null;
-function playSound(type) {
-    if (!soundEnabled) return;
-    try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
-        oscillator.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-        oscillator.type = 'sine';
-        gainNode.gain.value = soundVolume / 100 * 0.25;
-        
-        if (type === 'click') {
-            oscillator.frequency.value = 880;
-            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.15);
-        } else if (type === 'open') {
-            oscillator.frequency.value = 523.25;
-            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.25);
-        } else if (type === 'close') {
-            oscillator.frequency.value = 261.63;
-            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.2);
-        }
-        oscillator.start();
-        oscillator.stop(audioCtx.currentTime + 0.2);
-    } catch(e) { console.log('Audio error'); }
-}
+let DESKTOP_ICONS_RIGHT = [
+    { id: 'tetris', icon: '🧩', label: 'Tetris', category: 'games', iconUrl: ICON_URLS.tetris, url: 'https://chipikipal800.github.io/Tetris/Tetris.htm' },
+    { id: 'solitaire', icon: '🃏', label: 'Solitaire', category: 'games', iconUrl: ICON_URLS.solitaire, url: 'https://chipikipal800.github.io/SolitareGame/' },
+    { id: 'minesweeper', icon: '💣', label: 'Minesweeper', category: 'games', iconUrl: ICON_URLS.minesweeper, url: 'https://chipikipal800.github.io/minesweepere/' }
+];
 
-function updateSoundIcon() {
-    const iconSpan = document.getElementById('soundIcon');
-    const volumeSpan = document.getElementById('soundVolume');
-    if (soundEnabled && soundVolume > 0) {
-        iconSpan.textContent = '🔊';
-        volumeSpan.textContent = `${soundVolume}%`;
-    } else if (!soundEnabled || soundVolume === 0) {
-        iconSpan.textContent = '🔇';
-        volumeSpan.textContent = 'Mute';
-    }
-}
+// ALL APPS
+const ALL_APPS = [
+    { id: 'gamehub', name: 'Game Hub', icon: '🎮', category: 'games', builtin: true },
+    { id: 'emulators', name: 'Emulators', icon: '🕹️', category: 'games', builtin: true },
+    { id: 'fantersearch', name: 'Fanter Search', icon: '🔍', category: 'tools', builtin: true, url: 'https://chipikipal800.github.io/Fanter-search/', external: true },
+    { id: 'flashgames', name: 'Flash Games', icon: '⚡', category: 'games', builtin: false, iconUrl: ICON_URLS.flashgames, url: 'https://chipikipal800.github.io/flash-games/list.html', external: true },
+    { id: 'fantarena', name: 'Fantarena', icon: '🏟️', category: 'social', builtin: false, iconUrl: ICON_URLS.fantarena, url: 'fantarena.html' },
+    { id: 'tetris', name: 'Tetris', icon: '🧩', url: 'https://chipikipal800.github.io/Tetris/Tetris.htm', category: 'games', external: true, iconUrl: ICON_URLS.tetris },
+    { id: 'solitaire', name: 'Solitaire', icon: '🃏', url: 'https://chipikipal800.github.io/SolitareGame/', category: 'games', external: true, iconUrl: ICON_URLS.solitaire },
+    { id: 'connectfour', name: 'Connect Four', icon: '🔴', url: 'https://chipikipal800.github.io/connect-four/', category: 'games', external: true, iconUrl: ICON_URLS.connectfour },
+    { id: 'minesweeper', name: 'Minesweeper', icon: '💣', url: 'https://chipikipal800.github.io/minesweepere/', category: 'games', external: true, iconUrl: ICON_URLS.minesweeper },
+    { id: 'checkers', name: 'Checkers', icon: '⚫', url: 'https://chipikipal800.github.io/Checkers/', category: 'games', external: true, iconUrl: ICON_URLS.checkers },
+    { id: 'sudoku', name: 'Sudoku', icon: '🔢', url: 'https://chipikipal800.github.io/sudoku-game/', category: 'games', external: true, iconUrl: ICON_URLS.sudoku },
+    { id: 'calculator', name: 'Calculator', icon: '🧮', category: 'tools', appType: 'calculator' },
+    { id: 'thefactory', name: 'The Factory', icon: '🏭', category: 'tools', appType: 'factory' },
+    { id: 'thestudio', name: 'The Studio', icon: '🎨', category: 'creative', appType: 'studio' },
+    { id: 'weather', name: 'Weather', icon: '🌤️', category: 'tools', appType: 'weather' },
+    { id: 'notes', name: 'Notes', icon: '📋', category: 'tools', appType: 'notes' },
+    { id: 'timer', name: 'Timer', icon: '⏱️', category: 'tools', appType: 'timer' },
+    { id: 'tasks', name: 'Tasks', icon: '✅', category: 'tools', appType: 'tasks' },
+    { id: 'whiteboard', name: 'Whiteboard', icon: '✏️', category: 'creative', appType: 'whiteboard' },
+    { id: 'browser', name: 'Browser', icon: '🌐', category: 'tools', appType: 'browser' },
+    { id: 'settings', name: 'Settings', icon: '⚙️', category: 'system', url: 'settings.html' },
+    { id: 'shop', name: 'Shop', icon: '🛒', category: 'system', url: 'shop.html' },
+    { id: 'account', name: 'Account', icon: '👤', category: 'system', url: 'fantaccount.html' }
+];
 
-function toggleSound() {
-    soundEnabled = !soundEnabled;
-    localStorage.setItem('soundEnabled', soundEnabled);
-    updateSoundIcon();
-    if (soundEnabled) playSound('click');
-}
+// Store apps for App Store
+const STORE_APPS = [
+    { id: 'flashgames', name: 'Flash Games', icon: '⚡', iconUrl: ICON_URLS.flashgames, category: 'games', description: '264 classic flash games - Bloons, Fancy Pants, Riddle School, and more!', creator: 'abcatlmfao', url: 'https://chipikipal800.github.io/flash-games/list.html' },
+    { id: 'fantarena', name: 'Fantarena', icon: '🏟️', iconUrl: ICON_URLS.fantarena, category: 'social', description: 'Chat with friends in real-time! Join channels, send messages, and make groups.', creator: 'abcatlmfao', url: 'fantarena.html' },
+    { id: 'connectfour', name: 'Connect Four', icon: '🔴', iconUrl: ICON_URLS.connectfour, category: 'games', description: 'Drop discs to connect four in a row!', creator: 'Classic', url: 'https://chipikipal800.github.io/connect-four/' },
+    { id: 'checkers', name: 'Checkers', icon: '⚫', iconUrl: ICON_URLS.checkers, category: 'games', description: 'Capture all opponent pieces by jumping over them.', creator: 'Classic', url: 'https://chipikipal800.github.io/Checkers/' },
+    { id: 'sudoku', name: 'Sudoku', icon: '🔢', iconUrl: ICON_URLS.sudoku, category: 'games', description: 'Number puzzle game. Fill the grid with digits 1-9.', creator: 'Classic', url: 'https://chipikipal800.github.io/sudoku-game/' }
+];
 
-// -------------------- SESSION CHECK --------------------
-const savedUser = localStorage.getItem('fanter_currentUser');
-if (savedUser && JSON.parse(savedUser).username !== 'Guest') {
-    currentUser = JSON.parse(savedUser);
-    document.getElementById('startUserName').textContent = currentUser.username;
-    document.getElementById('startUserEmail').textContent = currentUser.email || `${currentUser.username}@fanter.os`;
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('desktop').style.display = 'block';
-    document.getElementById('desktop').classList.add('visible');
-    setTimeout(() => initDesktop(), 100);
-}
+let installedApps = JSON.parse(localStorage.getItem('installedApps') || '[]');
 
-// -------------------- HELPER FUNCTIONS --------------------
+// Helper functions
 function showToast(msg) {
     const toast = document.getElementById('toast');
     toast.textContent = msg;
@@ -511,21 +518,22 @@ function showToastLarge(msg) {
     setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
-function showAchievement(name, reward) {
-    const popup = document.getElementById('achievementPopup');
-    document.getElementById('achievementName').textContent = name;
-    document.getElementById('achievementReward').textContent = `+${reward} 🪙`;
-    popup.classList.add('show');
-    setTimeout(() => popup.classList.remove('show'), 4000);
-    if (!achievements[name]) {
-        achievements[name] = true;
-        localStorage.setItem('fanter_achievements', JSON.stringify(achievements));
-        if (currentUser) {
-            currentUser.coins = (currentUser.coins || 0) + reward;
-            localStorage.setItem('fanter_currentUser', JSON.stringify(currentUser));
-        }
-        playSound('achievement');
-    }
+function playSound(type) {
+    if (!soundEnabled) return;
+    try {
+        if (!window.audioCtx) window.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = window.audioCtx.createOscillator();
+        const gainNode = window.audioCtx.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(window.audioCtx.destination);
+        oscillator.type = 'sine';
+        gainNode.gain.value = soundVolume / 100 * 0.2;
+        if (type === 'click') { oscillator.frequency.value = 880; gainNode.gain.exponentialRampToValueAtTime(0.00001, window.audioCtx.currentTime + 0.15); }
+        else if (type === 'open') { oscillator.frequency.value = 523.25; gainNode.gain.exponentialRampToValueAtTime(0.00001, window.audioCtx.currentTime + 0.25); }
+        else if (type === 'close') { oscillator.frequency.value = 261.63; gainNode.gain.exponentialRampToValueAtTime(0.00001, window.audioCtx.currentTime + 0.2); }
+        oscillator.start();
+        oscillator.stop(window.audioCtx.currentTime + 0.2);
+    } catch(e) { console.log('Audio error'); }
 }
 
 function updateRecentApps(appId, appName, appIcon, appIconId) {
@@ -562,17 +570,15 @@ function updateClock() {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     document.getElementById('calendarMonth').textContent = months[now.getMonth()];
 }
-
 setInterval(updateClock, 1000);
 
-// Battery API
 async function updateBattery() {
     if ('getBattery' in navigator) {
         try {
             const battery = await navigator.getBattery();
             document.getElementById('batteryLevel').textContent = `${Math.round(battery.level * 100)}%`;
             document.getElementById('batteryStatus').textContent = battery.charging ? 'Charging ⚡' : 'Discharging';
-        } catch(e) { console.log('Battery error'); }
+        } catch(e) {}
     } else {
         document.getElementById('batteryLevel').textContent = 'N/A';
         document.getElementById('batteryStatus').textContent = 'N/A';
@@ -580,7 +586,6 @@ async function updateBattery() {
 }
 updateBattery();
 
-// Weather
 async function updateWeather() {
     try {
         const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=40.7128&longitude=-74.0060&current_weather=true&temperature_unit=fahrenheit');
@@ -589,12 +594,11 @@ async function updateWeather() {
             document.getElementById('weatherTemp').textContent = `${Math.round(data.current_weather.temperature)}°F`;
             document.getElementById('weatherCondition').textContent = data.current_weather.weathercode === 0 ? 'Clear' : 'Cloudy';
         }
-    } catch(e) { console.log('Weather error'); }
+    } catch(e) {}
 }
 updateWeather();
 setInterval(updateWeather, 600000);
 
-// -------------------- GAMES --------------------
 async function loadGames() {
     try {
         const res = await fetch('./config/games.json');
@@ -604,9 +608,7 @@ async function loadGames() {
         console.log(`Loaded ${GAMES_DATA.length} games`);
     } catch(e) {
         console.warn('No games.json, using fallback');
-        GAMES_DATA = [
-            { name: "Hollow Knight", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsLIpQXZ-qUzdIOxeFC9LAaYznn0jmMIE9WA&s", url: "https://abcatlmfao.github.io/hollow-knight2/", category: "adventure", desc: "Descend into a bug kingdom.", developer: "Team Cherry", releaseDate: "2017" }
-        ];
+        GAMES_DATA = [{ name: "Hollow Knight", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsLIpQXZ-qUzdIOxeFC9LAaYznn0jmMIE9WA&s", url: "https://abcatlmfao.github.io/hollow-knight2/", category: "adventure", desc: "Descend into a bug kingdom.", developer: "Team Cherry", releaseDate: "2017" }];
     }
 }
 
@@ -640,79 +642,88 @@ function showGameDetails(game) {
     };
 }
 
-  // -------------------- DESKTOP ICONS --------------------
-let DESKTOP_ICONS_LEFT = [
-    { id: 'gamehub', icon: '🎮', label: 'Game Hub', category: 'games' },
-    { id: 'flashgames', icon: '⚡', label: 'Flash Games', category: 'games' },
-    { id: 'appstore', icon: '📦', label: 'App Store', category: 'system' },
-    { id: 'settings', icon: '⚙️', label: 'Settings', category: 'system' }
-];
-
-let DESKTOP_ICONS_RIGHT = [
-    { id: 'gamehub', icon: '🎮', label: 'Game Hub', category: 'games' },
-    { id: 'flashgames', icon: '⚡', label: 'Flash Games', category: 'games', iconUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyT2jnbsFTNI1TsyzRqTvixcENBsmsN8nknw&s' },
-    { id: 'tetris', icon: '🧩', label: 'Tetris', category: 'games', iconUrl: 'https://tetris.wiki/images/thumb/5/52/Tetris_%28N3TWORK%29_icon.png/220px-Tetris_%28N3TWORK%29_icon.png' },
-    { id: 'solitaire', icon: '🃏', label: 'Solitaire', category: 'games', iconUrl: 'https://play-lh.googleusercontent.com/1ywLh7-1RvXuE40IcxXL3vU4LhdkcopUOxJrrZjRlyZX-b_4zgXd2Hc5EyyWwmfruns' },
-    { id: 'connectfour', icon: '🔴', label: 'Connect Four', category: 'games', iconUrl: 'https://m.media-amazon.com/images/I/71WIAdYrTiL.png' },
-    { id: 'minesweeper', icon: '💣', label: 'Minesweeper', category: 'games', iconUrl: 'https://p1.hiclipart.com/preview/249/974/567/red-circle-minesweeper-minesweeper-deluxe-minesweeper-adfree-video-games-land-mine-naval-mine-android-png-clipart.jpg' },
-    { id: 'checkers', icon: '⚫', label: 'Checkers', category: 'games', iconUrl: 'https://p7.hiclipart.com/preview/327/19/604/formula-one-racing-flags-drapeau-xe0-damier-auto-racing-checkered-flag-icon.jpg' },
-    { id: 'sudoku', icon: '🔢', label: 'Sudoku', category: 'games', iconUrl: 'https://t3.ftcdn.net/jpg/02/23/28/28/360_F_223282851_HP22kLC9EjTtN9dwNgQrrwrF5cL5xSF5.jpg' },
-    { id: 'thefactory', icon: '🏭', label: 'Factory', category: 'tools' },
-    { id: 'weather', icon: '🌤️', label: 'Weather', category: 'tools' }
-];
-
-// ALL APPS with their icon URLs
-const ALL_APPS = [
-    { id: 'gamehub', name: 'Game Hub', icon: '🎮', category: 'games', builtin: true },
-    { id: 'flashgames', name: 'Flash Games', icon: '⚡', category: 'games', builtin: true, iconUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyT2jnbsFTNI1TsyzRqTvixcENBsmsN8nknw&s' },
-    { id: 'appstore', name: 'FantAppStore', icon: '📦', category: 'system', builtin: true },
-    { id: 'tetris', name: 'Tetris', icon: '🧩', url: 'https://chipikipal800.github.io/Tetris/Tetris.htm', category: 'games', external: true, iconUrl: 'https://tetris.wiki/images/thumb/5/52/Tetris_%28N3TWORK%29_icon.png/220px-Tetris_%28N3TWORK%29_icon.png' },
-    { id: 'solitaire', name: 'Solitaire', icon: '🃏', url: 'https://chipikipal800.github.io/SolitareGame/', category: 'games', external: true, iconUrl: 'https://play-lh.googleusercontent.com/1ywLh7-1RvXuE40IcxXL3vU4LhdkcopUOxJrrZjRlyZX-b_4zgXd2Hc5EyyWwmfruns' },
-    { id: 'connectfour', name: 'Connect Four', icon: '🔴', url: 'https://chipikipal800.github.io/connect-four/', category: 'games', external: true, iconUrl: 'https://m.media-amazon.com/images/I/71WIAdYrTiL.png' },
-    { id: 'minesweeper', name: 'Minesweeper', icon: '💣', url: 'https://chipikipal800.github.io/minesweepere/', category: 'games', external: true, iconUrl: 'https://p1.hiclipart.com/preview/249/974/567/red-circle-minesweeper-minesweeper-deluxe-minesweeper-adfree-video-games-land-mine-naval-mine-android-png-clipart.jpg' },
-    { id: 'checkers', name: 'Checkers', icon: '⚫', url: 'https://chipikipal800.github.io/Checkers/', category: 'games', external: true, iconUrl: 'https://p7.hiclipart.com/preview/327/19/604/formula-one-racing-flags-drapeau-xe0-damier-auto-racing-checkered-flag-icon.jpg' },
-    { id: 'sudoku', name: 'Sudoku', icon: '🔢', url: 'https://chipikipal800.github.io/sudoku-game/', category: 'games', external: true, iconUrl: 'https://t3.ftcdn.net/jpg/02/23/28/28/360_F_223282851_HP22kLC9EjTtN9dwNgQrrwrF5cL5xSF5.jpg' },
-    { id: 'calculator', name: 'Calculator', icon: '🧮', category: 'tools', appType: 'calculator' },
-    { id: 'thefactory', name: 'The Factory', icon: '🏭', category: 'tools', appType: 'factory' },
-    { id: 'thestudio', name: 'The Studio', icon: '🎨', category: 'creative', appType: 'studio' },
-    { id: 'weather', name: 'Weather', icon: '🌤️', category: 'tools', appType: 'weather' },
-    { id: 'notes', name: 'Notes', icon: '📋', category: 'tools', appType: 'notes' },
-    { id: 'timer', name: 'Timer', icon: '⏱️', category: 'tools', appType: 'timer' },
-    { id: 'tasks', name: 'Tasks', icon: '✅', category: 'tools', appType: 'tasks' },
-    { id: 'whiteboard', name: 'Whiteboard', icon: '✏️', category: 'creative', appType: 'whiteboard' },
-   { id: 'browser', name: 'Browser', icon: '🌐', category: 'tools', appType: 'browser', url: 'https://chipikipal800.github.io/Fanter-search/' },
-    { id: 'settings', name: 'Settings', icon: '⚙️', category: 'system', url: 'settings.html' },
-    { id: 'shop', name: 'Shop', icon: '🛒', category: 'system', url: 'shop.html' },
-    { id: 'fantarena', name: 'Fantarena', icon: '🏟️', category: 'social', url: 'fantarena.html' },
-    { id: 'account', name: 'Account', icon: '👤', category: 'system', url: 'fantaccount.html' }
-];
-
-// Helper function to render an app icon (emoji or image)
-function renderAppIcon(app) {
-    if (app.iconUrl) {
-        return `<img src="${app.iconUrl}" style="width:32px;height:32px;border-radius:8px;object-fit:cover;" onerror="this.style.display='none';this.parentElement.innerHTML='${app.icon}'">`;
-    }
-    return app.icon;
+// Desktop Icons - Draggable with position saving
+function saveIconPositions() {
+    const positions = {};
+    document.querySelectorAll('.desktop-icon').forEach(icon => {
+        positions[icon.dataset.id] = { x: parseFloat(icon.style.left), y: parseFloat(icon.style.top) };
+    });
+    localStorage.setItem('desktopIconPositions', JSON.stringify(positions));
 }
 
-function renderDesktopIcon(icon) {
-    if (icon.iconUrl) {
-        return `<img src="${icon.iconUrl}" style="width:42px;height:42px;border-radius:12px;object-fit:cover;" onerror="this.style.display='none';this.parentElement.innerHTML='${icon.icon}'">`;
-    }
-    return icon.icon;
+function renderDesktopIcons() {
+    const leftContainer = document.getElementById('desktopIconsLeft');
+    const rightContainer = document.getElementById('desktopIconsRight');
+    const savedPositions = JSON.parse(localStorage.getItem('desktopIconPositions') || '{}');
+    
+    leftContainer.innerHTML = DESKTOP_ICONS_LEFT.map((icon, idx) => {
+        const pos = savedPositions[icon.id] || { x: 20, y: 70 + idx * 100 };
+        return `<div class="desktop-icon" data-id="${icon.id}" style="left: ${pos.x}px; top: ${pos.y}px;"><div class="icon">${icon.icon}</div><div class="label">${icon.label}</div><div class="unpin-btn" data-id="${icon.id}">✕</div></div>`;
+    }).join('');
+    
+    rightContainer.innerHTML = DESKTOP_ICONS_RIGHT.map((icon, idx) => {
+        const pos = savedPositions[icon.id] || { x: window.innerWidth - 105, y: 70 + idx * 100 };
+        return `<div class="desktop-icon" data-id="${icon.id}" style="left: ${pos.x}px; top: ${pos.y}px;"><div class="icon">${icon.iconUrl ? `<img src="${icon.iconUrl}" onerror="this.style.display='none';this.parentElement.innerHTML='${icon.icon}'">` : icon.icon}</div><div class="label">${icon.label}</div><div class="unpin-btn" data-id="${icon.id}">✕</div></div>`;
+    }).join('');
+    
+    // Add pinned apps
+    const pinnedGames = pinnedApps.filter(p => p.category === 'games' && !DESKTOP_ICONS_RIGHT.some(i => i.id === p.id));
+    rightContainer.innerHTML += pinnedGames.map((icon, idx) => {
+        const pos = savedPositions[icon.id] || { x: window.innerWidth - 105, y: 70 + (DESKTOP_ICONS_RIGHT.length + idx) * 100 };
+        return `<div class="desktop-icon" data-id="${icon.id}" style="left: ${pos.x}px; top: ${pos.y}px;"><div class="icon">${icon.iconUrl ? `<img src="${icon.iconUrl}" onerror="this.style.display='none';this.parentElement.innerHTML='${icon.icon}'">` : icon.icon}</div><div class="label">${icon.name}</div><div class="unpin-btn" data-id="${icon.id}">✕</div></div>`;
+    }).join('');
+    
+    // Make icons draggable
+    document.querySelectorAll('.desktop-icon').forEach(el => {
+        let isDragging = false, dragStartX = 0, dragStartY = 0, startLeft = 0, startTop = 0;
+        el.addEventListener('mousedown', (e) => {
+            if (e.target.classList.contains('unpin-btn')) return;
+            isDragging = true;
+            dragStartX = e.clientX;
+            dragStartY = e.clientY;
+            startLeft = parseFloat(el.style.left);
+            startTop = parseFloat(el.style.top);
+            el.style.zIndex = '1000';
+            el.style.opacity = '0.8';
+            e.preventDefault();
+        });
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            let newLeft = startLeft + (e.clientX - dragStartX);
+            let newTop = startTop + (e.clientY - dragStartY);
+            newLeft = Math.max(5, Math.min(newLeft, window.innerWidth - 100));
+            newTop = Math.max(5, Math.min(newTop, window.innerHeight - 100));
+            el.style.left = `${newLeft}px`;
+            el.style.top = `${newTop}px`;
+        });
+        document.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                el.style.zIndex = '';
+                el.style.opacity = '';
+                saveIconPositions();
+            }
+        });
+        el.addEventListener('click', (e) => {
+            if (e.target.classList.contains('unpin-btn')) return;
+            const app = ALL_APPS.find(a => a.id === el.dataset.id);
+            if (app) launchApp(app);
+            playSound('click');
+        });
+        const unpinBtn = el.querySelector('.unpin-btn');
+        if (unpinBtn) {
+            unpinBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                unpinAppFromDesktop(unpinBtn.dataset.id);
+                el.remove();
+            });
+        }
+    });
 }
 
-function loadPinnedIcons() {
-    const savedPins = localStorage.getItem('pinnedApps');
-    if (savedPins) {
-        pinnedApps = JSON.parse(savedPins);
-    }
-    renderDesktopIcons();
-}
-
-function pinAppToDesktop(appId, appName, appIcon, appCategory, appIconUrl) {
+function pinAppToDesktop(appId, appName, appIcon, appCategory, appIconUrl, appUrl) {
     if (!pinnedApps.find(p => p.id === appId)) {
-        pinnedApps.push({ id: appId, name: appName, icon: appIcon, category: appCategory, iconUrl: appIconUrl });
+        pinnedApps.push({ id: appId, name: appName, icon: appIcon, category: appCategory, iconUrl: appIconUrl, url: appUrl });
         localStorage.setItem('pinnedApps', JSON.stringify(pinnedApps));
         renderDesktopIcons();
         showToast(`Pinned "${appName}" to desktop!`);
@@ -728,125 +739,90 @@ function unpinAppFromDesktop(appId) {
     playSound('click');
 }
 
-function renderDesktopIcons() {
-    const leftContainer = document.getElementById('desktopIconsLeft');
-    const rightContainer = document.getElementById('desktopIconsRight');
+// Marquee selection
+function startMarquee(e) {
+    if (e.target.closest('.desktop-icon')) return;
+    isMarqueeSelecting = true;
+    marqueeStartX = e.clientX;
+    marqueeStartY = e.clientY;
+    const marquee = document.getElementById('marqueeSelection');
+    marquee.style.left = `${marqueeStartX}px`;
+    marquee.style.top = `${marqueeStartY}px`;
+    marquee.style.width = '0';
+    marquee.style.height = '0';
+    marquee.style.display = 'block';
+    selectedIcons = [];
+}
+
+function updateMarquee(e) {
+    if (!isMarqueeSelecting) return;
+    const marquee = document.getElementById('marqueeSelection');
+    const currentX = e.clientX;
+    const currentY = e.clientY;
+    const width = Math.abs(currentX - marqueeStartX);
+    const height = Math.abs(currentY - marqueeStartY);
+    const left = Math.min(marqueeStartX, currentX);
+    const top = Math.min(marqueeStartY, currentY);
+    marquee.style.left = `${left}px`;
+    marquee.style.top = `${top}px`;
+    marquee.style.width = `${width}px`;
+    marquee.style.height = `${height}px`;
     
-    const allLeftIcons = [...DESKTOP_ICONS_LEFT];
-    const pinnedLeftIcons = pinnedApps.filter(p => p.category !== 'games').map(p => ({ id: p.id, icon: p.icon, label: p.name, category: p.category, isPinned: true, iconUrl: p.iconUrl }));
-    const allRightIcons = [...DESKTOP_ICONS_RIGHT];
-    const pinnedRightIcons = pinnedApps.filter(p => p.category === 'games').map(p => ({ id: p.id, icon: p.icon, label: p.name, category: p.category, isPinned: true, iconUrl: p.iconUrl }));
-    
-    // Load saved positions
-    let savedPositions = JSON.parse(localStorage.getItem('desktopIconPositions') || '{}');
-    
-    leftContainer.innerHTML = [...allLeftIcons, ...pinnedLeftIcons].map((icon, idx) => {
-        const pos = savedPositions[icon.id] || { x: 20, y: 20 + idx * 95 };
-        return `
-            <div class="desktop-icon" data-id="${icon.id}" style="left: ${pos.x}px; top: ${pos.y}px; position: absolute; animation: none;">
-                <div class="icon">${icon.iconUrl ? `<img src="${icon.iconUrl}" onerror="this.style.display='none';this.parentElement.innerHTML='${icon.icon}'">` : icon.icon}</div>
-                <div class="label">${icon.label}</div>
-                <div class="unpin-btn" data-id="${icon.id}">✕</div>
-            </div>
-        `;
-    }).join('');
-    
-    rightContainer.innerHTML = [...allRightIcons, ...pinnedRightIcons].map((icon, idx) => {
-        const pos = savedPositions[icon.id] || { x: window.innerWidth - 115, y: 20 + idx * 95 };
-        return `
-            <div class="desktop-icon" data-id="${icon.id}" style="left: ${pos.x}px; top: ${pos.y}px; position: absolute; animation: none;">
-                <div class="icon">${icon.iconUrl ? `<img src="${icon.iconUrl}" onerror="this.style.display='none';this.parentElement.innerHTML='${icon.icon}'">` : icon.icon}</div>
-                <div class="label">${icon.label}</div>
-                <div class="unpin-btn" data-id="${icon.id}">✕</div>
-            </div>
-        `;
-    }).join('');
-    
-    // Make icons draggable
-    document.querySelectorAll('.desktop-icon').forEach(el => {
-        let isDragging = false;
-        let dragStartX = 0, dragStartY = 0;
-        let originalLeft = 0, originalTop = 0;
-        
-        el.addEventListener('mousedown', (e) => {
-            if (e.target.classList.contains('unpin-btn')) return;
-            isDragging = true;
-            dragStartX = e.clientX;
-            dragStartY = e.clientY;
-            originalLeft = parseFloat(el.style.left);
-            originalTop = parseFloat(el.style.top);
-            el.style.zIndex = '1000';
-            el.style.opacity = '0.8';
-            e.preventDefault();
-        });
-        
-        document.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            const dx = e.clientX - dragStartX;
-            const dy = e.clientY - dragStartY;
-            let newLeft = originalLeft + dx;
-            let newTop = originalTop + dy;
-            newLeft = Math.max(5, Math.min(newLeft, window.innerWidth - 100));
-            newTop = Math.max(5, Math.min(newTop, window.innerHeight - 100));
-            el.style.left = `${newLeft}px`;
-            el.style.top = `${newTop}px`;
-        });
-        
-        document.addEventListener('mouseup', () => {
-            if (isDragging) {
-                isDragging = false;
-                el.style.zIndex = '';
-                el.style.opacity = '';
-                // Save position
-                const positions = JSON.parse(localStorage.getItem('desktopIconPositions') || '{}');
-                positions[el.dataset.id] = { x: parseFloat(el.style.left), y: parseFloat(el.style.top) };
-                localStorage.setItem('desktopIconPositions', JSON.stringify(positions));
+    document.querySelectorAll('.desktop-icon').forEach(icon => {
+        const rect = icon.getBoundingClientRect();
+        if (rect.left < currentX && rect.right > marqueeStartX && rect.top < currentY && rect.bottom > marqueeStartY) {
+            if (!selectedIcons.includes(icon)) {
+                selectedIcons.push(icon);
+                icon.style.outline = '2px solid var(--accent)';
             }
-        });
-        
-        el.addEventListener('click', (e) => {
-            if (e.target.classList.contains('unpin-btn')) return;
-            if (!isDragging) {
-                const app = ALL_APPS.find(a => a.id === el.dataset.id);
-                if (app) launchApp(app);
-                playSound('click');
-            }
-        });
-        
-        const unpinBtn = el.querySelector('.unpin-btn');
-        if (unpinBtn) {
-            unpinBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                unpinAppFromDesktop(unpinBtn.dataset.id);
-                el.remove(); // Remove from dOM immediately
-            });
+        } else if (selectedIcons.includes(icon)) {
+            selectedIcons = selectedIcons.filter(i => i !== icon);
+            icon.style.outline = '';
         }
     });
 }
 
-// -------------------- WINDOW MANAGEMENT -------------------- (brr brr patapim is cracking bro) \\
+function endMarquee(e) {
+    isMarqueeSelecting = false;
+    const marquee = document.getElementById('marqueeSelection');
+    marquee.style.display = 'none';
+    if (selectedIcons.length === 0) return;
+    if (e.ctrlKey) {
+        selectedIcons.forEach(icon => {
+            const app = ALL_APPS.find(a => a.id === icon.dataset.id);
+            if (app) launchApp(app);
+        });
+    } else if (selectedIcons.length === 1) {
+        const app = ALL_APPS.find(a => a.id === selectedIcons[0].dataset.id);
+        if (app) launchApp(app);
+    }
+    selectedIcons.forEach(icon => icon.style.outline = '');
+    selectedIcons = [];
+}
+
+// Window management
 function createGameHubWindow() {
     const id = nextWindowId++;
     const win = document.createElement('div');
     win.className = 'window';
     win.id = `window-${id}`;
-    win.style.cssText = `left:80px; top:60px; width:1100px; height:700px;`;
+    win.style.cssText = `left:80px; top:60px; width:1000px; height:650px;`;
     win.innerHTML = `
         <div class="window-header"><div class="window-title"><span>🎮</span><span>Game Hub</span></div><div class="window-controls"><button class="window-control minimize">─</button><button class="window-control maximize">□</button><button class="window-control close">✕</button></div></div>
-        <div class="window-content" style="padding:20px;">
-            <div style="display:flex; gap:12px; margin-bottom:20px;">
-                <input type="text" id="gameSearch-${id}" placeholder="Search games..." style="flex:2; padding:12px 16px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:30px; color:white;">
-                <select id="categorySelect-${id}" style="padding:12px 20px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:30px; color:white;">
+        <div class="window-content" style="padding:16px;">
+            <div style="display:flex; gap:10px; margin-bottom:16px;">
+                <input type="text" id="gameSearch-${id}" placeholder="Search games..." style="flex:2; padding:10px 14px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:30px; color:white; font-size:13px;">
+                <select id="categorySelect-${id}" style="padding:10px 14px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:30px; color:white;">
                     <option value="all">All Games</option><option value="action">Action</option><option value="platformer">Platformer</option><option value="adventure">Adventure</option><option value="horror">Horror</option>
                 </select>
-                <button id="randomGameBtn-${id}" style="padding:12px 24px; background:var(--accent); border:none; border-radius:30px; color:white; cursor:pointer;">🎲 Random</button>
+                <button id="randomGameBtn-${id}" style="padding:10px 20px; background:var(--accent); border:none; border-radius:30px; color:white; cursor:pointer;">🎲 Random</button>
             </div>
-            <div id="gameGrid-${id}" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; max-height:500px; overflow-y:auto;"></div>
-            <div style="text-align:center; padding:12px; color:gray; font-size:11px; border-top:1px solid var(--border-glass); margin-top:16px;">a site created by abcatlmfao · parcoil network</div>
+            <div id="gameGrid-${id}" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:14px; max-height:500px; overflow-y:auto;"></div>
+            <div style="text-align:center; padding:10px; color:gray; font-size:10px; border-top:1px solid var(--border-glass); margin-top:12px;">a site created by abcatlmfao · parcoil network</div>
         </div>
     `;
     document.body.appendChild(win);
-    windows.push({ id, element: win, app: { id: 'gamehub', name: 'Game Hub', icon: '🎮' }, minimized: false, maximized: false, x:80, y:60, w:1100, h:700 });
+    windows.push({ id, element: win, app: { id: 'gamehub', name: 'Game Hub', icon: '🎮' }, minimized: false, maximized: false, x:80, y:60, w:1000, h:650 });
     focusWindow(id);
     setupWindowEvents(win, id);
     addResizeHandles(win, id);
@@ -893,144 +869,46 @@ function createGameHubWindow() {
     return id;
 }
 
-function createFlashGamesWindow() {
+function createEmulatorsWindow() {
     const id = nextWindowId++;
     const win = document.createElement('div');
     win.className = 'window';
     win.id = `window-${id}`;
-    win.style.cssText = `left:100px; top:60px; width:1200px; height:750px;`;
+    win.style.cssText = `left:100px; top:80px; width:550px; height:450px;`;
     win.innerHTML = `
-        <div class="window-header"><div class="window-title"><span>⚡</span><span>Flash Games</span></div><div class="window-controls"><button class="window-control minimize">─</button><button class="window-control maximize">□</button><button class="window-control close">✕</button></div></div>
-        <div class="window-content" style="padding:0;">
-            <iframe src="https://chipikipal800.github.io/flash-games/list.html" style="width:100%; height:100%; border:none;"></iframe>
+        <div class="window-header"><div class="window-title"><span>🕹️</span><span>Emulators</span></div><div class="window-controls"><button class="window-control minimize">─</button><button class="window-control maximize">□</button><button class="window-control close">✕</button></div></div>
+        <div class="window-content" style="padding:16px;">
+            <div style="display:grid; gap:10px;">
+                <div class="emulator-item" data-url="https://chipikipal800.github.io/MKGBA2.0/" style="display:flex; align-items:center; gap:14px; padding:12px; background:rgba(255,255,255,0.05); border-radius:12px; cursor:pointer;"><span style="font-size:28px;">🎮</span><div style="flex:1;"><div style="font-weight:500;">Game Boy Advance</div></div><span>▶</span></div>
+                <div class="emulator-item" data-url="https://chipikipal800.github.io/nes-emulator-/" style="display:flex; align-items:center; gap:14px; padding:12px; background:rgba(255,255,255,0.05); border-radius:12px; cursor:pointer;"><span style="font-size:28px;">📺</span><div style="flex:1;"><div style="font-weight:500;">Nintendo NES</div></div><span>▶</span></div>
+                <div class="emulator-item" data-url="https://chipikipal800.github.io/n64-emulator/" style="display:flex; align-items:center; gap:14px; padding:12px; background:rgba(255,255,255,0.05); border-radius:12px; cursor:pointer;"><span style="font-size:28px;">🎮</span><div style="flex:1;"><div style="font-weight:500;">Nintendo 64</div></div><span>▶</span></div>
+                <div class="emulator-item" data-url="https://chipikipal800.github.io/Sega-Genesis-Emulator-/" style="display:flex; align-items:center; gap:14px; padding:12px; background:rgba(255,255,255,0.05); border-radius:12px; cursor:pointer;"><span style="font-size:28px;">🌀</span><div style="flex:1;"><div style="font-weight:500;">Sega Genesis</div></div><span>▶</span></div>
+                <div class="emulator-item" data-url="https://chipikipal800.github.io/Virtual-boy-emulator-/" style="display:flex; align-items:center; gap:14px; padding:12px; background:rgba(255,255,255,0.05); border-radius:12px; cursor:pointer;"><span style="font-size:28px;">🕶️</span><div style="flex:1;"><div style="font-weight:500;">Virtual Boy</div></div><span>▶</span></div>
+                <div class="emulator-item" data-url="https://chipikipal800.github.io/atari7800-emulatorwroms/" style="display:flex; align-items:center; gap:14px; padding:12px; background:rgba(255,255,255,0.05); border-radius:12px; cursor:pointer;"><span style="font-size:28px;">🎮</span><div style="flex:1;"><div style="font-weight:500;">Atari 7800</div></div><span>▶</span></div>
+            </div>
         </div>
     `;
     document.body.appendChild(win);
-    windows.push({ id, element: win, app: { id: 'flashgames', name: 'Flash Games', icon: '⚡', iconUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyT2jnbsFTNI1TsyzRqTvixcENBsmsN8nknw&s' }, minimized: false, maximized: false, x:100, y:60, w:1200, h:750 });
+    windows.push({ id, element: win, app: { id: 'emulators', name: 'Emulators', icon: '🕹️' }, minimized: false, maximized: false, x:100, y:80, w:550, h:450 });
     focusWindow(id);
     setupWindowEvents(win, id);
     addResizeHandles(win, id);
     updateTaskbar();
     playSound('open');
-    return id;
-}
-
-function createAppStoreWindow() {
-    const id = nextWindowId++;
-    const win = document.createElement('div');
-    win.className = 'window';
-    win.id = `window-${id}`;
-    win.style.cssText = `left:200px; top:80px; width:800px; height:650px;`;
-    win.innerHTML = `
-        <div class="window-header"><div class="window-title"><span>📦</span><span>FantAppStore</span></div><div class="window-controls"><button class="window-control minimize">─</button><button class="window-control maximize">□</button><button class="window-control close">✕</button></div></div>
-        <div class="window-content">
-            <div style="margin-bottom:16px;">
-                <input type="text" id="appStoreSearch-${id}" placeholder="Search apps..." style="width:100%; padding:12px 16px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:30px; color:white;">
-            </div>
-            <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap;">
-                <button class="store-cat-btn active" data-cat="all">All</button>
-                <button class="store-cat-btn" data-cat="games">🎮 Games</button>
-                <button class="store-cat-btn" data-cat="tools">🛠️ Tools</button>
-                <button class="store-cat-btn" data-cat="creative">🎨 Creative</button>
-                <button class="store-cat-btn" data-cat="system">⚙️ System</button>
-            </div>
-            <div id="appStoreGrid-${id}" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px; max-height:450px; overflow-y:auto;"></div>
-        </div>
-    `;
-    document.body.appendChild(win);
-    windows.push({ id, element: win, app: { id: 'appstore', name: 'FantAppStore', icon: '📦' }, minimized: false, maximized: false, x:200, y:80, w:800, h:650 });
-    focusWindow(id);
-    setupWindowEvents(win, id);
-    addResizeHandles(win, id);
-    updateTaskbar();
-    playSound('open');
-    
-    const storeAppsList = [
-        { id: 'tetris', name: 'Tetris', icon: '🧩', iconUrl: 'https://tetris.wiki/images/thumb/5/52/Tetris_%28N3TWORK%29_icon.png/220px-Tetris_%28N3TWORK%29_icon.png', category: 'games', description: 'Classic falling blocks puzzle game!', creator: 'Alexey Pajitnov', url: 'https://chipikipal800.github.io/Tetris/Tetris.htm' },
-        { id: 'solitaire', name: 'Solitaire', icon: '🃏', iconUrl: 'https://play-lh.googleusercontent.com/1ywLh7-1RvXuE40IcxXL3vU4LhdkcopUOxJrrZjRlyZX-b_4zgXd2Hc5EyyWwmfruns', category: 'games', description: 'Stack cards in descending order.', creator: 'Classic', url: 'https://chipikipal800.github.io/SolitareGame/' },
-        { id: 'connectfour', name: 'Connect Four', icon: '🔴', iconUrl: 'https://m.media-amazon.com/images/I/71WIAdYrTiL.png', category: 'games', description: 'Drop discs to connect four!', creator: 'Classic', url: 'https://chipikipal800.github.io/connect-four/' },
-        { id: 'minesweeper', name: 'Minesweeper', icon: '💣', iconUrl: 'https://p1.hiclipart.com/preview/249/974/567/red-circle-minesweeper-minesweeper-deluxe-minesweeper-adfree-video-games-land-mine-naval-mine-android-png-clipart.jpg', category: 'games', description: 'Classic grid-based puzzle.', creator: 'Classic', url: 'https://chipikipal800.github.io/minesweepere/' },
-        { id: 'checkers', name: 'Checkers', icon: '⚫', iconUrl: 'https://p7.hiclipart.com/preview/327/19/604/formula-one-racing-flags-drapeau-xe0-damier-auto-racing-checkered-flag-icon.jpg', category: 'games', description: 'Capture all opponent pieces.', creator: 'Classic', url: 'https://chipikipal800.github.io/Checkers/' },
-        { id: 'sudoku', name: 'Sudoku', icon: '🔢', iconUrl: 'https://t3.ftcdn.net/jpg/02/23/28/28/360_F_223282851_HP22kLC9EjTtN9dwNgQrrwrF5cL5xSF5.jpg', category: 'games', description: 'Number puzzle game.', creator: 'Classic', url: 'https://chipikipal800.github.io/sudoku-game/' }
-    ];
-    
-    let installedApps = JSON.parse(localStorage.getItem('installedApps') || '[]');
-    
-    function renderStore() {
-        const searchTerm = document.getElementById(`appStoreSearch-${id}`).value.toLowerCase();
-        const activeCat = win.querySelector('.store-cat-btn.active')?.dataset.cat || 'all';
-        
-        let filtered = storeAppsList.filter(app => {
-            const matchesSearch = app.name.toLowerCase().includes(searchTerm);
-            const matchesCat = activeCat === 'all' || app.category === activeCat;
-            return matchesSearch && matchesCat;
-        });
-        
-        const grid = document.getElementById(`appStoreGrid-${id}`);
-        grid.innerHTML = filtered.map(app => {
-            const isInstalled = installedApps.includes(app.id);
-            return `
-                <div style="background:rgba(255,255,255,0.05); border-radius:16px; padding:16px; transition:all 0.2s;">
-                    <div style="font-size:48px; text-align:center; margin-bottom:12px;"><img src="${app.iconUrl}" style="width:48px;height:48px;border-radius:12px;" onerror="this.style.display='none';this.parentElement.innerHTML='${app.icon}'"></div>
-                    <div style="font-weight:600; margin-bottom:4px;">${app.name}</div>
-                    <div style="font-size:11px; color:${isInstalled ? '#4caf50' : 'gray'}; margin-bottom:8px;">by ${app.creator}</div>
-                    <div style="font-size:11px; color:var(--text-muted); margin-bottom:12px; line-height:1.4;">${app.description}</div>
-                    <button class="install-btn-${id}" data-id="${app.id}" data-url="${app.url}" data-name="${app.name}" data-icon="${app.icon}" data-iconurl="${app.iconUrl}" style="width:100%; padding:8px; background:${isInstalled ? 'rgba(255,255,255,0.1)' : 'var(--accent)'}; border:none; border-radius:12px; color:white; cursor:pointer;">
-                        ${isInstalled ? '✓ Installed' : '📥 Install'}
-                    </button>
-                </div>
-            `;
-        }).join('');
-        
-        grid.querySelectorAll(`.install-btn-${id}`).forEach(btn => {
-            btn.addEventListener('click', () => {
-                const appId = btn.dataset.id;
-                const appName = btn.dataset.name;
-                const appIcon = btn.dataset.icon;
-                const appIconUrl = btn.dataset.iconurl;
-                const appUrl = btn.dataset.url;
-                
-                if (installedApps.includes(appId)) {
-                    installedApps = installedApps.filter(i => i !== appId);
-                    showToast(`Uninstalled ${appName}`);
-                    playSound('click');
-                } else {
-                    installedApps.push(appId);
-                    // Add to ALL_APPS if not already there
-                    if (!ALL_APPS.find(a => a.id === appId)) {
-                        ALL_APPS.push({ id: appId, name: appName, icon: appIcon, iconUrl: appIconUrl, url: appUrl, category: 'games', external: true });
-                        renderStartApps();
-                    }
-                    showToast(`Installed ${appName}! Check the Start Menu`);
-                    playSound('click');
-                }
-                localStorage.setItem('installedApps', JSON.stringify(installedApps));
-                renderStore();
-            });
-        });
-    }
-    
-    win.querySelectorAll('.store-cat-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            win.querySelectorAll('.store-cat-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            renderStore();
-        });
+    win.querySelectorAll('.emulator-item').forEach(el => {
+        el.addEventListener('click', () => window.open(el.dataset.url, '_blank'));
     });
-    
-    document.getElementById(`appStoreSearch-${id}`).addEventListener('input', renderStore);
-    renderStore();
     return id;
 }
 
-function createExternalWindow(app, x = 150, y = 100, w = 900, h = 650) {
+function createExternalWindow(app, x = 150, y = 100, w = 1000, h = 700) {
     const id = nextWindowId++;
     const win = document.createElement('div');
     win.className = 'window';
     win.id = `window-${id}`;
     win.style.cssText = `left:${x}px; top:${y}px; width:${w}px; height:${h}px;`;
     win.innerHTML = `
-        <div class="window-header"><div class="window-title"><span>${app.iconUrl ? `<img src="${app.iconUrl}" style="width:22px;height:22px;border-radius:6px;" onerror="this.style.display='none';this.parentElement.innerHTML='${app.icon}'">` : app.icon}</span><span>${app.name}</span></div><div class="window-controls"><button class="window-control minimize">─</button><button class="window-control maximize">□</button><button class="window-control close">✕</button></div></div>
+        <div class="window-header"><div class="window-title"><span>${app.iconUrl ? `<img src="${app.iconUrl}" onerror="this.style.display='none';this.parentElement.innerHTML='${app.icon}'">` : app.icon}</span><span>${app.name}</span></div><div class="window-controls"><button class="window-control minimize">─</button><button class="window-control maximize">□</button><button class="window-control close">✕</button></div></div>
         <div class="window-content"><iframe src="${app.url}" style="width:100%; height:100%; border:none;"></iframe></div>
     `;
     document.body.appendChild(win);
@@ -1048,36 +926,29 @@ function createCalculatorWindow() {
     const win = document.createElement('div');
     win.className = 'window';
     win.id = `window-${id}`;
-    win.style.cssText = `left:150px; top:100px; width:450px; height:550px;`;
+    win.style.cssText = `left:150px; top:100px; width:400px; height:500px;`;
     win.innerHTML = `
         <div class="window-header"><div class="window-title"><span>🧮</span><span>Calculator</span></div><div class="window-controls"><button class="window-control minimize">─</button><button class="window-control maximize">□</button><button class="window-control close">✕</button></div></div>
         <div class="window-content">
-            <div style="background:rgba(0,0,0,0.3); border-radius:16px; padding:20px; text-align:right; font-size:32px; font-family:monospace; margin-bottom:16px;" id="calcDisplay-${id}">0</div>
-            <div style="display:flex; gap:10px; margin-bottom:16px;">
-                <button class="calc-mode-btn" data-mode="basic">Basic</button>
-                <button class="calc-mode-btn" data-mode="scientific">Scientific</button>
-            </div>
+            <div style="background:rgba(0,0,0,0.3); border-radius:14px; padding:16px; text-align:right; font-size:28px; font-family:monospace; margin-bottom:14px;" id="calcDisplay-${id}">0</div>
+            <div style="display:flex; gap:8px; margin-bottom:14px;"><button class="calc-mode-btn" data-mode="basic">Basic</button><button class="calc-mode-btn" data-mode="scientific">Scientific</button></div>
             <div id="calcButtons-${id}" class="calculator-grid"></div>
         </div>
     `;
     document.body.appendChild(win);
-    windows.push({ id, element: win, app: { id: 'calculator', name: 'Calculator', icon: '🧮' }, minimized: false, maximized: false, x:150, y:100, w:450, h:550 });
+    windows.push({ id, element: win, app: { id: 'calculator', name: 'Calculator', icon: '🧮' }, minimized: false, maximized: false, x:150, y:100, w:400, h:500 });
     focusWindow(id);
     setupWindowEvents(win, id);
     addResizeHandles(win, id);
     updateTaskbar();
     playSound('open');
     
-    let calcExpr = '';
-    let mode = 'basic';
+    let calcExpr = '', mode = 'basic';
     const display = document.getElementById(`calcDisplay-${id}`);
     const buttonsContainer = document.getElementById(`calcButtons-${id}`);
-    
     const basicButtons = ['7','8','9','/','4','5','6','*','1','2','3','-','0','.','=','+','C','⌫'];
     const scientificButtons = ['7','8','9','/','4','5','6','*','1','2','3','-','0','.','=','+','C','⌫','sin','cos','tan','√','^','(',')'];
-    
     function updateDisplay() { display.innerText = calcExpr || '0'; }
-    
     function renderButtons() {
         const buttons = mode === 'basic' ? basicButtons : scientificButtons;
         buttonsContainer.innerHTML = buttons.map(btn => `<button class="calc-btn" data-val="${btn}">${btn}</button>`).join('');
@@ -1086,9 +957,8 @@ function createCalculatorWindow() {
                 const val = btn.dataset.val;
                 if (val === 'C') calcExpr = '';
                 else if (val === '⌫') calcExpr = calcExpr.slice(0, -1);
-                else if (val === '=') {
-                    try { calcExpr = eval(calcExpr).toString(); } catch(e) { calcExpr = 'Error'; }
-                } else if (val === 'sin') calcExpr = `Math.sin(${calcExpr})`;
+                else if (val === '=') { try { calcExpr = eval(calcExpr).toString(); } catch(e) { calcExpr = 'Error'; } }
+                else if (val === 'sin') calcExpr = `Math.sin(${calcExpr})`;
                 else if (val === 'cos') calcExpr = `Math.cos(${calcExpr})`;
                 else if (val === 'tan') calcExpr = `Math.tan(${calcExpr})`;
                 else if (val === '√') calcExpr = `Math.sqrt(${calcExpr})`;
@@ -1099,7 +969,6 @@ function createCalculatorWindow() {
             });
         });
     }
-    
     win.querySelectorAll('.calc-mode-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             mode = btn.dataset.mode;
@@ -1119,19 +988,19 @@ function createFactoryWindow() {
     const win = document.createElement('div');
     win.className = 'window';
     win.id = `window-${id}`;
-    win.style.cssText = `left:150px; top:80px; width:550px; height:500px;`;
+    win.style.cssText = `left:150px; top:80px; width:500px; height:450px;`;
     win.innerHTML = `
         <div class="window-header"><div class="window-title"><span>🏭</span><span>The Factory</span></div><div class="window-controls"><button class="window-control minimize">─</button><button class="window-control maximize">□</button><button class="window-control close">✕</button></div></div>
         <div class="window-content">
-            <select id="factoryType-${id}" style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:12px; color:white; margin-bottom:16px;">
+            <select id="factoryType-${id}" style="width:100%; padding:10px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:10px; color:white; margin-bottom:14px;">
                 <option value="joke">😂 Joke</option><option value="quote">💭 Quote</option><option value="fact">📚 Random Fact</option><option value="randomizer">🎲 Randomizer</option>
             </select>
-            <div id="factoryOutput-${id}" style="background:rgba(0,0,0,0.3); padding:20px; border-radius:16px; min-height:150px; margin-bottom:16px;"></div>
-            <button id="factoryGenerate-${id}" style="width:100%; padding:12px; background:var(--accent); border:none; border-radius:30px; color:white; cursor:pointer;">Generate</button>
+            <div id="factoryOutput-${id}" style="background:rgba(0,0,0,0.3); padding:16px; border-radius:14px; min-height:120px; margin-bottom:14px;"></div>
+            <button id="factoryGenerate-${id}" style="width:100%; padding:10px; background:var(--accent); border:none; border-radius:30px; color:white; cursor:pointer;">Generate</button>
         </div>
     `;
     document.body.appendChild(win);
-    windows.push({ id, element: win, app: { id: 'thefactory', name: 'The Factory', icon: '🏭' }, minimized: false, maximized: false, x:150, y:80, w:550, h:500 });
+    windows.push({ id, element: win, app: { id: 'thefactory', name: 'The Factory', icon: '🏭' }, minimized: false, maximized: false, x:150, y:80, w:500, h:450 });
     focusWindow(id);
     setupWindowEvents(win, id);
     addResizeHandles(win, id);
@@ -1164,20 +1033,16 @@ function createStudioWindow() {
     const win = document.createElement('div');
     win.className = 'window';
     win.id = `window-${id}`;
-    win.style.cssText = `left:150px; top:80px; width:500px; height:550px;`;
+    win.style.cssText = `left:150px; top:80px; width:500px; height:520px;`;
     win.innerHTML = `
         <div class="window-header"><div class="window-title"><span>🎨</span><span>The Studio</span></div><div class="window-controls"><button class="window-control minimize">─</button><button class="window-control maximize">□</button><button class="window-control close">✕</button></div></div>
         <div class="window-content" style="text-align:center;">
             <canvas id="studioCanvas-${id}" width="400" height="400" style="border:2px solid var(--border-glass); border-radius:12px; background:white; cursor:crosshair;"></canvas>
-            <div style="margin-top:12px; display:flex; gap:8px; justify-content:center;">
-                <input type="color" id="studioColor-${id}" value="#000000">
-                <button id="studioClear-${id}" class="calc-btn">Clear</button>
-                <button id="studioSave-${id}" class="calc-btn">Save</button>
-            </div>
+            <div style="margin-top:10px; display:flex; gap:8px; justify-content:center;"><input type="color" id="studioColor-${id}" value="#000000"><button id="studioClear-${id}" class="calc-btn">Clear</button><button id="studioSave-${id}" class="calc-btn">Save</button></div>
         </div>
     `;
     document.body.appendChild(win);
-    windows.push({ id, element: win, app: { id: 'thestudio', name: 'The Studio', icon: '🎨' }, minimized: false, maximized: false, x:150, y:80, w:500, h:550 });
+    windows.push({ id, element: win, app: { id: 'thestudio', name: 'The Studio', icon: '🎨' }, minimized: false, maximized: false, x:150, y:80, w:500, h:520 });
     focusWindow(id);
     setupWindowEvents(win, id);
     addResizeHandles(win, id);
@@ -1190,8 +1055,7 @@ function createStudioWindow() {
     let color = document.getElementById(`studioColor-${id}`).value;
     canvas.width = 400; canvas.height = 400;
     ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, 400, 400);
-    
+    ctx.fillRect(0,0,400,400);
     canvas.addEventListener('mousedown', () => drawing = true);
     canvas.addEventListener('mouseup', () => drawing = false);
     canvas.addEventListener('mousemove', (e) => {
@@ -1202,11 +1066,10 @@ function createStudioWindow() {
         const x = (e.clientX - rect.left) * scaleX;
         const y = (e.clientY - rect.top) * scaleY;
         ctx.fillStyle = color;
-        ctx.fillRect(x - 4, y - 4, 8, 8);
-        playSound('click');
+        ctx.fillRect(x-4, y-4, 8, 8);
     });
     document.getElementById(`studioColor-${id}`).addEventListener('change', (e) => color = e.target.value);
-    document.getElementById(`studioClear-${id}`).onclick = () => { ctx.fillStyle = 'white'; ctx.fillRect(0, 0, 400, 400); playSound('click'); };
+    document.getElementById(`studioClear-${id}`).onclick = () => { ctx.fillStyle = 'white'; ctx.fillRect(0,0,400,400); playSound('click'); };
     document.getElementById(`studioSave-${id}`).onclick = () => { const link = document.createElement('a'); link.download = 'drawing.png'; link.href = canvas.toDataURL(); link.click(); playSound('click'); };
     return id;
 }
@@ -1216,17 +1079,17 @@ function createWeatherWindow() {
     const win = document.createElement('div');
     win.className = 'window';
     win.id = `window-${id}`;
-    win.style.cssText = `left:150px; top:100px; width:450px; height:450px;`;
+    win.style.cssText = `left:150px; top:100px; width:420px; height:400px;`;
     win.innerHTML = `
         <div class="window-header"><div class="window-title"><span>🌤️</span><span>Weather</span></div><div class="window-controls"><button class="window-control minimize">─</button><button class="window-control maximize">□</button><button class="window-control close">✕</button></div></div>
         <div class="window-content" style="text-align:center;">
-            <input type="text" id="weatherCity-${id}" placeholder="Enter city..." style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:12px; color:white; margin-bottom:12px;">
-            <button id="weatherGet-${id}" style="width:100%; padding:12px; background:var(--accent); border:none; border-radius:30px; color:white; cursor:pointer;">Get Weather</button>
-            <div id="weatherResult-${id}" style="margin-top:16px; background:rgba(0,0,0,0.3); padding:20px; border-radius:16px;"></div>
+            <input type="text" id="weatherCity-${id}" placeholder="Enter city..." style="width:100%; padding:10px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:10px; color:white; margin-bottom:10px;">
+            <button id="weatherGet-${id}" style="width:100%; padding:10px; background:var(--accent); border:none; border-radius:30px; color:white; cursor:pointer;">Get Weather</button>
+            <div id="weatherResult-${id}" style="margin-top:14px; background:rgba(0,0,0,0.3); padding:16px; border-radius:14px;"></div>
         </div>
     `;
     document.body.appendChild(win);
-    windows.push({ id, element: win, app: { id: 'weather', name: 'Weather', icon: '🌤️' }, minimized: false, maximized: false, x:150, y:100, w:450, h:450 });
+    windows.push({ id, element: win, app: { id: 'weather', name: 'Weather', icon: '🌤️' }, minimized: false, maximized: false, x:150, y:100, w:420, h:400 });
     focusWindow(id);
     setupWindowEvents(win, id);
     addResizeHandles(win, id);
@@ -1244,7 +1107,7 @@ function createWeatherWindow() {
             const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&temperature_unit=fahrenheit`);
             const weatherData = await weatherRes.json();
             const temp = Math.round(weatherData.current_weather.temperature);
-            document.getElementById(`weatherResult-${id}`).innerHTML = `<div style="font-size:48px;">${temp}°F</div><div>${name}</div><div>${weatherData.current_weather.weathercode === 0 ? '☀️ Clear' : '☁️ Cloudy'}</div>`;
+            document.getElementById(`weatherResult-${id}`).innerHTML = `<div style="font-size:42px;">${temp}°F</div><div>${name}</div><div>${weatherData.current_weather.weathercode === 0 ? '☀️ Clear' : '☁️ Cloudy'}</div>`;
             playSound('click');
         } catch(e) { document.getElementById(`weatherResult-${id}`).innerHTML = 'Error fetching weather'; }
     };
@@ -1256,13 +1119,13 @@ function createNotesWindow() {
     const win = document.createElement('div');
     win.className = 'window';
     win.id = `window-${id}`;
-    win.style.cssText = `left:150px; top:100px; width:450px; height:400px;`;
+    win.style.cssText = `left:150px; top:100px; width:400px; height:380px;`;
     win.innerHTML = `
         <div class="window-header"><div class="window-title"><span>📋</span><span>Notes</span></div><div class="window-controls"><button class="window-control minimize">─</button><button class="window-control maximize">□</button><button class="window-control close">✕</button></div></div>
-        <div class="window-content"><textarea id="notesText-${id}" style="width:100%; height:100%; background:rgba(0,0,0,0.3); border:none; color:white; padding:12px; resize:none;" placeholder="Write your notes here..."></textarea></div>
+        <div class="window-content"><textarea id="notesText-${id}" style="width:100%; height:100%; background:rgba(0,0,0,0.3); border:none; color:white; padding:10px; resize:none;" placeholder="Write your notes here..."></textarea></div>
     `;
     document.body.appendChild(win);
-    windows.push({ id, element: win, app: { id: 'notes', name: 'Notes', icon: '📋' }, minimized: false, maximized: false, x:150, y:100, w:450, h:400 });
+    windows.push({ id, element: win, app: { id: 'notes', name: 'Notes', icon: '📋' }, minimized: false, maximized: false, x:150, y:100, w:400, h:380 });
     focusWindow(id);
     setupWindowEvents(win, id);
     addResizeHandles(win, id);
@@ -1281,33 +1144,28 @@ function createTimerWindow() {
     const win = document.createElement('div');
     win.className = 'window';
     win.id = `window-${id}`;
-    win.style.cssText = `left:150px; top:100px; width:400px; height:350px;`;
+    win.style.cssText = `left:150px; top:100px; width:380px; height:320px;`;
     win.innerHTML = `
         <div class="window-header"><div class="window-title"><span>⏱️</span><span>Timer</span></div><div class="window-controls"><button class="window-control minimize">─</button><button class="window-control maximize">□</button><button class="window-control close">✕</button></div></div>
         <div class="window-content" style="text-align:center;">
-            <div style="font-size:48px; font-family:monospace; margin:20px 0;" id="timerDisplay-${id}">25:00</div>
-            <div style="display:flex; gap:10px; justify-content:center;">
-                <button id="timerStart-${id}" class="calc-btn">Start</button>
-                <button id="timerPause-${id}" class="calc-btn">Pause</button>
-                <button id="timerReset-${id}" class="calc-btn">Reset</button>
-            </div>
+            <div style="font-size:44px; font-family:monospace; margin:16px 0;" id="timerDisplay-${id}">25:00</div>
+            <div style="display:flex; gap:8px; justify-content:center;"><button id="timerStart-${id}" class="calc-btn">Start</button><button id="timerPause-${id}" class="calc-btn">Pause</button><button id="timerReset-${id}" class="calc-btn">Reset</button></div>
         </div>
     `;
     document.body.appendChild(win);
-    windows.push({ id, element: win, app: { id: 'timer', name: 'Timer', icon: '⏱️' }, minimized: false, maximized: false, x:150, y:100, w:400, h:350 });
+    windows.push({ id, element: win, app: { id: 'timer', name: 'Timer', icon: '⏱️' }, minimized: false, maximized: false, x:150, y:100, w:380, h:320 });
     focusWindow(id);
     setupWindowEvents(win, id);
     addResizeHandles(win, id);
     updateTaskbar();
     playSound('open');
     
-    let interval = null;
-    let time = 25 * 60;
+    let interval = null, time = 25 * 60;
     const display = document.getElementById(`timerDisplay-${id}`);
-    function update() { const m = Math.floor(time / 60), s = time % 60; display.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`; }
-    document.getElementById(`timerStart-${id}`).onclick = () => { if (interval) clearInterval(interval); interval = setInterval(() => { if (time > 0) { time--; update(); } else { clearInterval(interval); showToast('Time is up!'); playSound('click'); } }, 1000); playSound('click'); };
-    document.getElementById(`timerPause-${id}`).onclick = () => { if (interval) clearInterval(interval); interval = null; playSound('click'); };
-    document.getElementById(`timerReset-${id}`).onclick = () => { time = 25 * 60; update(); playSound('click'); };
+    function update() { const m = Math.floor(time/60), s = time%60; display.innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; }
+    document.getElementById(`timerStart-${id}`).onclick = () => { if(interval) clearInterval(interval); interval = setInterval(() => { if(time>0){time--; update();}else{clearInterval(interval); showToast('Time is up!'); playSound('click');} },1000); playSound('click'); };
+    document.getElementById(`timerPause-${id}`).onclick = () => { if(interval) clearInterval(interval); interval = null; playSound('click'); };
+    document.getElementById(`timerReset-${id}`).onclick = () => { time = 25*60; update(); playSound('click'); };
     update();
     return id;
 }
@@ -1317,19 +1175,16 @@ function createTasksWindow() {
     const win = document.createElement('div');
     win.className = 'window';
     win.id = `window-${id}`;
-    win.style.cssText = `left:150px; top:100px; width:450px; height:450px;`;
+    win.style.cssText = `left:150px; top:100px; width:400px; height:420px;`;
     win.innerHTML = `
         <div class="window-header"><div class="window-title"><span>✅</span><span>Tasks</span></div><div class="window-controls"><button class="window-control minimize">─</button><button class="window-control maximize">□</button><button class="window-control close">✕</button></div></div>
         <div class="window-content">
-            <div style="display:flex; gap:8px; margin-bottom:16px;">
-                <input type="text" id="taskInput-${id}" placeholder="New task..." style="flex:1; padding:10px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:12px; color:white;">
-                <button id="addTask-${id}" class="calc-btn">Add</button>
-            </div>
+            <div style="display:flex; gap:8px; margin-bottom:14px;"><input type="text" id="taskInput-${id}" placeholder="New task..." style="flex:1; padding:8px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:10px; color:white;"><button id="addTask-${id}" class="calc-btn">Add</button></div>
             <div id="taskList-${id}" style="display:flex; flex-direction:column; gap:8px;"></div>
         </div>
     `;
     document.body.appendChild(win);
-    windows.push({ id, element: win, app: { id: 'tasks', name: 'Tasks', icon: '✅' }, minimized: false, maximized: false, x:150, y:100, w:450, h:450 });
+    windows.push({ id, element: win, app: { id: 'tasks', name: 'Tasks', icon: '✅' }, minimized: false, maximized: false, x:150, y:100, w:400, h:420 });
     focusWindow(id);
     setupWindowEvents(win, id);
     addResizeHandles(win, id);
@@ -1340,17 +1195,11 @@ function createTasksWindow() {
     const list = document.getElementById(`taskList-${id}`);
     const input = document.getElementById(`taskInput-${id}`);
     function render() {
-        list.innerHTML = tasks.map((t, i) => `
-            <div style="display:flex; align-items:center; gap:8px; padding:8px; background:rgba(255,255,255,0.05); border-radius:8px;">
-                <input type="checkbox" ${t.done ? 'checked' : ''} data-index="${i}" style="width:18px;">
-                <span style="flex:1; ${t.done ? 'text-decoration:line-through; color:gray;' : ''}">${t.text}</span>
-                <button class="delete-task" data-index="${i}" style="background:none; border:none; color:var(--danger); cursor:pointer;">🗑</button>
-            </div>
-        `).join('');
+        list.innerHTML = tasks.map((t,i) => `<div style="display:flex; align-items:center; gap:8px; padding:6px; background:rgba(255,255,255,0.05); border-radius:8px;"><input type="checkbox" ${t.done ? 'checked' : ''} data-index="${i}"><span style="flex:1; ${t.done ? 'text-decoration:line-through; color:gray;' : ''}">${t.text}</span><button class="delete-task" data-index="${i}" style="background:none; border:none; color:var(--danger); cursor:pointer;">🗑</button></div>`).join('');
         list.querySelectorAll('input[type="checkbox"]').forEach(cb => { cb.onchange = () => { tasks[cb.dataset.index].done = cb.checked; localStorage.setItem('user_tasks', JSON.stringify(tasks)); render(); playSound('click'); }; });
         list.querySelectorAll('.delete-task').forEach(btn => { btn.onclick = () => { tasks.splice(btn.dataset.index, 1); localStorage.setItem('user_tasks', JSON.stringify(tasks)); render(); playSound('click'); }; });
     }
-    document.getElementById(`addTask-${id}`).onclick = () => { if (input.value.trim()) { tasks.push({ text: input.value.trim(), done: false }); localStorage.setItem('user_tasks', JSON.stringify(tasks)); input.value = ''; render(); playSound('click'); } };
+    document.getElementById(`addTask-${id}`).onclick = () => { if(input.value.trim()) { tasks.push({ text: input.value.trim(), done: false }); localStorage.setItem('user_tasks', JSON.stringify(tasks)); input.value = ''; render(); playSound('click'); } };
     render();
     return id;
 }
@@ -1360,20 +1209,16 @@ function createWhiteboardWindow() {
     const win = document.createElement('div');
     win.className = 'window';
     win.id = `window-${id}`;
-    win.style.cssText = `left:150px; top:100px; width:500px; height:550px;`;
+    win.style.cssText = `left:150px; top:100px; width:500px; height:520px;`;
     win.innerHTML = `
         <div class="window-header"><div class="window-title"><span>✏️</span><span>Whiteboard</span></div><div class="window-controls"><button class="window-control minimize">─</button><button class="window-control maximize">□</button><button class="window-control close">✕</button></div></div>
         <div class="window-content" style="text-align:center;">
             <canvas id="whiteboardCanvas-${id}" width="400" height="400" style="border:2px solid var(--border-glass); border-radius:12px; background:white; cursor:crosshair;"></canvas>
-            <div style="margin-top:12px; display:flex; gap:8px; justify-content:center;">
-                <input type="color" id="whiteboardColor-${id}" value="#000000">
-                <button id="whiteboardClear-${id}" class="calc-btn">Clear</button>
-                <button id="whiteboardSave-${id}" class="calc-btn">Save</button>
-            </div>
+            <div style="margin-top:10px; display:flex; gap:8px; justify-content:center;"><input type="color" id="whiteboardColor-${id}" value="#000000"><button id="whiteboardClear-${id}" class="calc-btn">Clear</button><button id="whiteboardSave-${id}" class="calc-btn">Save</button></div>
         </div>
     `;
     document.body.appendChild(win);
-    windows.push({ id, element: win, app: { id: 'whiteboard', name: 'Whiteboard', icon: '✏️' }, minimized: false, maximized: false, x:150, y:100, w:500, h:550 });
+    windows.push({ id, element: win, app: { id: 'whiteboard', name: 'Whiteboard', icon: '✏️' }, minimized: false, maximized: false, x:150, y:100, w:500, h:520 });
     focusWindow(id);
     setupWindowEvents(win, id);
     addResizeHandles(win, id);
@@ -1386,22 +1231,21 @@ function createWhiteboardWindow() {
     let color = document.getElementById(`whiteboardColor-${id}`).value;
     canvas.width = 400; canvas.height = 400;
     ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, 400, 400);
-    
+    ctx.fillRect(0,0,400,400);
     canvas.addEventListener('mousedown', () => drawing = true);
     canvas.addEventListener('mouseup', () => drawing = false);
     canvas.addEventListener('mousemove', (e) => {
-        if (!drawing) return;
+        if(!drawing) return;
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
         const x = (e.clientX - rect.left) * scaleX;
         const y = (e.clientY - rect.top) * scaleY;
         ctx.fillStyle = color;
-        ctx.fillRect(x - 4, y - 4, 8, 8);
+        ctx.fillRect(x-4, y-4, 8, 8);
     });
     document.getElementById(`whiteboardColor-${id}`).addEventListener('change', (e) => color = e.target.value);
-    document.getElementById(`whiteboardClear-${id}`).onclick = () => { ctx.fillStyle = 'white'; ctx.fillRect(0, 0, 400, 400); playSound('click'); };
+    document.getElementById(`whiteboardClear-${id}`).onclick = () => { ctx.fillStyle = 'white'; ctx.fillRect(0,0,400,400); playSound('click'); };
     document.getElementById(`whiteboardSave-${id}`).onclick = () => { const link = document.createElement('a'); link.download = 'whiteboard.png'; link.href = canvas.toDataURL(); link.click(); playSound('click'); };
     return id;
 }
@@ -1413,23 +1257,84 @@ function createBrowserWindow() {
     win.id = `window-${id}`;
     win.style.cssText = `left:150px; top:100px; width:1000px; height:700px;`;
     win.innerHTML = `
-        <div class="window-header">
-            <div class="window-title"><span>🌐</span><span>Browser</span></div>
-            <div class="window-controls">
-                <button class="window-control minimize">─</button>
-                <button class="window-control maximize">□</button>
-                <button class="window-control close">✕</button>
-            </div>
-        </div>
+        <div class="window-header"><div class="window-title"><span>🌐</span><span>Browser</span></div><div class="window-controls"><button class="window-control minimize">─</button><button class="window-control maximize">□</button><button class="window-control close">✕</button></div></div>
         <div class="window-content"><iframe src="https://chipikipal800.github.io/Fanter-search/" style="width:100%; height:100%; border:none;"></iframe></div>
     `;
     document.body.appendChild(win);
-    windows.push({ id, element: win, app: { id: 'browser', name: 'Browser', icon: '🌐', url: 'https://chipikipal800.github.io/Fanter-search/' }, minimized: false, maximized: false, x:150, y:100, w:1000, h:700 });
+    windows.push({ id, element: win, app: { id: 'browser', name: 'Browser', icon: '🌐' }, minimized: false, maximized: false, x:150, y:100, w:1000, h:700 });
     focusWindow(id);
     setupWindowEvents(win, id);
     addResizeHandles(win, id);
     updateTaskbar();
     playSound('open');
+    return id;
+}
+
+function createAppStoreWindow() {
+    const id = nextWindowId++;
+    const win = document.createElement('div');
+    win.className = 'window';
+    win.id = `window-${id}`;
+    win.style.cssText = `left:200px; top:80px; width:750px; height:600px;`;
+    win.innerHTML = `
+        <div class="window-header"><div class="window-title"><span>📦</span><span>FantAppStore</span></div><div class="window-controls"><button class="window-control minimize">─</button><button class="window-control maximize">□</button><button class="window-control close">✕</button></div></div>
+        <div class="window-content">
+            <div style="margin-bottom:14px;"><input type="text" id="appStoreSearch-${id}" placeholder="Search apps..." style="width:100%; padding:10px 14px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:30px; color:white;"></div>
+            <div style="display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;"><button class="store-cat-btn active" data-cat="all">All</button><button class="store-cat-btn" data-cat="games">🎮 Games</button><button class="store-cat-btn" data-cat="social">💬 Social</button></div>
+            <div id="appStoreGrid-${id}" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:14px; max-height:420px; overflow-y:auto;"></div>
+        </div>
+    `;
+    document.body.appendChild(win);
+    windows.push({ id, element: win, app: { id: 'appstore', name: 'FantAppStore', icon: '📦' }, minimized: false, maximized: false, x:200, y:80, w:750, h:600 });
+    focusWindow(id);
+    setupWindowEvents(win, id);
+    addResizeHandles(win, id);
+    updateTaskbar();
+    playSound('open');
+    
+    function renderStore() {
+        const searchTerm = document.getElementById(`appStoreSearch-${id}`).value.toLowerCase();
+        const activeCat = win.querySelector('.store-cat-btn.active')?.dataset.cat || 'all';
+        let filtered = STORE_APPS.filter(app => {
+            const matchesSearch = app.name.toLowerCase().includes(searchTerm);
+            const matchesCat = activeCat === 'all' || app.category === activeCat;
+            return matchesSearch && matchesCat;
+        });
+        const grid = document.getElementById(`appStoreGrid-${id}`);
+        grid.innerHTML = filtered.map(app => {
+            const isInstalled = installedApps.includes(app.id);
+            return `<div style="background:rgba(255,255,255,0.05); border-radius:14px; padding:14px;"><div style="font-size:42px; text-align:center; margin-bottom:10px;"><img src="${app.iconUrl}" style="width:42px;height:42px;border-radius:10px;" onerror="this.style.display='none';this.parentElement.innerHTML='${app.icon}'"></div><div style="font-weight:600; margin-bottom:3px;">${app.name}</div><div style="font-size:10px; color:gray; margin-bottom:8px;">by ${app.creator}</div><div style="font-size:10px; color:var(--text-muted); margin-bottom:10px; line-height:1.3;">${app.description}</div><button class="install-btn-${id}" data-id="${app.id}" data-url="${app.url}" data-name="${app.name}" data-icon="${app.icon}" data-iconurl="${app.iconUrl}" style="width:100%; padding:8px; background:${isInstalled ? 'rgba(255,255,255,0.1)' : 'var(--accent)'}; border:none; border-radius:10px; color:white; cursor:pointer;">${isInstalled ? '✓ Installed' : '📥 Install'}</button></div>`;
+        }).join('');
+        grid.querySelectorAll(`.install-btn-${id}`).forEach(btn => {
+            btn.addEventListener('click', () => {
+                const appId = btn.dataset.id, appName = btn.dataset.name, appIcon = btn.dataset.icon, appIconUrl = btn.dataset.iconurl, appUrl = btn.dataset.url;
+                if(installedApps.includes(appId)) {
+                    installedApps = installedApps.filter(i => i !== appId);
+                    showToast(`Uninstalled ${appName}`);
+                } else {
+                    installedApps.push(appId);
+                    if(!ALL_APPS.find(a => a.id === appId)) {
+                        ALL_APPS.push({ id: appId, name: appName, icon: appIcon, iconUrl: appIconUrl, url: appUrl, category: 'games', external: true });
+                        renderStartApps();
+                    }
+                    showToast(`Installed ${appName}! Check the Start Menu`);
+                }
+                localStorage.setItem('installedApps', JSON.stringify(installedApps));
+                renderStore();
+                playSound('click');
+            });
+        });
+    }
+    win.querySelectorAll('.store-cat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            win.querySelectorAll('.store-cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderStore();
+            playSound('click');
+        });
+    });
+    document.getElementById(`appStoreSearch-${id}`).addEventListener('input', renderStore);
+    renderStore();
     return id;
 }
 
@@ -1441,11 +1346,9 @@ function launchApp(app) {
         focusWindow(existing.id);
         return;
     }
-    
     updateRecentApps(app.id, app.name, app.icon, app.id);
-    
     if (app.id === 'gamehub') createGameHubWindow();
-    else if (app.id === 'flashgames') createFlashGamesWindow();
+    else if (app.id === 'emulators') createEmulatorsWindow();
     else if (app.id === 'appstore') createAppStoreWindow();
     else if (app.id === 'calculator') createCalculatorWindow();
     else if (app.id === 'thefactory') createFactoryWindow();
@@ -1460,7 +1363,6 @@ function launchApp(app) {
     else showToast(`${app.name} coming soon!`);
 }
 
-// -------------------- WINDOW HELPERS --------------------
 function setupWindowEvents(win, id) {
     const header = win.querySelector('.window-header');
     const minBtn = win.querySelector('.window-control.minimize');
@@ -1469,12 +1371,12 @@ function setupWindowEvents(win, id) {
     win.addEventListener('mousedown', () => focusWindow(id));
     let drag = null;
     header.addEventListener('mousedown', (e) => {
-        if (e.target.closest('.window-controls')) return;
+        if(e.target.closest('.window-controls')) return;
         drag = { x: e.clientX, y: e.clientY, left: parseInt(win.style.left), top: parseInt(win.style.top) };
         document.addEventListener('mousemove', onDrag);
         document.addEventListener('mouseup', stopDrag);
     });
-    function onDrag(e) { if (!drag) return; win.style.left = `${drag.left + (e.clientX - drag.x)}px`; win.style.top = `${drag.top + (e.clientY - drag.y)}px`; }
+    function onDrag(e) { if(!drag) return; win.style.left = `${drag.left + (e.clientX - drag.x)}px`; win.style.top = `${drag.top + (e.clientY - drag.y)}px`; }
     function stopDrag() { drag = null; document.removeEventListener('mousemove', onDrag); document.removeEventListener('mouseup', stopDrag); }
     minBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleMinimize(id); playSound('click'); });
     maxBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleMaximize(id); playSound('click'); });
@@ -1483,7 +1385,7 @@ function setupWindowEvents(win, id) {
 }
 
 function addResizeHandles(win, id) {
-    const handles = ['n', 's', 'w', 'e', 'nw', 'ne', 'sw', 'se'];
+    const handles = ['n','s','w','e','nw','ne','sw','se'];
     handles.forEach(dir => {
         const handle = document.createElement('div');
         handle.className = `resize-handle resize-${dir}`;
@@ -1499,16 +1401,16 @@ function addResizeHandles(win, id) {
 }
 
 function onResize(e) {
-    if (!resizeData) return;
+    if(!resizeData) return;
     const dx = e.clientX - resizeData.startX;
     const dy = e.clientY - resizeData.startY;
     const win = windows.find(w => w.id === resizeData.id);
-    if (!win || win.maximized) return;
+    if(!win || win.maximized) return;
     let newW = resizeData.startW, newH = resizeData.startH, newL = resizeData.startL, newT = resizeData.startT;
-    if (resizeData.dir.includes('e')) newW = Math.max(400, resizeData.startW + dx);
-    if (resizeData.dir.includes('w')) { newW = Math.max(400, resizeData.startW - dx); newL = resizeData.startL + dx; }
-    if (resizeData.dir.includes('s')) newH = Math.max(300, resizeData.startH + dy);
-    if (resizeData.dir.includes('n')) { newH = Math.max(300, resizeData.startH - dy); newT = resizeData.startT + dy; }
+    if(resizeData.dir.includes('e')) newW = Math.max(400, resizeData.startW + dx);
+    if(resizeData.dir.includes('w')) { newW = Math.max(400, resizeData.startW - dx); newL = resizeData.startL + dx; }
+    if(resizeData.dir.includes('s')) newH = Math.max(300, resizeData.startH + dy);
+    if(resizeData.dir.includes('n')) { newH = Math.max(300, resizeData.startH - dy); newT = resizeData.startT + dy; }
     win.element.style.width = `${newW}px`; win.element.style.height = `${newH}px`; win.element.style.left = `${newL}px`; win.element.style.top = `${newT}px`;
     win.w = newW; win.h = newH; win.x = newL; win.y = newT;
 }
@@ -1519,20 +1421,20 @@ function focusWindow(id) {
     activeWindowId = id;
     windows.forEach(win => {
         win.element.classList.remove('active');
-        if (win.id === id) { win.element.classList.add('active'); win.element.style.zIndex = 100 + windows.findIndex(w => w.id === id); }
+        if(win.id === id) { win.element.classList.add('active'); win.element.style.zIndex = 100 + windows.findIndex(w => w.id === id); }
     });
     updateTaskbar();
 }
 
 function toggleMinimize(id) {
     const win = windows.find(w => w.id === id);
-    if (win) { win.minimized = !win.minimized; win.element.classList.toggle('minimized', win.minimized); if (win.minimized && activeWindowId === id) { const next = windows.find(w => !w.minimized); if (next) focusWindow(next.id); else activeWindowId = null; } else if (!win.minimized) focusWindow(id); updateTaskbar(); }
+    if(win) { win.minimized = !win.minimized; win.element.classList.toggle('minimized', win.minimized); if(win.minimized && activeWindowId === id) { const next = windows.find(w => !w.minimized); if(next) focusWindow(next.id); else activeWindowId = null; } else if(!win.minimized) focusWindow(id); updateTaskbar(); }
 }
 
 function toggleMaximize(id) {
     const win = windows.find(w => w.id === id);
-    if (win) {
-        if (win.maximized) {
+    if(win) {
+        if(win.maximized) {
             win.element.classList.remove('maximized');
             win.element.style.width = `${win.w}px`; win.element.style.height = `${win.h}px`;
             win.element.style.left = `${win.x}px`; win.element.style.top = `${win.y}px`;
@@ -1554,7 +1456,7 @@ function toggleMaximize(id) {
 
 function closeWindowWithAnimation(id) {
     const win = windows.find(w => w.id === id);
-    if (win) {
+    if(win) {
         win.element.classList.add('closing');
         setTimeout(() => closeWindow(id), 200);
     }
@@ -1562,71 +1464,45 @@ function closeWindowWithAnimation(id) {
 
 function closeWindow(id) {
     const win = windows.find(w => w.id === id);
-    if (win) { win.element.remove(); windows = windows.filter(w => w.id !== id); if (activeWindowId === id) { const next = windows.find(w => !w.minimized); if (next) focusWindow(next.id); else activeWindowId = null; } updateTaskbar(); }
+    if(win) { win.element.remove(); windows = windows.filter(w => w.id !== id); if(activeWindowId === id) { const next = windows.find(w => !w.minimized); if(next) focusWindow(next.id); else activeWindowId = null; } updateTaskbar(); }
 }
 
 function updateTaskbar() {
     const container = document.getElementById('taskbarApps');
     container.innerHTML = windows.map(win => `<div class="taskbar-app ${activeWindowId === win.id ? 'active' : ''}" data-id="${win.id}"><span>${win.app.icon}</span><span>${win.app.name}</span></div>`).join('');
     container.querySelectorAll('.taskbar-app').forEach(el => {
-        el.addEventListener('click', () => { const id = parseInt(el.dataset.id); const win = windows.find(w => w.id === id); if (win) { if (win.minimized) toggleMinimize(id); else focusWindow(id); playSound('click'); } });
+        el.addEventListener('click', () => { const id = parseInt(el.dataset.id); const win = windows.find(w => w.id === id); if(win) { if(win.minimized) toggleMinimize(id); else focusWindow(id); playSound('click'); } });
     });
 }
-
-// -------------------- START MENU --------------------
-let currentCategory = 'all';
-let currentSearchTerm = '';
 
 function renderStartApps() {
     const container = document.getElementById('startApps');
     let filtered = ALL_APPS;
-    
-    if (currentCategory !== 'all') {
-        filtered = filtered.filter(a => a.category === currentCategory);
-    }
-    if (currentSearchTerm) {
-        filtered = filtered.filter(a => a.name.toLowerCase().includes(currentSearchTerm.toLowerCase()));
-    }
-    
+    if(currentCategory !== 'all') filtered = filtered.filter(a => a.category === currentCategory);
+    if(currentSearchTerm) filtered = filtered.filter(a => a.name.toLowerCase().includes(currentSearchTerm.toLowerCase()));
     container.innerHTML = filtered.map(app => `
         <div class="start-app" data-app-id="${app.id}">
             <div class="start-app-icon">${app.iconUrl ? `<img src="${app.iconUrl}" onerror="this.style.display='none';this.parentElement.innerHTML='${app.icon}'">` : app.icon}</div>
             <div class="start-app-name">${app.name}</div>
-            <div class="start-app-pin" data-id="${app.id}" data-name="${app.name}" data-icon="${app.icon}" data-category="${app.category}" data-iconurl="${app.iconUrl || ''}">📌</div>
+            <div class="start-app-pin" data-id="${app.id}" data-name="${app.name}" data-icon="${app.icon}" data-category="${app.category}" data-iconurl="${app.iconUrl || ''}" data-url="${app.url || ''}">📌</div>
         </div>
     `).join('');
-    
     container.querySelectorAll('.start-app').forEach(el => {
-        el.addEventListener('click', (e) => {
-            if (e.target.classList.contains('start-app-pin')) return;
-            const app = ALL_APPS.find(a => a.id === el.dataset.appId);
-            if (app) launchApp(app);
-        });
+        el.addEventListener('click', (e) => { if(e.target.classList.contains('start-app-pin')) return; const app = ALL_APPS.find(a => a.id === el.dataset.appId); if(app) launchApp(app); });
         const pinBtn = el.querySelector('.start-app-pin');
-        if (pinBtn) {
-            pinBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const appId = pinBtn.dataset.id;
-                const appName = pinBtn.dataset.name;
-                const appIcon = pinBtn.dataset.icon;
-                const appCategory = pinBtn.dataset.category;
-                const appIconUrl = pinBtn.dataset.iconurl;
-                pinAppToDesktop(appId, appName, appIcon, appCategory, appIconUrl);
-            });
-        }
+        if(pinBtn) pinBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            pinAppToDesktop(pinBtn.dataset.id, pinBtn.dataset.name, pinBtn.dataset.icon, pinBtn.dataset.category, pinBtn.dataset.iconurl, pinBtn.dataset.url);
+        });
     });
 }
 
 function toggleStartMenu() {
     startMenuOpen = !startMenuOpen;
     document.getElementById('startMenu').classList.toggle('open', startMenuOpen);
-    if (startMenuOpen) {
-        document.getElementById('startSearch').focus();
-        renderStartApps();
-    }
+    if(startMenuOpen) { document.getElementById('startSearch').focus(); renderStartApps(); }
 }
 
-// Category buttons
 document.querySelectorAll('.start-cat-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         document.querySelectorAll('.start-cat-btn').forEach(b => b.classList.remove('active'));
@@ -1642,41 +1518,44 @@ document.getElementById('startSearch').addEventListener('input', (e) => {
     renderStartApps();
 });
 
-// -------------------- BOOT MENU --------------------
 function updateBootResults(query) {
     const container = document.getElementById('bootResults');
-    let results = query ? GAMES_DATA.filter(g => g.name.toLowerCase().includes(query.toLowerCase())).slice(0, 10) : GAMES_DATA.slice(0, 8);
+    let results = query ? GAMES_DATA.filter(g => g.name.toLowerCase().includes(query.toLowerCase())).slice(0,10) : GAMES_DATA.slice(0,8);
     currentBootResults = results;
     selectedBootIndex = results.length > 0 ? 0 : -1;
-    if (!results.length) { container.innerHTML = '<div style="padding:20px;text-align:center;">no games found</div>'; return; }
-    container.innerHTML = results.map((game, idx) => `
-        <div class="boot-result ${idx === selectedBootIndex ? 'selected' : ''}" data-index="${idx}">
-            <div class="boot-result-icon">🎮</div>
-            <div class="boot-result-info"><div class="boot-result-name">${game.name}</div><div class="boot-result-desc">${game.category}</div></div>
-        </div>
-    `).join('');
-    container.querySelectorAll('.boot-result').forEach(el => {
-        el.addEventListener('click', () => { const game = currentBootResults[parseInt(el.dataset.index)]; if (game) showGameDetails(game); toggleBootMenu(); playSound('click'); });
-    });
+    if(!results.length) { container.innerHTML = '<div style="padding:16px;text-align:center;">no games found</div>'; return; }
+    container.innerHTML = results.map((game,idx) => `<div class="boot-result ${idx === selectedBootIndex ? 'selected' : ''}" data-index="${idx}"><div class="boot-result-icon">🎮</div><div class="boot-result-info"><div class="boot-result-name">${game.name}</div><div class="boot-result-desc">${game.category}</div></div></div>`).join('');
+    container.querySelectorAll('.boot-result').forEach(el => { el.addEventListener('click', () => { const game = currentBootResults[parseInt(el.dataset.index)]; if(game) showGameDetails(game); toggleBootMenu(); playSound('click'); }); });
 }
 
 function toggleBootMenu() {
     bootMenuOpen = !bootMenuOpen;
     document.getElementById('bootMenu').classList.toggle('open', bootMenuOpen);
-    if (bootMenuOpen) { document.getElementById('bootSearch').focus(); updateBootResults(''); }
+    if(bootMenuOpen) { document.getElementById('bootSearch').focus(); updateBootResults(''); }
 }
 
-// -------------------- WALLPAPER --------------------
+function setWallpaper(type) {
+    const bgDiv = document.getElementById('desktopBg');
+    bgDiv.className = 'desktop-bg';
+    bgDiv.classList.add(`wallpaper-${type}`);
+    localStorage.setItem('fanter_wallpaper', type);
+    showToast('Wallpaper changed!');
+    playSound('click');
+}
+
 function uploadWallpaper() {
     const input = document.createElement('input');
     input.type = 'file'; input.accept = 'image/*';
     input.onchange = (e) => {
         const file = e.target.files[0];
-        if (file) {
+        if(file) {
             const reader = new FileReader();
             reader.onload = (ev) => {
-                localStorage.setItem('fanter_wallpaper', ev.target.result);
-                document.getElementById('desktopBg').style.backgroundImage = `url(${ev.target.result})`;
+                const bgDiv = document.getElementById('desktopBg');
+                bgDiv.style.backgroundImage = `url(${ev.target.result})`;
+                bgDiv.className = 'desktop-bg';
+                localStorage.setItem('fanter_wallpaper_custom', ev.target.result);
+                localStorage.removeItem('fanter_wallpaper');
                 showToast('Wallpaper changed!');
                 playSound('click');
             };
@@ -1686,60 +1565,40 @@ function uploadWallpaper() {
     input.click();
 }
 
-// -------------------- SHORTCUTS --------------------
 function showShortcuts() {
     alert(`⌨️ KEYBOARD SHORTCUTS\n\nCtrl+K → Quick launch / search games\nCtrl+W → Close active window\nCtrl+M → Minimize active window\nCtrl+/ → Show this menu\nEsc → Close menus / Exit fullscreen\n\n🖱️ Right-click desktop → Wallpaper & Widgets\n🖱️ Double-click titlebar → Maximize window`);
 }
 
-// -------------------- LOGIN WITH FADE --------------------
 async function handleLogin() {
     const username = document.getElementById('loginUsername').value;
     const password = document.getElementById('loginPassword').value;
-    if (!username || !password) {
+    if(!username || !password) {
         document.getElementById('loginError').textContent = 'Enter username and password';
         return;
     }
-    if (!supabaseClient) {
+    if(!supabaseClient) {
         document.getElementById('loginError').textContent = 'Supabase connecting... try again';
         return;
     }
     try {
-        const { data: profile, error: profileError } = await supabaseClient
-            .from('profiles')
-            .select('id, email')
-            .eq('username', username)
-            .single();
-        
-        if (profileError || !profile) {
-            document.getElementById('loginError').textContent = 'User not found';
-            return;
-        }
-        
-        const { data, error } = await supabaseClient.auth.signInWithPassword({ 
-            email: profile.email, 
-            password: password 
-        });
-        
-        if (error) throw error;
-        
+        const { data: profile, error: profileError } = await supabaseClient.from('profiles').select('id, email').eq('username', username).single();
+        if(profileError || !profile) { document.getElementById('loginError').textContent = 'User not found'; return; }
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email: profile.email, password: password });
+        if(error) throw error;
         currentUser = data.user;
         currentUser.username = username;
         localStorage.setItem('fanter_currentUser', JSON.stringify(currentUser));
         document.getElementById('startUserName').textContent = username;
         document.getElementById('startUserEmail').textContent = profile.email;
-        
         const loginScreen = document.getElementById('loginScreen');
         const desktop = document.getElementById('desktop');
         const fadeOverlay = document.getElementById('fadeOverlay');
-        
         loginScreen.style.transition = 'opacity 0.5s ease';
         loginScreen.style.opacity = '0';
-        
         setTimeout(() => {
             loginScreen.classList.remove('visible');
             loginScreen.style.display = 'none';
             fadeOverlay.classList.add('active');
-            
             setTimeout(() => {
                 desktop.style.display = 'block';
                 desktop.classList.add('visible');
@@ -1749,39 +1608,131 @@ async function handleLogin() {
                 initDesktop();
             }, 2000);
         }, 500);
-    } catch (err) {
-        document.getElementById('loginError').textContent = err.message;
-    }
+    } catch(err) { document.getElementById('loginError').textContent = err.message; }
 }
 
 function showRegister() { window.location.href = 'fantaccount.html'; }
 
-// -------------------- INITIALIZATION --------------------
+function updateSoundIcon() {
+    const iconSpan = document.getElementById('soundIcon');
+    const volumeSpan = document.getElementById('soundVolume');
+    if(soundEnabled && soundVolume > 0) { iconSpan.textContent = '🔊'; volumeSpan.textContent = `${soundVolume}%`; }
+    else { iconSpan.textContent = '🔇'; volumeSpan.textContent = 'Mute'; }
+}
+
+function toggleSound() {
+    soundEnabled = !soundEnabled;
+    localStorage.setItem('soundEnabled', soundEnabled);
+    updateSoundIcon();
+    if(soundEnabled) playSound('click');
+}
+
+function showAchievement(name, reward) {
+    const popup = document.getElementById('achievementPopup');
+    document.getElementById('achievementName').textContent = name;
+    document.getElementById('achievementReward').textContent = `+${reward} 🪙`;
+    popup.classList.add('show');
+    setTimeout(() => popup.classList.remove('show'), 4000);
+    if(!achievements[name]) {
+        achievements[name] = true;
+        localStorage.setItem('fanter_achievements', JSON.stringify(achievements));
+        if(currentUser) {
+            currentUser.coins = (currentUser.coins || 0) + reward;
+            localStorage.setItem('fanter_currentUser', JSON.stringify(currentUser));
+        }
+        playSound('click');
+    }
+}
+
+// Recent apps drag and snap
+function initRecentAppsDrag() {
+    const recentRow = document.getElementById('recentAppsRow');
+    let isDragging = false, startX = 0, startLeft = 0;
+    recentRow.addEventListener('mousedown', (e) => {
+        if(e.target.closest('.recent-app-item')) return;
+        isDragging = true;
+        startX = e.clientX;
+        startLeft = parseFloat(recentRow.style.left) || (window.innerWidth/2 - recentRow.offsetWidth/2);
+        recentRow.style.cursor = 'grabbing';
+        e.preventDefault();
+    });
+    document.addEventListener('mousemove', (e) => {
+        if(!isDragging) return;
+        let newLeft = startLeft + (e.clientX - startX);
+        newLeft = Math.max(10, Math.min(newLeft, window.innerWidth - recentRow.offsetWidth - 10));
+        recentRow.style.left = `${newLeft}px`;
+        recentRow.style.transform = 'none';
+    });
+    document.addEventListener('mouseup', () => {
+        if(isDragging) {
+            isDragging = false;
+            recentRow.style.cursor = '';
+            const centerX = window.innerWidth/2 - recentRow.offsetWidth/2;
+            const leftX = 10;
+            const rightX = window.innerWidth - recentRow.offsetWidth - 10;
+            const currentLeft = parseFloat(recentRow.style.left);
+            let snapPos = 'center';
+            if(Math.abs(currentLeft - leftX) < Math.abs(currentLeft - centerX) && Math.abs(currentLeft - leftX) < Math.abs(currentLeft - rightX)) snapPos = 'left';
+            else if(Math.abs(currentLeft - rightX) < Math.abs(currentLeft - centerX)) snapPos = 'right';
+            if(snapPos === 'left') recentRow.style.left = `${leftX}px`;
+            else if(snapPos === 'right') recentRow.style.left = `${rightX}px`;
+            else recentRow.style.left = `${centerX}px`;
+            localStorage.setItem('recentSnapPosition', snapPos);
+        }
+    });
+    const savedPos = localStorage.getItem('recentSnapPosition');
+    if(savedPos === 'left') recentRow.style.left = '10px';
+    else if(savedPos === 'right') recentRow.style.left = `${window.innerWidth - recentRow.offsetWidth - 10}px`;
+    else recentRow.style.left = `${window.innerWidth/2 - recentRow.offsetWidth/2}px`;
+    recentRow.style.transform = 'none';
+}
+
+// Marquee selection
+function initMarquee() {
+    const desktopBg = document.getElementById('desktopBg');
+    desktopBg.addEventListener('mousedown', startMarquee);
+    document.addEventListener('mousemove', updateMarquee);
+    document.addEventListener('mouseup', endMarquee);
+}
+
 async function initDesktop() {
     await loadGames();
-    loadPinnedIcons();
+    renderDesktopIcons();
     renderStartApps();
+    renderRecentApps();
     updateClock();
     updateSoundIcon();
-    renderRecentApps();
+    initRecentAppsDrag();
+    initMarquee();
     
     document.getElementById('startBtn').onclick = toggleStartMenu;
     document.getElementById('bootSearch').oninput = (e) => updateBootResults(e.target.value);
     document.getElementById('bootSearch').onkeydown = (e) => {
-        if (e.key === 'ArrowDown') { e.preventDefault(); if (selectedBootIndex < currentBootResults.length - 1) { selectedBootIndex++; updateBootResults(document.getElementById('bootSearch').value); } }
-        else if (e.key === 'ArrowUp') { e.preventDefault(); if (selectedBootIndex > 0) { selectedBootIndex--; updateBootResults(document.getElementById('bootSearch').value); } }
-        else if (e.key === 'Enter') { e.preventDefault(); if (currentBootResults[selectedBootIndex]) { showGameDetails(currentBootResults[selectedBootIndex]); toggleBootMenu(); } }
+        if(e.key === 'ArrowDown') { e.preventDefault(); if(selectedBootIndex < currentBootResults.length-1){selectedBootIndex++; updateBootResults(document.getElementById('bootSearch').value);} }
+        else if(e.key === 'ArrowUp') { e.preventDefault(); if(selectedBootIndex > 0){selectedBootIndex--; updateBootResults(document.getElementById('bootSearch').value);} }
+        else if(e.key === 'Enter') { e.preventDefault(); if(currentBootResults[selectedBootIndex]){ showGameDetails(currentBootResults[selectedBootIndex]); toggleBootMenu(); } }
     };
     document.getElementById('datetimeBtn').onclick = () => document.getElementById('widgetsPanel').classList.toggle('open');
     document.getElementById('closeWidgetsPanel').onclick = () => document.getElementById('widgetsPanel').classList.remove('open');
     document.getElementById('soundControl').onclick = toggleSound;
     
+    // Wallpaper menu
+    const wallpaperMenu = document.getElementById('wallpaperMenu');
+    document.getElementById('ctxWallpaperPresets').onclick = () => wallpaperMenu.classList.toggle('open');
+    document.getElementById('closeWallpaperMenu').onclick = () => wallpaperMenu.classList.remove('open');
+    document.querySelectorAll('.wallpaper-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+            setWallpaper(opt.dataset.wallpaper);
+            wallpaperMenu.classList.remove('open');
+        });
+    });
+    
     document.querySelectorAll('.widgets-panel-item').forEach(item => {
         item.addEventListener('click', () => {
             const widget = item.dataset.widget;
             const el = document.getElementById(`${widget}Widget`);
-            if (el) {
-                if (el.style.display === 'none') {
+            if(el) {
+                if(el.style.display === 'none') {
                     el.style.display = 'block';
                     document.getElementById(`${widget}WidgetToggle`).textContent = '✅';
                 } else {
@@ -1799,10 +1750,10 @@ async function initDesktop() {
     ['time', 'calendar', 'weather', 'battery'].forEach(w => {
         const saved = localStorage.getItem(`widget_${w}`);
         const el = document.getElementById(`${w}Widget`);
-        if (el && saved === 'false') el.style.display = 'none';
-        else if (el && saved === 'true') el.style.display = 'block';
-        else if (el && w === 'weather') el.style.display = 'none';
-        else if (el && w === 'battery') el.style.display = 'none';
+        if(el && saved === 'false') el.style.display = 'none';
+        else if(el && saved === 'true') el.style.display = 'block';
+        else if(el && w === 'weather') el.style.display = 'none';
+        else if(el && w === 'battery') el.style.display = 'none';
     });
     
     document.getElementById('ctxRefresh').onclick = () => location.reload();
@@ -1821,222 +1772,46 @@ async function initDesktop() {
     };
     
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && activeWindowId) {
+        if(e.key === 'Escape' && activeWindowId) {
             const win = windows.find(w => w.id === activeWindowId);
-            if (win?.maximized) toggleMaximize(activeWindowId);
+            if(win?.maximized) toggleMaximize(activeWindowId);
         }
-        if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); toggleBootMenu(); }
-        if ((e.ctrlKey || e.metaKey) && e.key === '/') { e.preventDefault(); showShortcuts(); }
-        if (e.key === 'Escape') { if (bootMenuOpen) toggleBootMenu(); if (startMenuOpen) toggleStartMenu(); }
-        if ((e.ctrlKey || e.metaKey) && e.key === 'w') { e.preventDefault(); if (activeWindowId) closeWindowWithAnimation(activeWindowId); }
-        if ((e.ctrlKey || e.metaKey) && e.key === 'm') { e.preventDefault(); if (activeWindowId) toggleMinimize(activeWindowId); }
+        if((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); toggleBootMenu(); }
+        if((e.ctrlKey || e.metaKey) && e.key === '/') { e.preventDefault(); showShortcuts(); }
+        if(e.key === 'Escape') { if(bootMenuOpen) toggleBootMenu(); if(startMenuOpen) toggleStartMenu(); }
+        if((e.ctrlKey || e.metaKey) && e.key === 'w') { e.preventDefault(); if(activeWindowId) closeWindowWithAnimation(activeWindowId); }
+        if((e.ctrlKey || e.metaKey) && e.key === 'm') { e.preventDefault(); if(activeWindowId) toggleMinimize(activeWindowId); }
     });
     
     showToast('🎉 Welcome to fanterOS!');
     
-    setTimeout(() => {
-        createGameHubWindow();
-    }, 500);
+    // Only open Game Hub if user explicitly clicks it - NOT on startup
+    // setTimeout(() => { createGameubWindow(); }, 500);  // REMOVED - no auto-open
 }
 
-// -------------------- SUPABASE INIT --------------------
 function initSupabase() {
-    if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+    if(typeof window.supabase !== 'undefined' && window.supabase.createClient) {
         supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         console.log('✅ Supabase ready');
-    } else {
-        setTimeout(initSupabase, 100);
-    }
+    } else { setTimeout(initSupabase, 100); }
 }
 initSupabase();
 
-// Only show login screen if no user is logged in
-if (!savedUser || JSON.parse(savedUser).username === 'Guest') {
-    document.getElementById('loginScreen').classList.add('visible');
-} else {
+const savedUserData = localStorage.getItem('fanter_currentUser');
+if(savedUserData && JSON.parse(savedUserData).username !== 'Guest') {
+    currentUser = JSON.parse(savedUserData);
+    document.getElementById('startUserName').textContent = currentUser.username;
+    document.getElementById('startUserEmail').textContent = currentUser.email || `${currentUser.username}@fanter.os`;
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('desktop').style.display = 'block';
     document.getElementById('desktop').classList.add('visible');
     initDesktop();
+} else {
+    document.getElementById('loginScreen').classList.add('visible');
 }
 
 document.getElementById('loginBtn').onclick = handleLogin;
 document.getElementById('showRegister').onclick = showRegister;
-
-  // Make recent apps row draggable and snappable
-let isDraggingRecent = false;
-let dragStartX = 0, dragStartY = 0;
-let recentStartLeft = 0, recentStartBottom = 80;
-let recentSnapPosition = 'center'; // 'center', 'left', 'right'
-
-const recentRow = document.getElementById('recentAppsRow');
-const taskbar = document.getElementById('taskbar');
-
-function snapRecentToPosition() {
-    const taskbarRect = taskbar.getBoundingClientRect();
-    const recentRect = recentRow.getBoundingClientRect();
-    const centerX = window.innerWidth / 2 - recentRect.width / 2;
-    const leftX = 20;
-    const rightX = window.innerWidth - recentRect.width - 20;
-    
-    if (recentSnapPosition === 'center') {
-        recentRow.style.left = `${centerX}px`;
-        recentRow.style.bottom = '80px';
-        recentRow.style.transform = 'none';
-    } else if (recentSnapPosition === 'left') {
-        recentRow.style.left = `${leftX}px`;
-        recentRow.style.bottom = '80px';
-        recentRow.style.transform = 'none';
-    } else if (recentSnapPosition === 'right') {
-        recentRow.style.left = `${rightX}px`;
-        recentRow.style.bottom = '80px';
-        recentRow.style.transform = 'none';
-    }
-    localStorage.setItem('recentSnapPosition', recentSnapPosition);
-}
-
-function checkSnapPosition() {
-    const taskbarRect = taskbar.getBoundingClientRect();
-    const recentRect = recentRow.getBoundingClientRect();
-    const centerX = window.innerWidth / 2 - recentRect.width / 2;
-    const leftX = 20;
-    const rightX = window.innerWidth - recentRect.width - 20;
-    
-    const currentLeft = parseFloat(recentRow.style.left);
-    
-    // Check which position is closest
-    const distToCenter = Math.abs(currentLeft - centerX);
-    const distToLeft = Math.abs(currentLeft - leftX);
-    const distToRight = Math.abs(currentLeft - rightX);
-    
-    if (distToCenter < distToLeft && distToCenter < distToRight) {
-        recentSnapPosition = 'center';
-    } else if (distToLeft < distToCenter && distToLeft < distToRight) {
-        recentSnapPosition = 'left';
-    } else {
-        recentSnapPosition = 'right';
-    }
-    
-    recentRow.classList.add('snapping');
-    snapRecentToPosition();
-    setTimeout(() => recentRow.classList.remove('snapping'), 300);
-}
-
-recentRow.addEventListener('mousedown', (e) => {
-    if (e.target.closest('.recent-app-item')) return;
-    isDraggingRecent = true;
-    dragStartX = e.clientX;
-    dragStartY = e.clientY;
-    recentStartLeft = parseFloat(recentRow.style.left) || (window.innerWidth / 2 - recentRow.offsetWidth / 2);
-    recentRow.classList.add('dragging');
-    recentRow.style.transition = 'none';
-    e.preventDefault();
-});
-
-document.addEventListener('mousemove', (e) => {
-    if (!isDraggingRecent) return;
-    const dx = e.clientX - dragStartX;
-    let newLeft = recentStartLeft + dx;
-    newLeft = Math.max(10, Math.min(newLeft, window.innerWidth - recentRow.offsetWidth - 10));
-    recentRow.style.left = `${newLeft}px`;
-    recentRow.style.bottom = '80px';
-    recentRow.style.transform = 'none';
-});
-
-document.addEventListener('mouseup', () => {
-    if (isDraggingRecent) {
-        isDraggingRecent = false;
-        recentRow.classList.remove('dragging');
-        recentRow.style.transition = '';
-        checkSnapPosition();
-    }
-});
-
-// Load saved snap position
-const savedSnapPos = localStorage.getItem('recentSnapPosition');
-if (savedSnapPos) {
-    recentSnapPosition = savedSnapPos;
-    snapRecentToPosition();
-} else {
-    snapRecentToPosition();
-}
-
-  // Make widgets draggable
-let isDraggingWidget = false;
-let currentWidget = null;
-let widgetStartX = 0, widgetStartY = 0;
-let widgetOriginalLeft = 0, widgetOriginalTop = 0;
-let widgetPositions = JSON.parse(localStorage.getItem('widgetPositions') || '{}');
-
-function saveWidgetPositions() {
-    localStorage.setItem('widgetPositions', JSON.stringify(widgetPositions));
-}
-
-function positionWidgets() {
-    document.querySelectorAll('.widget').forEach(widget => {
-        const id = widget.id;
-        if (widgetPositions[id]) {
-            widget.style.position = 'absolute';
-            widget.style.left = `${widgetPositions[id].left}px`;
-            widget.style.top = `${widgetPositions[id].top}px`;
-            widget.style.margin = '0';
-        } else {
-            widget.style.position = 'relative';
-            widget.style.left = '';
-            widget.style.top = '';
-        }
-    });
-}
-
-document.querySelectorAll('.widget').forEach(widget => {
-    widget.addEventListener('mousedown', (e) => {
-        if (e.target.closest('.widget-title') || e.target === widget || widget.contains(e.target)) {
-            isDraggingWidget = true;
-            currentWidget = widget;
-            const rect = widget.getBoundingClientRect();
-            widgetStartX = e.clientX - rect.left;
-            widgetStartY = e.clientY - rect.top;
-            
-            if (!widget.style.position || widget.style.position !== 'absolute') {
-                const rect = widget.getBoundingClientRect();
-                widget.style.position = 'absolute';
-                widget.style.left = `${rect.left}px`;
-                widget.style.top = `${rect.top}px`;
-                widget.style.margin = '0';
-            }
-            widgetOriginalLeft = parseFloat(widget.style.left);
-            widgetOriginalTop = parseFloat(widget.style.top);
-            widget.classList.add('dragging');
-            widget.style.transition = 'none';
-            e.preventDefault();
-        }
-    });
-});
-
-document.addEventListener('mousemove', (e) => {
-    if (!isDraggingWidget || !currentWidget) return;
-    const newLeft = e.clientX - widgetStartX;
-    const newTop = e.clientY - widgetStartY;
-    currentWidget.style.left = `${Math.max(5, Math.min(newLeft, window.innerWidth - currentWidget.offsetWidth - 5))}px`;
-    currentWidget.style.top = `${Math.max(5, Math.min(newTop, window.innerHeight - 120))}px`;
-});
-
-document.addEventListener('mouseup', () => {
-    if (isDraggingWidget && currentWidget) {
-        isDraggingWidget = false;
-        currentWidget.classList.remove('dragging');
-        currentWidget.style.transition = '';
-        widgetPositions[currentWidget.id] = {
-            left: parseFloat(currentWidget.style.left),
-            top: parseFloat(currentWidget.style.top)
-        };
-        saveWidgetPositions();
-        currentWidget = null;
-        showToast('Widget position saved');
-    }
-});
-
-positionWidgets();
 </script>
 </body>
 </html>
