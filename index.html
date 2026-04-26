@@ -48,8 +48,8 @@
     .wallpaper-minecraftian{background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSt2kxzqFZR9IrVdWL04CFvDdkI-8hMLz3RSg&s')}
     
     /* Desktop Icons */
-    .desktop-icons-left, .desktop-icons-right{position:absolute;top:0;left:0;width:100%;height:100%;z-index:15}
-    .desktop-icon{position:absolute;display:flex;flex-direction:column;align-items:center;width:85px;padding:10px 6px;border-radius:14px;cursor:pointer;transition:all 0.2s ease;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);z-index:20}
+    .desktop-icons-left, .desktop-icons-right{position:absolute;top:0;left:0;width:100%;height:100%;z-index:15;pointer-events:none}
+    .desktop-icon{position:absolute;display:flex;flex-direction:column;align-items:center;width:85px;padding:10px 6px;border-radius:14px;cursor:pointer;transition:all 0.2s ease;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);z-index:20;pointer-events:auto}
     .desktop-icon.dragging{opacity:0.7;z-index:1000}
     .desktop-icon:hover{background:rgba(255,255,255,0.2);transform:translateY(-3px)}
     .desktop-icon .icon{font-size:36px;margin-bottom:6px}
@@ -73,8 +73,8 @@
     .taskbar-time{font-size:11px;font-weight:500}
     .taskbar-date{font-size:8px;color:var(--text-muted)}
     
-    /* Recent Apps Row - INSIDE taskbar area */
-    .recent-apps-row{position:absolute;bottom:52px;left:50%;transform:translateX(-50%);background:var(--bg-glass);backdrop-filter:blur(20px);border:1px solid var(--border-glass);border-radius:20px;padding:6px 16px;z-index:14;display:flex;gap:12px;white-space:nowrap;cursor:grab}
+    /* Recent Apps Row */
+    .recent-apps-row{position:fixed;bottom:52px;left:50%;transform:translateX(-50%);background:var(--bg-glass);backdrop-filter:blur(20px);border:1px solid var(--border-glass);border-radius:20px;padding:6px 16px;z-index:14;display:flex;gap:12px;white-space:nowrap;cursor:grab}
     .recent-apps-row.dragging{cursor:grabbing;opacity:0.8}
     .recent-apps-title{font-size:10px;color:var(--text-muted);padding-right:10px;border-right:1px solid var(--border-glass);display:flex;align-items:center}
     .recent-app-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:4px 8px;border-radius:10px;transition:all 0.15s}
@@ -85,7 +85,7 @@
     
     /* Widgets */
     .desktop-widgets{position:absolute;bottom:12px;left:12px;display:flex;gap:10px;z-index:15}
-    .widget{background:var(--bg-glass);backdrop-filter:blur(20px);border:1px solid var(--border-glass);border-radius:14px;padding:8px 12px;min-width:90px;cursor:grab;transition:all 0.2s}
+    .widget{background:var(--bg-glass);backdrop-filter:blur(20px);border:1px solid var(--border-glass);border-radius:14px;padding:8px 12px;min-width:90px;cursor:grab;transition:all 0.2s;position:relative}
     .widget:hover{transform:translateY(-2px);background:rgba(25,25,35,0.95)}
     .widget.dragging{cursor:grabbing;opacity:0.7}
     .widget-title{font-size:9px;color:var(--text-muted);margin-bottom:4px}
@@ -366,6 +366,7 @@
 <script>
 // ============================================
 // FANTER OS - COMPLETE FIXED VERSION
+// Fixed: Marquee selection, wallpaper loading, widget saving, icon positions
 // ============================================
 
 const SUPABASE_URL = "https://gvzgnclowylrrpovdvtw.supabase.co";
@@ -594,6 +595,23 @@ function showGameDetails(game) {
     };
 }
 
+// Load wallpaper on startup
+function loadSavedWallpaper() {
+    const savedWallpaper = localStorage.getItem('fanter_wallpaper');
+    const customWallpaper = localStorage.getItem('fanter_wallpaper_custom');
+    const bgDiv = document.getElementById('desktopBg');
+    
+    if (customWallpaper) {
+        bgDiv.style.backgroundImage = `url(${customWallpaper})`;
+        bgDiv.className = 'desktop-bg';
+    } else if (savedWallpaper) {
+        bgDiv.className = 'desktop-bg';
+        bgDiv.classList.add(`wallpaper-${savedWallpaper}`);
+    } else {
+        bgDiv.className = 'desktop-bg wallpaper-solace';
+    }
+}
+
 // Desktop icons - draggable with position saving
 let iconDragState = null;
 
@@ -602,25 +620,47 @@ function renderDesktopIcons() {
     const rightContainer = document.getElementById('desktopIconsRight');
     const savedPositions = JSON.parse(localStorage.getItem('desktopIconPositions') || '{}');
     
-    leftContainer.innerHTML = DESKTOP_ICONS_LEFT.map((icon, idx) => {
-        const pos = savedPositions[icon.id] || { x: 20, y: 70 + idx * 100 };
-        return `<div class="desktop-icon" data-id="${icon.id}" data-name="${icon.name}" data-iconurl="${icon.iconUrl || ''}" data-url="${icon.url || ''}" data-external="${icon.external || false}" style="left: ${pos.x}px; top: ${pos.y}px;"><div class="icon">${icon.iconUrl ? `<img src="${icon.iconUrl}" onerror="this.style.display='none';this.parentElement.innerHTML='${icon.icon}'">` : icon.icon}</div><div class="label">${icon.name}</div><div class="unpin-btn" data-id="${icon.id}">✕</div></div>`;
-    }).join('');
+    leftContainer.innerHTML = '';
+    rightContainer.innerHTML = '';
     
-    rightContainer.innerHTML = DESKTOP_ICONS_RIGHT.map((icon, idx) => {
+    DESKTOP_ICONS_LEFT.forEach((icon, idx) => {
+        const pos = savedPositions[icon.id] || { x: 20, y: 70 + idx * 100 };
+        const iconDiv = createIconElement(icon, pos);
+        leftContainer.appendChild(iconDiv);
+    });
+    
+    DESKTOP_ICONS_RIGHT.forEach((icon, idx) => {
         const pos = savedPositions[icon.id] || { x: window.innerWidth - 105, y: 70 + idx * 100 };
-        return `<div class="desktop-icon" data-id="${icon.id}" data-name="${icon.name}" data-iconurl="${icon.iconUrl || ''}" data-url="${icon.url || ''}" data-external="${icon.external || false}" style="left: ${pos.x}px; top: ${pos.y}px;"><div class="icon">${icon.iconUrl ? `<img src="${icon.iconUrl}" onerror="this.style.display='none';this.parentElement.innerHTML='${icon.icon}'">` : icon.icon}</div><div class="label">${icon.name}</div><div class="unpin-btn" data-id="${icon.id}">✕</div></div>`;
-    }).join('');
+        const iconDiv = createIconElement(icon, pos);
+        rightContainer.appendChild(iconDiv);
+    });
     
     // Add pinned apps
     const pinnedIcons = pinnedApps.filter(p => !DESKTOP_ICONS_LEFT.some(i => i.id === p.id) && !DESKTOP_ICONS_RIGHT.some(i => i.id === p.id));
     pinnedIcons.forEach((icon, idx) => {
         const pos = savedPositions[icon.id] || { x: window.innerWidth - 105, y: 70 + (DESKTOP_ICONS_RIGHT.length + idx) * 100 };
-        rightContainer.innerHTML += `<div class="desktop-icon" data-id="${icon.id}" data-name="${icon.name}" data-iconurl="${icon.iconUrl || ''}" data-url="${icon.url || ''}" style="left: ${pos.x}px; top: ${pos.y}px;"><div class="icon">${icon.iconUrl ? `<img src="${icon.iconUrl}" onerror="this.style.display='none';this.parentElement.innerHTML='${icon.icon}'">` : icon.icon}</div><div class="label">${icon.name}</div><div class="unpin-btn" data-id="${icon.id}">✕</div></div>`;
+        const iconDiv = createIconElement(icon, pos);
+        rightContainer.appendChild(iconDiv);
     });
-    
-    // Setup drag and click handlers
-    document.querySelectorAll('.desktop-icon').forEach(setupDesktopIconDrag);
+}
+
+function createIconElement(icon, pos) {
+    const div = document.createElement('div');
+    div.className = 'desktop-icon';
+    div.setAttribute('data-id', icon.id);
+    div.setAttribute('data-name', icon.name);
+    div.setAttribute('data-iconurl', icon.iconUrl || '');
+    div.setAttribute('data-url', icon.url || '');
+    div.setAttribute('data-external', icon.external || false);
+    div.style.left = `${pos.x}px`;
+    div.style.top = `${pos.y}px`;
+    div.innerHTML = `
+        <div class="icon">${icon.iconUrl ? `<img src="${icon.iconUrl}" onerror="this.style.display='none';this.parentElement.innerHTML='${icon.icon}'">` : icon.icon}</div>
+        <div class="label">${icon.name}</div>
+        <div class="unpin-btn" data-id="${icon.id}">✕</div>
+    `;
+    setupDesktopIconDrag(div);
+    return div;
 }
 
 function setupDesktopIconDrag(el) {
@@ -631,6 +671,7 @@ function setupDesktopIconDrag(el) {
     
     el.addEventListener('mousedown', (e) => {
         if (e.target.classList.contains('unpin-btn')) return;
+        e.stopPropagation(); // Prevent marquee from starting
         isDragging = true;
         hasMoved = false;
         dragStartX = e.clientX;
@@ -638,7 +679,6 @@ function setupDesktopIconDrag(el) {
         startLeft = parseFloat(el.style.left);
         startTop = parseFloat(el.style.top);
         el.classList.add('dragging');
-        e.preventDefault();
     });
     
     document.addEventListener('mousemove', (e) => {
@@ -700,9 +740,12 @@ function unpinAppFromDesktop(appId) {
     playSound('click');
 }
 
-// Marquee selection
+// Marquee selection - FIXED
 function startMarquee(e) {
+    // Only start marquee if clicking on desktop background (not on icons)
     if (e.target.closest('.desktop-icon')) return;
+    if (e.target !== document.getElementById('desktopBg') && !e.target.closest('.desktop-bg')) return;
+    
     isMarqueeSelecting = true;
     marqueeStartX = e.clientX;
     marqueeStartY = e.clientY;
@@ -729,26 +772,37 @@ function updateMarquee(e) {
     marquee.style.width = `${width}px`;
     marquee.style.height = `${height}px`;
     
+    // Clear previous selection outlines
+    document.querySelectorAll('.desktop-icon').forEach(icon => {
+        icon.style.outline = '';
+    });
+    selectedIcons = [];
+    
+    // Select new icons
     document.querySelectorAll('.desktop-icon').forEach(icon => {
         const rect = icon.getBoundingClientRect();
         if (rect.right > left && rect.left < left + width && rect.bottom > top && rect.top < top + height) {
-            if (!selectedIcons.includes(icon)) {
-                selectedIcons.push(icon);
-                icon.style.outline = `2px solid var(--accent)`;
-                icon.style.outlineOffset = '2px';
-            }
-        } else if (selectedIcons.includes(icon)) {
-            selectedIcons = selectedIcons.filter(i => i !== icon);
-            icon.style.outline = '';
+            selectedIcons.push(icon);
+            icon.style.outline = `2px solid var(--accent)`;
+            icon.style.outlineOffset = '2px';
         }
     });
 }
 
 function endMarquee(e) {
+    if (!isMarqueeSelecting) {
+        // Clear any lingering outlines
+        document.querySelectorAll('.desktop-icon').forEach(icon => {
+            icon.style.outline = '';
+        });
+        return;
+    }
     isMarqueeSelecting = false;
     const marquee = document.getElementById('marqueeSelection');
     marquee.style.display = 'none';
+    
     if (selectedIcons.length === 0) return;
+    
     if (e.ctrlKey) {
         selectedIcons.forEach(icon => {
             const app = ALL_APPS.find(a => a.id === icon.dataset.id);
@@ -762,7 +816,7 @@ function endMarquee(e) {
     selectedIcons = [];
 }
 
-// Window management
+// Window management functions (keep as is from your original)
 function createGameHubWindow() {
     const id = nextWindowId++;
     const win = document.createElement('div');
@@ -1479,6 +1533,7 @@ function setWallpaper(type) {
     bgDiv.className = 'desktop-bg';
     bgDiv.classList.add(`wallpaper-${type}`);
     localStorage.setItem('fanter_wallpaper', type);
+    localStorage.removeItem('fanter_wallpaper_custom');
     showToast('Wallpaper changed!');
     playSound('click');
 }
@@ -1583,30 +1638,43 @@ function initRecentAppsDrag() {
     recentRow.style.transform = 'none';
 }
 
-// Widget dragging
-let widgetDragState = null;
-
+// Widget dragging - FIXED with position saving
 function initWidgetDragging() {
+    const widgetsContainer = document.getElementById('desktopWidgets');
+    const savedPositions = JSON.parse(localStorage.getItem('widgetPositions') || '{}');
+    
+    // Apply saved positions first
+    Object.entries(savedPositions).forEach(([id, pos]) => {
+        const widget = document.getElementById(id);
+        if (widget) {
+            widget.style.position = 'absolute';
+            widget.style.left = `${pos.left}px`;
+            widget.style.top = `${pos.top}px`;
+            widget.style.margin = '0';
+            widgetsContainer.style.position = 'relative';
+            widgetsContainer.style.height = '0';
+        }
+    });
+    
+    // Setup dragging for each widget
     document.querySelectorAll('.widget').forEach(widget => {
         let isDragging = false;
         let startX = 0, startY = 0;
         let startLeft = 0, startTop = 0;
         
         widget.addEventListener('mousedown', (e) => {
-            if (e.target.closest('.widget-title') || widget.contains(e.target)) {
-                isDragging = true;
-                startX = e.clientX;
-                startY = e.clientY;
-                const rect = widget.getBoundingClientRect();
-                startLeft = rect.left;
-                startTop = rect.top;
-                widget.style.position = 'absolute';
-                widget.style.left = `${startLeft}px`;
-                widget.style.top = `${startTop}px`;
-                widget.style.margin = '0';
-                widget.classList.add('dragging');
-                e.preventDefault();
-            }
+            e.stopPropagation();
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            const rect = widget.getBoundingClientRect();
+            startLeft = rect.left;
+            startTop = rect.top;
+            widget.style.position = 'absolute';
+            widget.style.left = `${startLeft}px`;
+            widget.style.top = `${startTop}px`;
+            widget.style.margin = '0';
+            widget.classList.add('dragging');
         });
         
         document.addEventListener('mousemove', (e) => {
@@ -1628,22 +1696,8 @@ function initWidgetDragging() {
                 const positions = JSON.parse(localStorage.getItem('widgetPositions') || '{}');
                 positions[widget.id] = { left: parseFloat(widget.style.left), top: parseFloat(widget.style.top) };
                 localStorage.setItem('widgetPositions', JSON.stringify(positions));
-                widget.style.position = '';
-                widget.style.left = '';
-                widget.style.top = '';
             }
         });
-    });
-    
-    const savedPositions = JSON.parse(localStorage.getItem('widgetPositions') || '{}');
-    Object.entries(savedPositions).forEach(([id, pos]) => {
-        const widget = document.getElementById(id);
-        if (widget) {
-            widget.style.position = 'absolute';
-            widget.style.left = `${pos.left}px`;
-            widget.style.top = `${pos.top}px`;
-            widget.style.margin = '0';
-        }
     });
 }
 
@@ -1695,6 +1749,7 @@ function showRegister() { window.location.href = 'fantaccount.html'; }
 
 async function initDesktop() {
     await loadGames();
+    loadSavedWallpaper(); // Load saved wallpaper on desktop init
     renderDesktopIcons();
     renderStartApps();
     renderRecentApps();
@@ -1747,8 +1802,13 @@ async function initDesktop() {
     document.getElementById('ctxWallpaper').onclick = uploadWallpaper;
     document.getElementById('ctxWidgets').onclick = () => {
         const widgetsDiv = document.getElementById('desktopWidgets');
-        widgetsDiv.classList.toggle('visible');
-        showToast('Widgets toggled');
+        if (widgetsDiv.style.display === 'none') {
+            widgetsDiv.style.display = 'flex';
+            showToast('Widgets shown');
+        } else {
+            widgetsDiv.style.display = 'none';
+            showToast('Widgets hidden');
+        }
     };
     document.getElementById('ctxShortcuts').onclick = showShortcuts;
     
@@ -1763,7 +1823,7 @@ async function initDesktop() {
         setTimeout(() => document.addEventListener('click', () => menu.classList.remove('visible'), { once: true }), 10);
     };
     
-    // Marquee selection on desktop background
+    // Marquee selection on desktop background - FIXED
     desktopBg.addEventListener('mousedown', startMarquee);
     document.addEventListener('mousemove', updateMarquee);
     document.addEventListener('mouseup', endMarquee);
