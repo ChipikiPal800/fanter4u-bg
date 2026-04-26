@@ -10,54 +10,17 @@
     :root{--accent:#7c5cff;--bg-glass:rgba(15,15,25,0.85);--border-glass:rgba(255,255,255,0.08);--text-primary:#f0f0ff;--text-secondary:#a0a0c0;--text-muted:#606080;--danger:#ff5e5e;--success:#4cd964;--warning:#ffcc00}
     body{font-family:'Inter',sans-serif;background:#0a0a0f;height:100vh;overflow:hidden;color:var(--text-primary)}
     
-    /* Glassmorphism base */
-    .window, .taskbar, .start-menu, .boot-menu, .context-menu, .widget, .recent-apps-row, .sound-control, .quick-settings, .widgets-panel {
-      backdrop-filter: blur(12px);
-      background: var(--bg-glass);
-    }
-    
-    /* Fullscreen removes glass */
-    .window.maximized {
-      backdrop-filter: none;
-      background: rgba(18,18,26,0.98);
-    }
-    
     @keyframes slideUp{0%{transform:translateY(20px);opacity:0}100%{transform:translateY(0);opacity:1}}
-    @keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
-    @keyframes windowPop{0%{transform:scale(0.3) translateY(50px);opacity:0}80%{transform:scale(1.02)}100%{transform:scale(1) translateY(0);opacity:1}}
-    @keyframes windowCloseAnim{0%{transform:scale(1);opacity:1}100%{transform:scale(0.2) translateY(100px);opacity:0}}
+    @keyframes windowPop{0%{transform:scale(0.3);opacity:0}80%{transform:scale(1.02)}100%{transform:scale(1);opacity:1}}
+    @keyframes windowCloseAnim{0%{transform:scale(1);opacity:1}100%{transform:scale(0.2);opacity:0}}
     @keyframes fullscreenEnter{0%{transform:scale(0.95);opacity:0}100%{transform:scale(1);opacity:1}}
-    @keyframes fadeInIcons{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
     
     .fade-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:19999;opacity:0;pointer-events:none;transition:opacity 2s ease}
     .fade-overlay.active{opacity:1;pointer-events:all}
-    
-    /* Marquee selection */
-    .marquee-selection {
-      position: absolute;
-      border: 2px solid var(--accent);
-      background: rgba(124,92,255,0.1);
-      pointer-events: none;
-      z-index: 10000;
-      display: none;
-    }
-    
-    /* Wallpaper presets */
-    .wallpaper-solace{background-image:url('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/ee4c29a6-9564-4bee-befd-79a0597c29ca/dhsrl04-16049839-0c0f-4077-977f-09a992ec4b07.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiIvZi9lZTRjMjlhNi05NTY0LTRiZWUtYmVmZC03OWEwNTk3YzI5Y2EvZGhzcmwwNC0xNjA0OTgzOS0wYzBmLTQwNzctOTc3Zi0wOWE5OTJlYzRiMDcuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.XIZi3LNLcPUgY_lP-4R7TJ2r6klMfpBRxT7-cMHGvic')}
-    .wallpaper-land{background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7c-QOc5ISuGZ6bmIzNAuOQiz9ngy_UbXvbg&s')}
-    .wallpaper-flow{background-image:url('https://i.redd.it/wallpaper-pack-more-in-the-desc-v0-fqzef996ntt81.png?width=6016&format=png&auto=webp&s=194a7425819ef5c1166f88eefeb67f9a758916d4')}
-    .wallpaper-liney{background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV-Ul-Y4fhrjfWEFkbxZoQk-jEFZjTv5bRog&s')}
-    .wallpaper-reflection{background-image:url('https://i.redd.it/2cpsrvjldn3a1.jpg')}
-    .wallpaper-swirl{background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQUDodvPd3LCZWdy6YzSHRxdSzu3Wn6cNsUew&s')}
-    .wallpaper-morning{background-image:url('https://thumbs.dreamstime.com/b/ethereal-celestial-sunset-sky-grass-silhouette-flaring-light-mystical-landscape-illustration-captures-profound-451909202.jpg')}
-    .wallpaper-minecraftian{background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSt2kxzqFZR9IrVdWL04CFvDdkI-8hMLz3RSg&s')}
-    .wallpaper-jump{background-image:url('https://images.pexels.com/photos/15591636/pexels-photo-15591636/free-photo-of-silhouette-of-a-person-sitting-at-the-edge-of-a-rock-at-sunset.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500')}
-    .wallpaper-oldenlake{background-image:url('https://images.pexels.com/photos/28318336/pexels-photo-28318336.jpeg?cs=srgb&dl=pexels-ruben-reijgwart-820557011-28318336.jpg&fm=jpg')}
-    .wallpaper-minecraftian2{background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0lUjm8dqO71I0BPnui_mG01bUuNjp0-lu7g&s')}
-    .wallpaper-liquid{background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf0ro4HGLM_R577boLd8zMnKibbJAeADUxOw&s')}
+    .marquee-selection{position:absolute;border:2px solid var(--accent);background:rgba(124,92,255,0.15);pointer-events:none;z-index:10000;display:none}
     
     /* Login Screen */
-    .login-screen{position:fixed;top:0;left:0;width:100%;height:100%;background-size:cover;background-position:center;z-index:10000;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity 0.6s ease}
+    .login-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:url('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/ee4c29a6-9564-4bee-befd-79a0597c29ca/dhsrl04-16049839-0c0f-4077-977f-09a992ec4b07.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiIvZi9lZTRjMjlhNi05NTY0LTRiZWUtYmVmZC03OWEwNTk3YzI5Y2EvZGhzcmwwNC0xNjA0OTgzOS0wYzBmLTQwNzctOTc3Zi0wOWE5OTJlYzRiMDcuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.XIZi3LNLcPUgY_lP-4R7TJ2r6klMfpBRxT7-cMHGvic') center/cover no-repeat;z-index:10000;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity 0.6s ease}
     .login-screen::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px)}
     .login-screen.visible{opacity:1;visibility:visible}
     .login-card{position:relative;z-index:10;background:var(--bg-glass);backdrop-filter:blur(20px);border:1px solid var(--border-glass);border-radius:32px;padding:40px;width:400px;text-align:center;animation:slideUp 0.4s ease}
@@ -78,58 +41,22 @@
     .desktop-bg{position:absolute;top:0;left:0;width:100%;height:100%;background-size:cover;background-position:center;z-index:-1}
     .desktop-bg::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.3)}
     
+    /* Wallpaper presets */
+    .wallpaper-solace{background-image:url('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/ee4c29a6-9564-4bee-befd-79a0597c29ca/dhsrl04-16049839-0c0f-4077-977f-09a992ec4b07.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiIvZi9lZTRjMjlhNi05NTY0LTRiZWUtYmVmZC03OWEwNTk3YzI5Y2EvZGhzcmwwNC0xNjA0OTgzOS0wYzBmLTQwNzctOTc3Zi0wOWE5OTJlYzRiMDcuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.XIZi3LNLcPUgY_lP-4R7TJ2r6klMfpBRxT7-cMHGvic')}
+    .wallpaper-land{background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7c-QOc5ISuGZ6bmIzNAuOQiz9ngy_UbXvbg&s')}
+    .wallpaper-flow{background-image:url('https://i.redd.it/wallpaper-pack-more-in-the-desc-v0-fqzef996ntt81.png?width=6016&format=png&auto=webp&s=194a7425819ef5c1166f88eefeb67f9a758916d4')}
+    .wallpaper-minecraftian{background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSt2kxzqFZR9IrVdWL04CFvDdkI-8hMLz3RSg&s')}
+    
     /* Desktop Icons */
     .desktop-icons-left, .desktop-icons-right{position:absolute;top:0;left:0;width:100%;height:100%;z-index:15}
-    .desktop-icon{position:absolute;display:flex;flex-direction:column;align-items:center;width:85px;padding:10px 6px;border-radius:14px;cursor:pointer;transition:all 0.2s ease;background:rgba(0,0,0,0.3);backdrop-filter:blur(4px)}
+    .desktop-icon{position:absolute;display:flex;flex-direction:column;align-items:center;width:85px;padding:10px 6px;border-radius:14px;cursor:pointer;transition:all 0.2s ease;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);z-index:20}
+    .desktop-icon.dragging{opacity:0.7;z-index:1000}
     .desktop-icon:hover{background:rgba(255,255,255,0.2);transform:translateY(-3px)}
     .desktop-icon .icon{font-size:36px;margin-bottom:6px}
     .desktop-icon .icon img{width:36px;height:36px;border-radius:10px;object-fit:cover}
     .desktop-icon .label{font-size:10px;text-align:center;color:white;font-weight:500;text-shadow:0 1px 2px rgba(0,0,0,0.5)}
-    .desktop-icon .unpin-btn{position:absolute;top:-8px;right:-8px;width:18px;height:18px;background:var(--danger);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:10px;color:white;cursor:pointer;z-index:20}
+    .desktop-icon .unpin-btn{position:absolute;top:-8px;right:-8px;width:18px;height:18px;background:var(--danger);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:10px;color:white;cursor:pointer;z-index:25}
     .desktop-icon:hover .unpin-btn{display:flex}
-    
-    /* Recent Apps Row - integrated into taskbar area */
-    .recent-apps-row{position:absolute;bottom:60px;left:50%;transform:translateX(-50%);background:var(--bg-glass);backdrop-filter:blur(20px);border:1px solid var(--border-glass);border-radius:20px;padding:6px 16px;z-index:15;display:flex;gap:12px;white-space:nowrap;cursor:grab}
-    .recent-apps-row.dragging{cursor:grabbing;opacity:0.8}
-    .recent-apps-title{font-size:10px;color:var(--text-muted);padding-right:10px;border-right:1px solid var(--border-glass);display:flex;align-items:center}
-    .recent-app-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:4px 8px;border-radius:10px;transition:all 0.15s}
-    .recent-app-item:hover{background:rgba(255,255,255,0.1);transform:translateY(-2px)}
-    .recent-app-icon{font-size:20px}
-    .recent-app-icon img{width:20px;height:20px;border-radius:5px}
-    .recent-app-name{font-size:8px;color:var(--text-secondary);max-width:50px;overflow:hidden;text-overflow:ellipsis}
-    
-    /* Sound Control */
-    .sound-control{position:fixed;bottom:12px;right:12px;background:var(--bg-glass);backdrop-filter:blur(20px);border:1px solid var(--border-glass);border-radius:20px;padding:6px 10px;z-index:15;display:flex;gap:6px;align-items:center;cursor:pointer}
-    
-    /* Widgets */
-    .desktop-widgets{position:absolute;bottom:12px;left:12px;display:none;gap:10px;z-index:15}
-    .desktop-widgets.visible{display:flex}
-    .widget{background:var(--bg-glass);backdrop-filter:blur(20px);border:1px solid var(--border-glass);border-radius:16px;padding:8px 12px;min-width:100px;cursor:grab;transition:all 0.2s}
-    .widget:hover{transform:translateY(-2px);background:rgba(25,25,35,0.95)}
-    .widget.dragging{cursor:grabbing;opacity:0.7}
-    .widget-title{font-size:9px;color:var(--text-muted);margin-bottom:4px}
-    .widget-time{font-size:22px;font-weight:600;font-family:monospace}
-    .widget-date{font-size:8px;color:var(--text-secondary);margin-top:2px}
-    .calendar-day{font-size:24px;font-weight:600}
-    .battery-level{font-size:22px;font-weight:600;font-family:monospace}
-    .battery-status{font-size:8px;color:var(--text-secondary);margin-top:2px}
-    .weather-temp{font-size:18px;font-weight:600}
-    .weather-condition{font-size:8px;color:var(--text-secondary)}
-    
-    /* Widgets Panel */
-    .widgets-panel{position:fixed;bottom:56px;right:12px;width:220px;background:var(--bg-glass);backdrop-filter:blur(24px);border-radius:14px;border:1px solid var(--border-glass);z-index:1002;transform:translateY(20px);opacity:0;visibility:hidden;transition:all 0.2s}
-    .widgets-panel.open{transform:translateY(0);opacity:1;visibility:visible}
-    .widgets-panel-header{padding:10px 14px;border-bottom:1px solid var(--border-glass);font-weight:600;font-size:12px}
-    .widgets-panel-item{padding:8px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:12px}
-    .widgets-panel-item:hover{background:rgba(255,255,255,0.05)}
-    
-    /* Wallpaper Preset Menu */
-    .wallpaper-menu{position:fixed;bottom:56px;right:12px;width:280px;background:var(--bg-glass);backdrop-filter:blur(24px);border-radius:14px;border:1px solid var(--border-glass);z-index:1002;transform:translateY(20px);opacity:0;visibility:hidden;transition:all 0.2s;max-height:400px;overflow-y:auto}
-    .wallpaper-menu.open{transform:translateY(0);opacity:1;visibility:visible}
-    .wallpaper-menu-header{padding:10px 14px;border-bottom:1px solid var(--border-glass);font-weight:600;font-size:12px}
-    .wallpaper-option{padding:8px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;font-size:12px}
-    .wallpaper-option:hover{background:rgba(255,255,255,0.05)}
-    .wallpaper-preview{width:30px;height:30px;border-radius:6px;background-size:cover;background-position:center}
     
     /* Taskbar */
     .taskbar{position:fixed;bottom:0;left:0;right:0;height:48px;background:var(--bg-glass);backdrop-filter:blur(20px);border-top:1px solid var(--border-glass);display:flex;align-items:center;justify-content:space-between;padding:0 12px;z-index:1000}
@@ -145,6 +72,48 @@
     .taskbar-datetime:hover{background:rgba(255,255,255,0.1)}
     .taskbar-time{font-size:11px;font-weight:500}
     .taskbar-date{font-size:8px;color:var(--text-muted)}
+    
+    /* Recent Apps Row - INSIDE taskbar area */
+    .recent-apps-row{position:absolute;bottom:52px;left:50%;transform:translateX(-50%);background:var(--bg-glass);backdrop-filter:blur(20px);border:1px solid var(--border-glass);border-radius:20px;padding:6px 16px;z-index:14;display:flex;gap:12px;white-space:nowrap;cursor:grab}
+    .recent-apps-row.dragging{cursor:grabbing;opacity:0.8}
+    .recent-apps-title{font-size:10px;color:var(--text-muted);padding-right:10px;border-right:1px solid var(--border-glass);display:flex;align-items:center}
+    .recent-app-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:4px 8px;border-radius:10px;transition:all 0.15s}
+    .recent-app-item:hover{background:rgba(255,255,255,0.1);transform:translateY(-2px)}
+    .recent-app-icon{font-size:20px}
+    .recent-app-icon img{width:20px;height:20px;border-radius:5px}
+    .recent-app-name{font-size:8px;color:var(--text-secondary);max-width:50px;overflow:hidden;text-overflow:ellipsis}
+    
+    /* Widgets */
+    .desktop-widgets{position:absolute;bottom:12px;left:12px;display:flex;gap:10px;z-index:15}
+    .widget{background:var(--bg-glass);backdrop-filter:blur(20px);border:1px solid var(--border-glass);border-radius:14px;padding:8px 12px;min-width:90px;cursor:grab;transition:all 0.2s}
+    .widget:hover{transform:translateY(-2px);background:rgba(25,25,35,0.95)}
+    .widget.dragging{cursor:grabbing;opacity:0.7}
+    .widget-title{font-size:9px;color:var(--text-muted);margin-bottom:4px}
+    .widget-time{font-size:20px;font-weight:600;font-family:monospace}
+    .widget-date{font-size:8px;color:var(--text-secondary);margin-top:2px}
+    .calendar-day{font-size:22px;font-weight:600}
+    .battery-level{font-size:20px;font-weight:600;font-family:monospace}
+    .battery-status{font-size:8px;color:var(--text-secondary);margin-top:2px}
+    .weather-temp{font-size:16px;font-weight:600}
+    .weather-condition{font-size:8px;color:var(--text-secondary)}
+    
+    /* Widgets Panel */
+    .widgets-panel{position:fixed;bottom:56px;right:12px;width:220px;background:var(--bg-glass);backdrop-filter:blur(24px);border-radius:14px;border:1px solid var(--border-glass);z-index:1002;transform:translateY(20px);opacity:0;visibility:hidden;transition:all 0.2s}
+    .widgets-panel.open{transform:translateY(0);opacity:1;visibility:visible}
+    .widgets-panel-header{padding:10px 14px;border-bottom:1px solid var(--border-glass);font-weight:600;font-size:12px}
+    .widgets-panel-item{padding:8px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:12px}
+    .widgets-panel-item:hover{background:rgba(255,255,255,0.05)}
+    
+    /* Wallpaper Menu */
+    .wallpaper-menu{position:fixed;bottom:56px;right:12px;width:240px;background:var(--bg-glass);backdrop-filter:blur(24px);border-radius:14px;border:1px solid var(--border-glass);z-index:1002;transform:translateY(20px);opacity:0;visibility:hidden;transition:all 0.2s;max-height:350px;overflow-y:auto}
+    .wallpaper-menu.open{transform:translateY(0);opacity:1;visibility:visible}
+    .wallpaper-menu-header{padding:10px 14px;border-bottom:1px solid var(--border-glass);font-weight:600;font-size:12px}
+    .wallpaper-option{padding:8px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;font-size:12px}
+    .wallpaper-option:hover{background:rgba(255,255,255,0.05)}
+    .wallpaper-preview{width:30px;height:30px;border-radius:6px;background-size:cover;background-position:center}
+    
+    /* Sound Control */
+    .sound-control{position:fixed;bottom:12px;right:12px;background:var(--bg-glass);backdrop-filter:blur(20px);border:1px solid var(--border-glass);border-radius:20px;padding:6px 10px;z-index:15;display:flex;gap:6px;align-items:center;cursor:pointer}
     
     /* Start Menu */
     .start-menu{position:fixed;bottom:52px;left:10px;width:450px;background:var(--bg-glass);backdrop-filter:blur(24px);border-radius:14px;border:1px solid var(--border-glass);z-index:1001;transform:translateY(20px) scale(0.98);opacity:0;visibility:hidden;transition:all 0.2s;overflow:hidden;max-height:550px}
@@ -165,7 +134,7 @@
     .start-app-icon{font-size:28px}
     .start-app-icon img{width:28px;height:28px;border-radius:8px}
     .start-app-name{font-size:10px;text-align:center;max-width:70px;overflow:hidden;text-overflow:ellipsis}
-    .start-app-pin{position:absolute;top:-2px;right:-2px;font-size:8px;background:rgba(0,0,0,0.5);border-radius:50%;width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0}
+    .start-app-pin{position:absolute;top:-2px;right:-2px;font-size:8px;background:rgba(0,0,0,0.6);border-radius:50%;width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;color:#ffcc00}
     .start-app:hover .start-app-pin{opacity:1}
     
     /* Boot Menu */
@@ -174,9 +143,8 @@
     .boot-search{padding:20px;border-bottom:1px solid var(--border-glass)}
     .boot-search input{width:100%;padding:14px 18px;background:rgba(0,0,0,0.3);border:1px solid var(--border-glass);border-radius:18px;color:white;font-size:16px;outline:none}
     .boot-results{max-height:400px;overflow-y:auto;padding:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
-    .boot-result{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;cursor:pointer;background:rgba(255,255,255,0.05);transition:all 0.1s}
+    .boot-result{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;cursor:pointer;background:rgba(255,255,255,0.05)}
     .boot-result.selected{background:var(--accent)}
-    .boot-result:hover:not(.selected){background:rgba(255,255,255,0.15)}
     .boot-result-icon{font-size:28px}
     .boot-result-info{flex:1}
     .boot-result-name{font-weight:500;font-size:13px}
@@ -194,7 +162,7 @@
     .window-title{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:500}
     .window-title img{width:18px;height:18px;border-radius:5px}
     .window-controls{display:flex;gap:8px}
-    .window-control{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;cursor:pointer;font-size:12px;background:transparent;border:none;color:var(--text-secondary);transition:all 0.15s}
+    .window-control{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;cursor:pointer;font-size:12px;background:transparent;border:none;color:var(--text-secondary)}
     .window-control:hover{background:rgba(255,255,255,0.1);transform:scale(1.05)}
     .window-control.close:hover{background:var(--danger);color:white}
     .window-content{flex:1;overflow:auto;background:rgba(10,10,15,0.95);padding:16px}
@@ -202,7 +170,6 @@
     
     /* Resize handles */
     .resize-handle{position:absolute;z-index:10}
-    .resize-n,.resize-s,.resize-w,.resize-e{background:transparent}
     .resize-n{top:0;left:10px;right:10px;height:5px;cursor:n-resize}
     .resize-s{bottom:0;left:10px;right:10px;height:5px;cursor:s-resize}
     .resize-w{top:10px;left:0;bottom:10px;width:5px;cursor:w-resize}
@@ -214,16 +181,15 @@
     .resize-se{bottom:0;right:0;cursor:se-resize}
     
     /* Game Card */
-    .game-card{background:rgba(255,255,255,0.05);border-radius:14px;overflow:hidden;cursor:pointer;transition:all 0.2s}
-    .game-card:hover{transform:translateY(-4px);background:rgba(255,255,255,0.1)}
+    .game-card{background:rgba(255,255,255,0.05);border-radius:12px;overflow:hidden;cursor:pointer;transition:all 0.2s}
+    .game-card:hover{transform:translateY(-3px);background:rgba(255,255,255,0.1)}
     .game-card img{width:100%;aspect-ratio:16/9;object-fit:cover}
     .game-card-info{padding:10px}
     .game-card-title{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .game-card-category{font-size:9px;color:var(--text-muted);margin-top:3px}
-    .game-card-stats{font-size:8px;color:gray;margin-top:3px}
     
     /* Game Modal */
-    .game-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);backdrop-filter:blur(12px);z-index:20000;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all 0.2s}
+    .game-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);backdrop-filter:blur(12px);z-index:20000;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden}
     .game-modal.open{opacity:1;visibility:visible}
     .game-modal-content{background:linear-gradient(135deg,#1a1a2e,#0f0f1a);border-radius:20px;width:850px;max-width:90vw;max-height:85vh;overflow-y:auto;border:1px solid var(--border-glass)}
     .game-modal-header{position:relative;height:180px;overflow:hidden}
@@ -237,15 +203,14 @@
     .game-description{color:var(--text-secondary);line-height:1.4;margin-bottom:12px;font-size:12px}
     .game-info-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border-glass);font-size:11px}
     .game-play-btn{width:100%;padding:10px;background:linear-gradient(135deg,var(--accent),#5a3cc9);border:none;border-radius:30px;color:white;font-size:13px;font-weight:600;cursor:pointer;margin-top:12px}
-    .game-play-btn:hover{transform:translateY(-2px)}
     .close-modal{position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.5);border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;color:white;z-index:10}
     .close-modal:hover{background:var(--danger)}
     
     /* Toast */
-    .toast-large{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.95);backdrop-filter:blur(16px);border:2px solid var(--accent);border-radius:40px;padding:10px 24px;color:white;font-size:13px;z-index:20001;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap}
-    .toast-large.show{opacity:1}
     .toast{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.9);border:1px solid var(--accent);border-radius:30px;padding:8px 16px;color:white;font-size:12px;z-index:20001;opacity:0;transition:opacity 0.2s;pointer-events:none}
     .toast.show{opacity:1}
+    .toast-large{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.95);border:2px solid var(--accent);border-radius:40px;padding:10px 24px;color:white;font-size:13px;z-index:20001;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap}
+    .toast-large.show{opacity:1}
     
     /* Context Menu */
     .context-menu{position:fixed;background:var(--bg-glass);border-radius:10px;padding:6px 0;min-width:160px;z-index:10001;opacity:0;visibility:hidden}
@@ -265,7 +230,7 @@
     
     /* Calculator */
     .calculator-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px}
-    .calc-btn{background:rgba(255,255,255,0.1);border:none;border-radius:12px;padding:12px;color:white;font-size:16px;cursor:pointer;transition:all 0.1s}
+    .calc-btn{background:rgba(255,255,255,0.1);border:none;border-radius:10px;padding:10px;color:white;font-size:14px;cursor:pointer}
     .calc-btn:hover{background:var(--accent);transform:scale(1.02)}
     .calc-mode-btn{background:rgba(255,255,255,0.05);border:1px solid var(--border-glass);border-radius:10px;padding:6px;color:white;cursor:pointer;font-size:11px}
     .calc-mode-btn.active{background:var(--accent);border-color:var(--accent)}
@@ -273,14 +238,14 @@
     ::-webkit-scrollbar{width:4px}
     ::-webkit-scrollbar-track{background:rgba(255,255,255,0.03)}
     ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15);border-radius:3px}
-    ::-webkit-scrollbar-thumb:hover{background:var(--accent)}
     
-    @media (max-width:768px){.desktop-icons-left,.desktop-icons-right,.recent-apps-row,.sound-control{display:none}.window{min-width:90vw;left:5vw!important;right:5vw!important}}
+    @media (max-width:768px){.desktop-icons-left,.desktop-icons-right,.recent-apps-row{display:none}.window{min-width:90vw;left:5vw!important;right:5vw!important}}
   </style>
 </head>
 <body>
 
 <div class="fade-overlay" id="fadeOverlay"></div>
+<div class="marquee-selection" id="marqueeSelection"></div>
 
 <!-- Login Screen -->
 <div class="login-screen" id="loginScreen">
@@ -315,37 +280,27 @@
   <div class="desktop-widgets" id="desktopWidgets">
     <div class="widget" id="timeWidget"><div class="widget-title">🕐 TIME</div><div class="widget-time" id="widgetTime">--:--</div><div class="widget-date" id="widgetDate">---</div></div>
     <div class="widget" id="calendarWidget"><div class="widget-title">📅 CALENDAR</div><div class="calendar-day" id="calendarDay">15</div><div class="calendar-month" id="calendarMonth">Apr</div></div>
-    <div class="widget" id="weatherWidget" style="display:none"><div class="widget-title">🌤️ WEATHER</div><div class="weather-temp" id="weatherTemp">--°</div><div class="weather-condition" id="weatherCondition">--</div></div>
-    <div class="widget" id="batteryWidget" style="display:none"><div class="widget-title">🔋 BATTERY</div><div class="battery-level" id="batteryLevel">--%</div><div class="battery-status" id="batteryStatus">--</div></div>
+    <div class="widget" id="weatherWidget"><div class="widget-title">🌤️ WEATHER</div><div class="weather-temp" id="weatherTemp">--°</div><div class="weather-condition" id="weatherCondition">--</div></div>
+    <div class="widget" id="batteryWidget"><div class="widget-title">🔋 BATTERY</div><div class="battery-level" id="batteryLevel">--%</div><div class="battery-status" id="batteryStatus">--</div></div>
   </div>
 </div>
-
-<div class="marquee-selection" id="marqueeSelection"></div>
 
 <!-- Widgets Panel -->
 <div class="widgets-panel" id="widgetsPanel">
   <div class="widgets-panel-header">Widgets <span id="closeWidgetsPanel" style="float:right;cursor:pointer;">✕</span></div>
-  <div class="widgets-panel-item" data-widget="time">🕐 Time Widget <span id="timeWidgetToggle">✅</span></div>
-  <div class="widgets-panel-item" data-widget="calendar">📅 Calendar Widget <span id="calendarWidgetToggle">✅</span></div>
-  <div class="widgets-panel-item" data-widget="weather">🌤️ Weather Widget <span id="weatherWidgetToggle">❌</span></div>
-  <div class="widgets-panel-item" data-widget="battery">🔋 Battery Widget <span id="batteryWidgetToggle">❌</span></div>
+  <div class="widgets-panel-item" data-widget="time">🕐 Time <span id="timeWidgetToggle">✅</span></div>
+  <div class="widgets-panel-item" data-widget="calendar">📅 Calendar <span id="calendarWidgetToggle">✅</span></div>
+  <div class="widgets-panel-item" data-widget="weather">🌤️ Weather <span id="weatherWidgetToggle">✅</span></div>
+  <div class="widgets-panel-item" data-widget="battery">🔋 Battery <span id="batteryWidgetToggle">✅</span></div>
 </div>
 
-<!-- Wallpaper Preset Menu -->
+<!-- Wallpaper Menu -->
 <div class="wallpaper-menu" id="wallpaperMenu">
-  <div class="wallpaper-menu-header">Wallpaper Presets <span id="closeWallpaperMenu" style="float:right;cursor:pointer;">✕</span></div>
-  <div class="wallpaper-option" data-wallpaper="solace"><div class="wallpaper-preview" style="background-image:url('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/ee4c29a6-9564-4bee-befd-79a0597c29ca/dhsrl04-16049839-0c0f-4077-977f-09a992ec4b07.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiIvZi9lZTRjMjlhNi05NTY0LTRiZWUtYmVmZC03OWEwNTk3YzI5Y2EvZGhzcmwwNC0xNjA0OTgzOS0wYzBmLTQwNzctOTc3Zi0wOWE5OTJlYzRiMDcuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.XIZi3LNLcPUgY_lP-4R7TJ2r6klMfpBRxT7-cMHGvic')"></div><span>Solace (Default)</span></div>
+  <div class="wallpaper-menu-header">Wallpaper <span id="closeWallpaperMenu" style="float:right;cursor:pointer;">✕</span></div>
+  <div class="wallpaper-option" data-wallpaper="solace"><div class="wallpaper-preview" style="background-image:url('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/ee4c29a6-9564-4bee-befd-79a0597c29ca/dhsrl04-16049839-0c0f-4077-977f-09a992ec4b07.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiIvZi9lZTRjMjlhNi05NTY0LTRiZWUtYmVmZC03OWEwNTk3YzI5Y2EvZGhzcmwwNC0xNjA0OTgzOS0wYzBmLTQwNzctOTc3Zi0wOWE5OTJlYzRiMDcuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.XIZi3LNLcPUgY_lP-4R7TJ2r6klMfpBRxT7-cMHGvic')"></div><span>Solace</span></div>
   <div class="wallpaper-option" data-wallpaper="land"><div class="wallpaper-preview" style="background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7c-QOc5ISuGZ6bmIzNAuOQiz9ngy_UbXvbg&s')"></div><span>Land</span></div>
   <div class="wallpaper-option" data-wallpaper="flow"><div class="wallpaper-preview" style="background-image:url('https://i.redd.it/wallpaper-pack-more-in-the-desc-v0-fqzef996ntt81.png?width=6016&format=png&auto=webp&s=194a7425819ef5c1166f88eefeb67f9a758916d4')"></div><span>Flow</span></div>
-  <div class="wallpaper-option" data-wallpaper="liney"><div class="wallpaper-preview" style="background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV-Ul-Y4fhrjfWEFkbxZoQk-jEFZjTv5bRog&s')"></div><span>Liney</span></div>
-  <div class="wallpaper-option" data-wallpaper="reflection"><div class="wallpaper-preview" style="background-image:url('https://i.redd.it/2cpsrvjldn3a1.jpg')"></div><span>Reflection</span></div>
-  <div class="wallpaper-option" data-wallpaper="swirl"><div class="wallpaper-preview" style="background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQUDodvPd3LCZWdy6YzSHRxdSzu3Wn6cNsUew&s')"></div><span>Swirl</span></div>
-  <div class="wallpaper-option" data-wallpaper="morning"><div class="wallpaper-preview" style="background-image:url('https://thumbs.dreamstime.com/b/ethereal-celestial-sunset-sky-grass-silhouette-flaring-light-mystical-landscape-illustration-captures-profound-451909202.jpg')"></div><span>Morning</span></div>
   <div class="wallpaper-option" data-wallpaper="minecraftian"><div class="wallpaper-preview" style="background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSt2kxzqFZR9IrVdWL04CFvDdkI-8hMLz3RSg&s')"></div><span>Minecraftian</span></div>
-  <div class="wallpaper-option" data-wallpaper="jump"><div class="wallpaper-preview" style="background-image:url('https://images.pexels.com/photos/15591636/pexels-photo-15591636/free-photo-of-silhouette-of-a-person-sitting-at-the-edge-of-a-rock-at-sunset.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500')"></div><span>Jump</span></div>
-  <div class="wallpaper-option" data-wallpaper="oldenlake"><div class="wallpaper-preview" style="background-image:url('https://images.pexels.com/photos/28318336/pexels-photo-28318336.jpeg?cs=srgb&dl=pexels-ruben-reijgwart-820557011-28318336.jpg&fm=jpg')"></div><span>Olden Lake</span></div>
-  <div class="wallpaper-option" data-wallpaper="minecraftian2"><div class="wallpaper-preview" style="background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0lUjm8dqO71I0BPnui_mG01bUuNjp0-lu7g&s')"></div><span>Minecraftian 2</span></div>
-  <div class="wallpaper-option" data-wallpaper="liquid"><div class="wallpaper-preview" style="background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf0ro4HGLM_R577boLd8zMnKibbJAeADUxOw&s')"></div><span>Liquid</span></div>
 </div>
 
 <!-- Taskbar -->
@@ -395,11 +350,11 @@
   </div>
 </div>
 
-<div class="toast-large" id="toastLarge"></div>
 <div class="toast" id="toast"></div>
+<div class="toast-large" id="toastLarge"></div>
 <div class="context-menu" id="contextMenu">
   <div class="context-menu-item" id="ctxRefresh">🔄 Refresh</div>
-  <div class="context-menu-item" id="ctxWallpaper">🖼️ Change Wallpaper</div>
+  <div class="context-menu-item" id="ctxWallpaper">🖼️ Upload Wallpaper</div>
   <div class="context-menu-divider"></div>
   <div class="context-menu-item" id="ctxWallpaperPresets">🎨 Wallpaper Presets</div>
   <div class="context-menu-divider"></div>
@@ -410,7 +365,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // ============================================
-// FANTER OS - COMPLETE VERSION
+// FANTER OS - COMPLETE FIXED VERSION
 // ============================================
 
 const SUPABASE_URL = "https://gvzgnclowylrrpovdvtw.supabase.co";
@@ -441,43 +396,44 @@ let selectedIcons = [];
 
 // Icon URLs
 const ICON_URLS = {
+    gamehub: 'https://png.pngtree.com/png-clipart/20200224/original/pngtree-game-control-line-icon-vector-png-image_5209084.jpg',
+    emulators: 'https://cdn-icons-png.flaticon.com/512/3659/3659892.png',
+    fantersearch: 'https://cdn-icons-png.flaticon.com/512/2811/2811806.png',
+    fantarena: 'https://www.clipartmax.com/png/middle/213-2137325_chat-service-icon-transparent-png-chat-app-icon-png.png',
+    flashgames: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyT2jnbsFTNI1TsyzRqTvixcENBsmsN8nknw&s',
     tetris: 'https://tetris.wiki/images/thumb/5/52/Tetris_%28N3TWORK%29_icon.png/220px-Tetris_%28N3TWORK%29_icon.png',
     solitaire: 'https://play-lh.googleusercontent.com/1ywLh7-1RvXuE40IcxXL3vU4LhdkcopUOxJrrZjRlyZX-b_4zgXd2Hc5EyyWwmfruns',
-    connectfour: 'https://m.media-amazon.com/images/I/71WIAdYrTiL.png',
     minesweeper: 'https://p1.hiclipart.com/preview/249/974/567/red-circle-minesweeper-minesweeper-deluxe-minesweeper-adfree-video-games-land-mine-naval-mine-android-png-clipart.jpg',
-    checkers: 'https://p7.hiclipart.com/preview/327/19/604/formula-one-racing-flags-drapeau-xe0-damier-auto-racing-checkered-flag-icon.jpg',
-    sudoku: 'https://t3.ftcdn.net/jpg/02/23/28/28/360_F_223282851_HP22kLC9EjTtN9dwNgQrrwrF5cL5xSF5.jpg',
-    flashgames: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyT2jnbsFTNI1TsyzRqTvixcENBsmsN8nknw&s',
-    fantarena: 'https://cdn-icons-png.flaticon.com/512/1055/1055685.png'
+    appstore: 'https://cdn-icons-png.flaticon.com/512/1045/1045274.png',
+    settings: 'https://cdn-icons-png.flaticon.com/512/892/892775.png'
 };
 
-// Desktop icons - default set
-let DESKTOP_ICONS_LEFT = [
-    { id: 'gamehub', icon: '🎮', label: 'Game Hub', category: 'games' },
-    { id: 'emulators', icon: '🕹️', label: 'Emulators', category: 'games' },
-    { id: 'fantersearch', icon: '🔍', label: 'Fanter Search', category: 'tools', url: 'https://chipikipal800.github.io/Fanter-search/' },
-    { id: 'settings', icon: '⚙️', label: 'Settings', category: 'system' }
+// Desktop icons
+const DESKTOP_ICONS_LEFT = [
+    { id: 'gamehub', name: 'Game Hub', icon: '🎮', iconUrl: ICON_URLS.gamehub, category: 'games' },
+    { id: 'emulators', name: 'Emulators', icon: '🕹️', iconUrl: ICON_URLS.emulators, category: 'games' },
+    { id: 'fantersearch', name: 'Fanter Search', icon: '🔍', iconUrl: ICON_URLS.fantersearch, category: 'tools', url: 'https://chipikipal800.github.io/Fanter-search/', external: true },
+    { id: 'settings', name: 'Settings', icon: '⚙️', iconUrl: ICON_URLS.settings, category: 'system', url: 'settings.html' }
 ];
 
-let DESKTOP_ICONS_RIGHT = [
-    { id: 'tetris', icon: '🧩', label: 'Tetris', category: 'games', iconUrl: ICON_URLS.tetris, url: 'https://chipikipal800.github.io/Tetris/Tetris.htm' },
-    { id: 'solitaire', icon: '🃏', label: 'Solitaire', category: 'games', iconUrl: ICON_URLS.solitaire, url: 'https://chipikipal800.github.io/SolitareGame/' },
-    { id: 'minesweeper', icon: '💣', label: 'Minesweeper', category: 'games', iconUrl: ICON_URLS.minesweeper, url: 'https://chipikipal800.github.io/minesweepere/' }
+const DESKTOP_ICONS_RIGHT = [
+    { id: 'tetris', name: 'Tetris', icon: '🧩', iconUrl: ICON_URLS.tetris, category: 'games', url: 'https://chipikipal800.github.io/Tetris/Tetris.htm', external: true },
+    { id: 'solitaire', name: 'Solitaire', icon: '🃏', iconUrl: ICON_URLS.solitaire, category: 'games', url: 'https://chipikipal800.github.io/SolitareGame/', external: true },
+    { id: 'minesweeper', name: 'Minesweeper', icon: '💣', iconUrl: ICON_URLS.minesweeper, category: 'games', url: 'https://chipikipal800.github.io/minesweepere/', external: true },
+    { id: 'appstore', name: 'FantAppStore', icon: '📦', iconUrl: ICON_URLS.appstore, category: 'system', builtin: true }
 ];
 
 // ALL APPS
 const ALL_APPS = [
-    { id: 'gamehub', name: 'Game Hub', icon: '🎮', category: 'games', builtin: true },
-    { id: 'emulators', name: 'Emulators', icon: '🕹️', category: 'games', builtin: true },
-    { id: 'fantersearch', name: 'Fanter Search', icon: '🔍', category: 'tools', builtin: true, url: 'https://chipikipal800.github.io/Fanter-search/', external: true },
-    { id: 'flashgames', name: 'Flash Games', icon: '⚡', category: 'games', builtin: false, iconUrl: ICON_URLS.flashgames, url: 'https://chipikipal800.github.io/flash-games/list.html', external: true },
-    { id: 'fantarena', name: 'Fantarena', icon: '🏟️', category: 'social', builtin: false, iconUrl: ICON_URLS.fantarena, url: 'fantarena.html' },
-    { id: 'tetris', name: 'Tetris', icon: '🧩', url: 'https://chipikipal800.github.io/Tetris/Tetris.htm', category: 'games', external: true, iconUrl: ICON_URLS.tetris },
-    { id: 'solitaire', name: 'Solitaire', icon: '🃏', url: 'https://chipikipal800.github.io/SolitareGame/', category: 'games', external: true, iconUrl: ICON_URLS.solitaire },
-    { id: 'connectfour', name: 'Connect Four', icon: '🔴', url: 'https://chipikipal800.github.io/connect-four/', category: 'games', external: true, iconUrl: ICON_URLS.connectfour },
-    { id: 'minesweeper', name: 'Minesweeper', icon: '💣', url: 'https://chipikipal800.github.io/minesweepere/', category: 'games', external: true, iconUrl: ICON_URLS.minesweeper },
-    { id: 'checkers', name: 'Checkers', icon: '⚫', url: 'https://chipikipal800.github.io/Checkers/', category: 'games', external: true, iconUrl: ICON_URLS.checkers },
-    { id: 'sudoku', name: 'Sudoku', icon: '🔢', url: 'https://chipikipal800.github.io/sudoku-game/', category: 'games', external: true, iconUrl: ICON_URLS.sudoku },
+    { id: 'gamehub', name: 'Game Hub', icon: '🎮', iconUrl: ICON_URLS.gamehub, category: 'games', builtin: true },
+    { id: 'emulators', name: 'Emulators', icon: '🕹️', iconUrl: ICON_URLS.emulators, category: 'games', builtin: true },
+    { id: 'fantersearch', name: 'Fanter Search', icon: '🔍', iconUrl: ICON_URLS.fantersearch, category: 'tools', builtin: true, url: 'https://chipikipal800.github.io/Fanter-search/', external: true },
+    { id: 'appstore', name: 'FantAppStore', icon: '📦', iconUrl: ICON_URLS.appstore, category: 'system', builtin: true },
+    { id: 'flashgames', name: 'Flash Games', icon: '⚡', iconUrl: ICON_URLS.flashgames, category: 'games', builtin: false, url: 'https://chipikipal800.github.io/flash-games/list.html', external: true },
+    { id: 'fantarena', name: 'Fantarena', icon: '🏟️', iconUrl: ICON_URLS.fantarena, category: 'social', builtin: false, url: 'fantarena.html' },
+    { id: 'tetris', name: 'Tetris', icon: '🧩', iconUrl: ICON_URLS.tetris, url: 'https://chipikipal800.github.io/Tetris/Tetris.htm', category: 'games', external: true },
+    { id: 'solitaire', name: 'Solitaire', icon: '🃏', iconUrl: ICON_URLS.solitaire, url: 'https://chipikipal800.github.io/SolitareGame/', category: 'games', external: true },
+    { id: 'minesweeper', name: 'Minesweeper', icon: '💣', iconUrl: ICON_URLS.minesweeper, url: 'https://chipikipal800.github.io/minesweepere/', category: 'games', external: true },
     { id: 'calculator', name: 'Calculator', icon: '🧮', category: 'tools', appType: 'calculator' },
     { id: 'thefactory', name: 'The Factory', icon: '🏭', category: 'tools', appType: 'factory' },
     { id: 'thestudio', name: 'The Studio', icon: '🎨', category: 'creative', appType: 'studio' },
@@ -486,8 +442,7 @@ const ALL_APPS = [
     { id: 'timer', name: 'Timer', icon: '⏱️', category: 'tools', appType: 'timer' },
     { id: 'tasks', name: 'Tasks', icon: '✅', category: 'tools', appType: 'tasks' },
     { id: 'whiteboard', name: 'Whiteboard', icon: '✏️', category: 'creative', appType: 'whiteboard' },
-    { id: 'browser', name: 'Browser', icon: '🌐', category: 'tools', appType: 'browser' },
-    { id: 'settings', name: 'Settings', icon: '⚙️', category: 'system', url: 'settings.html' },
+    { id: 'settings', name: 'Settings', icon: '⚙️', iconUrl: ICON_URLS.settings, category: 'system', url: 'settings.html' },
     { id: 'shop', name: 'Shop', icon: '🛒', category: 'system', url: 'shop.html' },
     { id: 'account', name: 'Account', icon: '👤', category: 'system', url: 'fantaccount.html' }
 ];
@@ -495,10 +450,7 @@ const ALL_APPS = [
 // Store apps for App Store
 const STORE_APPS = [
     { id: 'flashgames', name: 'Flash Games', icon: '⚡', iconUrl: ICON_URLS.flashgames, category: 'games', description: '264 classic flash games - Bloons, Fancy Pants, Riddle School, and more!', creator: 'abcatlmfao', url: 'https://chipikipal800.github.io/flash-games/list.html' },
-    { id: 'fantarena', name: 'Fantarena', icon: '🏟️', iconUrl: ICON_URLS.fantarena, category: 'social', description: 'Chat with friends in real-time! Join channels, send messages, and make groups.', creator: 'abcatlmfao', url: 'fantarena.html' },
-    { id: 'connectfour', name: 'Connect Four', icon: '🔴', iconUrl: ICON_URLS.connectfour, category: 'games', description: 'Drop discs to connect four in a row!', creator: 'Classic', url: 'https://chipikipal800.github.io/connect-four/' },
-    { id: 'checkers', name: 'Checkers', icon: '⚫', iconUrl: ICON_URLS.checkers, category: 'games', description: 'Capture all opponent pieces by jumping over them.', creator: 'Classic', url: 'https://chipikipal800.github.io/Checkers/' },
-    { id: 'sudoku', name: 'Sudoku', icon: '🔢', iconUrl: ICON_URLS.sudoku, category: 'games', description: 'Number puzzle game. Fill the grid with digits 1-9.', creator: 'Classic', url: 'https://chipikipal800.github.io/sudoku-game/' }
+    { id: 'fantarena', name: 'Fantarena', icon: '🏟️', iconUrl: ICON_URLS.fantarena, category: 'social', description: 'Chat with friends in real-time! Join channels, send messages, and make groups.', creator: 'abcatlmfao', url: 'fantarena.html' }
 ];
 
 let installedApps = JSON.parse(localStorage.getItem('installedApps') || '[]');
@@ -522,18 +474,18 @@ function playSound(type) {
     if (!soundEnabled) return;
     try {
         if (!window.audioCtx) window.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = window.audioCtx.createOscillator();
-        const gainNode = window.audioCtx.createGain();
-        oscillator.connect(gainNode);
-        gainNode.connect(window.audioCtx.destination);
-        oscillator.type = 'sine';
-        gainNode.gain.value = soundVolume / 100 * 0.2;
-        if (type === 'click') { oscillator.frequency.value = 880; gainNode.gain.exponentialRampToValueAtTime(0.00001, window.audioCtx.currentTime + 0.15); }
-        else if (type === 'open') { oscillator.frequency.value = 523.25; gainNode.gain.exponentialRampToValueAtTime(0.00001, window.audioCtx.currentTime + 0.25); }
-        else if (type === 'close') { oscillator.frequency.value = 261.63; gainNode.gain.exponentialRampToValueAtTime(0.00001, window.audioCtx.currentTime + 0.2); }
-        oscillator.start();
-        oscillator.stop(window.audioCtx.currentTime + 0.2);
-    } catch(e) { console.log('Audio error'); }
+        const osc = window.audioCtx.createOscillator();
+        const gain = window.audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(window.audioCtx.destination);
+        osc.type = 'sine';
+        gain.gain.value = soundVolume / 100 * 0.2;
+        if (type === 'click') { osc.frequency.value = 880; gain.gain.exponentialRampToValueAtTime(0.00001, window.audioCtx.currentTime + 0.15); }
+        else if (type === 'open') { osc.frequency.value = 523.25; gain.gain.exponentialRampToValueAtTime(0.00001, window.audioCtx.currentTime + 0.25); }
+        else if (type === 'close') { osc.frequency.value = 261.63; gain.gain.exponentialRampToValueAtTime(0.00001, window.audioCtx.currentTime + 0.2); }
+        osc.start();
+        osc.stop(window.audioCtx.currentTime + 0.2);
+    } catch(e) {}
 }
 
 function updateRecentApps(appId, appName, appIcon, appIconId) {
@@ -547,7 +499,7 @@ function renderRecentApps() {
     if (!container) return;
     container.innerHTML = recentApps.map(app => `
         <div class="recent-app-item" data-id="${app.id}">
-            <div class="recent-app-icon">${ICON_URLS[app.iconId] ? `<img src="${ICON_URLS[app.iconId]}">` : app.icon}</div>
+            <div class="recent-app-icon">${ICON_URLS[app.iconId] ? `<img src="${ICON_URLS[app.iconId]}" onerror="this.style.display='none';this.parentElement.innerHTML='${app.icon}'">` : app.icon}</div>
             <div class="recent-app-name">${app.name.length > 8 ? app.name.slice(0,6)+'..' : app.name}</div>
         </div>
     `).join('');
@@ -608,7 +560,7 @@ async function loadGames() {
         console.log(`Loaded ${GAMES_DATA.length} games`);
     } catch(e) {
         console.warn('No games.json, using fallback');
-        GAMES_DATA = [{ name: "Hollow Knight", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsLIpQXZ-qUzdIOxeFC9LAaYznn0jmMIE9WA&s", url: "https://abcatlmfao.github.io/hollow-knight2/", category: "adventure", desc: "Descend into a bug kingdom.", developer: "Team Cherry", releaseDate: "2017" }];
+        GAMES_DATA = [];
     }
 }
 
@@ -642,14 +594,8 @@ function showGameDetails(game) {
     };
 }
 
-// Desktop Icons - Draggable with position saving
-function saveIconPositions() {
-    const positions = {};
-    document.querySelectorAll('.desktop-icon').forEach(icon => {
-        positions[icon.dataset.id] = { x: parseFloat(icon.style.left), y: parseFloat(icon.style.top) };
-    });
-    localStorage.setItem('desktopIconPositions', JSON.stringify(positions));
-}
+// Desktop icons - draggable with position saving
+let iconDragState = null;
 
 function renderDesktopIcons() {
     const leftContainer = document.getElementById('desktopIconsLeft');
@@ -658,67 +604,82 @@ function renderDesktopIcons() {
     
     leftContainer.innerHTML = DESKTOP_ICONS_LEFT.map((icon, idx) => {
         const pos = savedPositions[icon.id] || { x: 20, y: 70 + idx * 100 };
-        return `<div class="desktop-icon" data-id="${icon.id}" style="left: ${pos.x}px; top: ${pos.y}px;"><div class="icon">${icon.icon}</div><div class="label">${icon.label}</div><div class="unpin-btn" data-id="${icon.id}">✕</div></div>`;
+        return `<div class="desktop-icon" data-id="${icon.id}" data-name="${icon.name}" data-iconurl="${icon.iconUrl || ''}" data-url="${icon.url || ''}" data-external="${icon.external || false}" style="left: ${pos.x}px; top: ${pos.y}px;"><div class="icon">${icon.iconUrl ? `<img src="${icon.iconUrl}" onerror="this.style.display='none';this.parentElement.innerHTML='${icon.icon}'">` : icon.icon}</div><div class="label">${icon.name}</div><div class="unpin-btn" data-id="${icon.id}">✕</div></div>`;
     }).join('');
     
     rightContainer.innerHTML = DESKTOP_ICONS_RIGHT.map((icon, idx) => {
         const pos = savedPositions[icon.id] || { x: window.innerWidth - 105, y: 70 + idx * 100 };
-        return `<div class="desktop-icon" data-id="${icon.id}" style="left: ${pos.x}px; top: ${pos.y}px;"><div class="icon">${icon.iconUrl ? `<img src="${icon.iconUrl}" onerror="this.style.display='none';this.parentElement.innerHTML='${icon.icon}'">` : icon.icon}</div><div class="label">${icon.label}</div><div class="unpin-btn" data-id="${icon.id}">✕</div></div>`;
+        return `<div class="desktop-icon" data-id="${icon.id}" data-name="${icon.name}" data-iconurl="${icon.iconUrl || ''}" data-url="${icon.url || ''}" data-external="${icon.external || false}" style="left: ${pos.x}px; top: ${pos.y}px;"><div class="icon">${icon.iconUrl ? `<img src="${icon.iconUrl}" onerror="this.style.display='none';this.parentElement.innerHTML='${icon.icon}'">` : icon.icon}</div><div class="label">${icon.name}</div><div class="unpin-btn" data-id="${icon.id}">✕</div></div>`;
     }).join('');
     
     // Add pinned apps
-    const pinnedGames = pinnedApps.filter(p => p.category === 'games' && !DESKTOP_ICONS_RIGHT.some(i => i.id === p.id));
-    rightContainer.innerHTML += pinnedGames.map((icon, idx) => {
+    const pinnedIcons = pinnedApps.filter(p => !DESKTOP_ICONS_LEFT.some(i => i.id === p.id) && !DESKTOP_ICONS_RIGHT.some(i => i.id === p.id));
+    pinnedIcons.forEach((icon, idx) => {
         const pos = savedPositions[icon.id] || { x: window.innerWidth - 105, y: 70 + (DESKTOP_ICONS_RIGHT.length + idx) * 100 };
-        return `<div class="desktop-icon" data-id="${icon.id}" style="left: ${pos.x}px; top: ${pos.y}px;"><div class="icon">${icon.iconUrl ? `<img src="${icon.iconUrl}" onerror="this.style.display='none';this.parentElement.innerHTML='${icon.icon}'">` : icon.icon}</div><div class="label">${icon.name}</div><div class="unpin-btn" data-id="${icon.id}">✕</div></div>`;
-    }).join('');
+        rightContainer.innerHTML += `<div class="desktop-icon" data-id="${icon.id}" data-name="${icon.name}" data-iconurl="${icon.iconUrl || ''}" data-url="${icon.url || ''}" style="left: ${pos.x}px; top: ${pos.y}px;"><div class="icon">${icon.iconUrl ? `<img src="${icon.iconUrl}" onerror="this.style.display='none';this.parentElement.innerHTML='${icon.icon}'">` : icon.icon}</div><div class="label">${icon.name}</div><div class="unpin-btn" data-id="${icon.id}">✕</div></div>`;
+    });
     
-    // Make icons draggable
-    document.querySelectorAll('.desktop-icon').forEach(el => {
-        let isDragging = false, dragStartX = 0, dragStartY = 0, startLeft = 0, startTop = 0;
-        el.addEventListener('mousedown', (e) => {
-            if (e.target.classList.contains('unpin-btn')) return;
-            isDragging = true;
-            dragStartX = e.clientX;
-            dragStartY = e.clientY;
-            startLeft = parseFloat(el.style.left);
-            startTop = parseFloat(el.style.top);
-            el.style.zIndex = '1000';
-            el.style.opacity = '0.8';
-            e.preventDefault();
-        });
-        document.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            let newLeft = startLeft + (e.clientX - dragStartX);
-            let newTop = startTop + (e.clientY - dragStartY);
-            newLeft = Math.max(5, Math.min(newLeft, window.innerWidth - 100));
-            newTop = Math.max(5, Math.min(newTop, window.innerHeight - 100));
-            el.style.left = `${newLeft}px`;
-            el.style.top = `${newTop}px`;
-        });
-        document.addEventListener('mouseup', () => {
-            if (isDragging) {
-                isDragging = false;
-                el.style.zIndex = '';
-                el.style.opacity = '';
-                saveIconPositions();
+    // Setup drag and click handlers
+    document.querySelectorAll('.desktop-icon').forEach(setupDesktopIconDrag);
+}
+
+function setupDesktopIconDrag(el) {
+    let isDragging = false;
+    let dragStartX = 0, dragStartY = 0;
+    let startLeft = 0, startTop = 0;
+    let hasMoved = false;
+    
+    el.addEventListener('mousedown', (e) => {
+        if (e.target.classList.contains('unpin-btn')) return;
+        isDragging = true;
+        hasMoved = false;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        startLeft = parseFloat(el.style.left);
+        startTop = parseFloat(el.style.top);
+        el.classList.add('dragging');
+        e.preventDefault();
+    });
+    
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - dragStartX;
+        const dy = e.clientY - dragStartY;
+        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) hasMoved = true;
+        let newLeft = startLeft + dx;
+        let newTop = startTop + dy;
+        newLeft = Math.max(5, Math.min(newLeft, window.innerWidth - 100));
+        newTop = Math.max(5, Math.min(newTop, window.innerHeight - 100));
+        el.style.left = `${newLeft}px`;
+        el.style.top = `${newTop}px`;
+    });
+    
+    document.addEventListener('mouseup', () => {
+        if (isDragging) {
+            isDragging = false;
+            el.classList.remove('dragging');
+            if (!hasMoved) {
+                // Click - launch app
+                const app = ALL_APPS.find(a => a.id === el.dataset.id);
+                if (app) launchApp(app);
+                playSound('click');
+            } else {
+                // Save position
+                const positions = JSON.parse(localStorage.getItem('desktopIconPositions') || '{}');
+                positions[el.dataset.id] = { x: parseFloat(el.style.left), y: parseFloat(el.style.top) };
+                localStorage.setItem('desktopIconPositions', JSON.stringify(positions));
             }
-        });
-        el.addEventListener('click', (e) => {
-            if (e.target.classList.contains('unpin-btn')) return;
-            const app = ALL_APPS.find(a => a.id === el.dataset.id);
-            if (app) launchApp(app);
-            playSound('click');
-        });
-        const unpinBtn = el.querySelector('.unpin-btn');
-        if (unpinBtn) {
-            unpinBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                unpinAppFromDesktop(unpinBtn.dataset.id);
-                el.remove();
-            });
         }
     });
+    
+    const unpinBtn = el.querySelector('.unpin-btn');
+    if (unpinBtn) {
+        unpinBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            unpinAppFromDesktop(unpinBtn.dataset.id);
+            el.remove();
+        });
+    }
 }
 
 function pinAppToDesktop(appId, appName, appIcon, appCategory, appIconUrl, appUrl) {
@@ -770,10 +731,11 @@ function updateMarquee(e) {
     
     document.querySelectorAll('.desktop-icon').forEach(icon => {
         const rect = icon.getBoundingClientRect();
-        if (rect.left < currentX && rect.right > marqueeStartX && rect.top < currentY && rect.bottom > marqueeStartY) {
+        if (rect.right > left && rect.left < left + width && rect.bottom > top && rect.top < top + height) {
             if (!selectedIcons.includes(icon)) {
                 selectedIcons.push(icon);
-                icon.style.outline = '2px solid var(--accent)';
+                icon.style.outline = `2px solid var(--accent)`;
+                icon.style.outlineOffset = '2px';
             }
         } else if (selectedIcons.includes(icon)) {
             selectedIcons = selectedIcons.filter(i => i !== icon);
@@ -840,13 +802,13 @@ function createGameHubWindow() {
         if (cat !== 'all') filtered = filtered.filter(g => g.category === cat);
         const term = searchInput?.value.toLowerCase() || '';
         if (term) filtered = filtered.filter(g => g.name.toLowerCase().includes(term));
+        if (filtered.length === 0) { grid.innerHTML = '<div style="text-align:center;padding:40px;">No games found</div>'; return; }
         grid.innerHTML = filtered.map(game => `
             <div class="game-card" data-game='${JSON.stringify(game)}'>
                 <img src="${game.image}" onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
                 <div class="game-card-info">
                     <div class="game-card-title">${game.name}</div>
                     <div class="game-card-category">${game.category}</div>
-                    <div class="game-card-stats">⏱️ ${Math.floor(gamePlayTime[game.name] || 0)}h played</div>
                 </div>
             </div>
         `).join('');
@@ -861,9 +823,7 @@ function createGameHubWindow() {
     if (searchInput) searchInput.addEventListener('input', renderGames);
     if (categorySelect) categorySelect.addEventListener('change', renderGames);
     if (randomBtn) randomBtn.addEventListener('click', () => {
-        const random = GAMES_DATA[Math.floor(Math.random() * GAMES_DATA.length)];
-        showGameDetails(random);
-        playSound('click');
+        if (GAMES_DATA.length) showGameDetails(GAMES_DATA[Math.floor(Math.random() * GAMES_DATA.length)]);
     });
     renderGames();
     return id;
@@ -885,6 +845,7 @@ function createEmulatorsWindow() {
                 <div class="emulator-item" data-url="https://chipikipal800.github.io/Sega-Genesis-Emulator-/" style="display:flex; align-items:center; gap:14px; padding:12px; background:rgba(255,255,255,0.05); border-radius:12px; cursor:pointer;"><span style="font-size:28px;">🌀</span><div style="flex:1;"><div style="font-weight:500;">Sega Genesis</div></div><span>▶</span></div>
                 <div class="emulator-item" data-url="https://chipikipal800.github.io/Virtual-boy-emulator-/" style="display:flex; align-items:center; gap:14px; padding:12px; background:rgba(255,255,255,0.05); border-radius:12px; cursor:pointer;"><span style="font-size:28px;">🕶️</span><div style="flex:1;"><div style="font-weight:500;">Virtual Boy</div></div><span>▶</span></div>
                 <div class="emulator-item" data-url="https://chipikipal800.github.io/atari7800-emulatorwroms/" style="display:flex; align-items:center; gap:14px; padding:12px; background:rgba(255,255,255,0.05); border-radius:12px; cursor:pointer;"><span style="font-size:28px;">🎮</span><div style="flex:1;"><div style="font-weight:500;">Atari 7800</div></div><span>▶</span></div>
+                <div class="emulator-item" data-url="https://chipikipal800.github.io/Atari-2600-emulator-/" style="display:flex; align-items:center; gap:14px; padding:12px; background:rgba(255,255,255,0.05); border-radius:12px; cursor:pointer;"><span style="font-size:28px;">🕹️</span><div style="flex:1;"><div style="font-weight:500;">Atari 2600</div></div><span>▶</span></div>
             </div>
         </div>
     `;
@@ -908,7 +869,7 @@ function createExternalWindow(app, x = 150, y = 100, w = 1000, h = 700) {
     win.id = `window-${id}`;
     win.style.cssText = `left:${x}px; top:${y}px; width:${w}px; height:${h}px;`;
     win.innerHTML = `
-        <div class="window-header"><div class="window-title"><span>${app.iconUrl ? `<img src="${app.iconUrl}" onerror="this.style.display='none';this.parentElement.innerHTML='${app.icon}'">` : app.icon}</span><span>${app.name}</span></div><div class="window-controls"><button class="window-control minimize">─</button><button class="window-control maximize">□</button><button class="window-control close">✕</button></div></div>
+        <div class="window-header"><div class="window-title"><span><img src="${app.iconUrl || ''}" style="width:18px;height:18px;border-radius:5px;" onerror="this.style.display='none';this.parentElement.innerHTML='${app.icon}'"></span><span>${app.name}</span></div><div class="window-controls"><button class="window-control minimize">─</button><button class="window-control maximize">□</button><button class="window-control close">✕</button></div></div>
         <div class="window-content"><iframe src="${app.url}" style="width:100%; height:100%; border:none;"></iframe></div>
     `;
     document.body.appendChild(win);
@@ -1250,26 +1211,6 @@ function createWhiteboardWindow() {
     return id;
 }
 
-function createBrowserWindow() {
-    const id = nextWindowId++;
-    const win = document.createElement('div');
-    win.className = 'window';
-    win.id = `window-${id}`;
-    win.style.cssText = `left:150px; top:100px; width:1000px; height:700px;`;
-    win.innerHTML = `
-        <div class="window-header"><div class="window-title"><span>🌐</span><span>Browser</span></div><div class="window-controls"><button class="window-control minimize">─</button><button class="window-control maximize">□</button><button class="window-control close">✕</button></div></div>
-        <div class="window-content"><iframe src="https://chipikipal800.github.io/Fanter-search/" style="width:100%; height:100%; border:none;"></iframe></div>
-    `;
-    document.body.appendChild(win);
-    windows.push({ id, element: win, app: { id: 'browser', name: 'Browser', icon: '🌐' }, minimized: false, maximized: false, x:150, y:100, w:1000, h:700 });
-    focusWindow(id);
-    setupWindowEvents(win, id);
-    addResizeHandles(win, id);
-    updateTaskbar();
-    playSound('open');
-    return id;
-}
-
 function createAppStoreWindow() {
     const id = nextWindowId++;
     const win = document.createElement('div');
@@ -1339,7 +1280,6 @@ function createAppStoreWindow() {
 }
 
 function launchApp(app) {
-    playSound('click');
     const existing = windows.find(w => w.app?.id === app.id);
     if (existing) {
         if (existing.minimized) toggleMinimize(existing.id);
@@ -1358,9 +1298,9 @@ function launchApp(app) {
     else if (app.id === 'timer') createTimerWindow();
     else if (app.id === 'tasks') createTasksWindow();
     else if (app.id === 'whiteboard') createWhiteboardWindow();
-    else if (app.id === 'browser') createBrowserWindow();
     else if (app.url) createExternalWindow(app);
     else showToast(`${app.name} coming soon!`);
+    playSound('click');
 }
 
 function setupWindowEvents(win, id) {
@@ -1569,64 +1509,6 @@ function showShortcuts() {
     alert(`⌨️ KEYBOARD SHORTCUTS\n\nCtrl+K → Quick launch / search games\nCtrl+W → Close active window\nCtrl+M → Minimize active window\nCtrl+/ → Show this menu\nEsc → Close menus / Exit fullscreen\n\n🖱️ Right-click desktop → Wallpaper & Widgets\n🖱️ Double-click titlebar → Maximize window`);
 }
 
-async function handleLogin() {
-    const username = document.getElementById('loginUsername').value;
-    const password = document.getElementById('loginPassword').value;
-    if(!username || !password) {
-        document.getElementById('loginError').textContent = 'Enter username and password';
-        return;
-    }
-    if(!supabaseClient) {
-        document.getElementById('loginError').textContent = 'Supabase connecting... try again';
-        return;
-    }
-    try {
-        const { data: profile, error: profileError } = await supabaseClient.from('profiles').select('id, email').eq('username', username).single();
-        if(profileError || !profile) { document.getElementById('loginError').textContent = 'User not found'; return; }
-        const { data, error } = await supabaseClient.auth.signInWithPassword({ email: profile.email, password: password });
-        if(error) throw error;
-        currentUser = data.user;
-        currentUser.username = username;
-        localStorage.setItem('fanter_currentUser', JSON.stringify(currentUser));
-        document.getElementById('startUserName').textContent = username;
-        document.getElementById('startUserEmail').textContent = profile.email;
-        const loginScreen = document.getElementById('loginScreen');
-        const desktop = document.getElementById('desktop');
-        const fadeOverlay = document.getElementById('fadeOverlay');
-        loginScreen.style.transition = 'opacity 0.5s ease';
-        loginScreen.style.opacity = '0';
-        setTimeout(() => {
-            loginScreen.classList.remove('visible');
-            loginScreen.style.display = 'none';
-            fadeOverlay.classList.add('active');
-            setTimeout(() => {
-                desktop.style.display = 'block';
-                desktop.classList.add('visible');
-                fadeOverlay.classList.remove('active');
-                showToast(`Welcome back, ${username}!`);
-                showAchievement('Welcome Aboard', 3);
-                initDesktop();
-            }, 2000);
-        }, 500);
-    } catch(err) { document.getElementById('loginError').textContent = err.message; }
-}
-
-function showRegister() { window.location.href = 'fantaccount.html'; }
-
-function updateSoundIcon() {
-    const iconSpan = document.getElementById('soundIcon');
-    const volumeSpan = document.getElementById('soundVolume');
-    if(soundEnabled && soundVolume > 0) { iconSpan.textContent = '🔊'; volumeSpan.textContent = `${soundVolume}%`; }
-    else { iconSpan.textContent = '🔇'; volumeSpan.textContent = 'Mute'; }
-}
-
-function toggleSound() {
-    soundEnabled = !soundEnabled;
-    localStorage.setItem('soundEnabled', soundEnabled);
-    updateSoundIcon();
-    if(soundEnabled) playSound('click');
-}
-
 function showAchievement(name, reward) {
     const popup = document.getElementById('achievementPopup');
     document.getElementById('achievementName').textContent = name;
@@ -1642,6 +1524,20 @@ function showAchievement(name, reward) {
         }
         playSound('click');
     }
+}
+
+function updateSoundIcon() {
+    const iconSpan = document.getElementById('soundIcon');
+    const volumeSpan = document.getElementById('soundVolume');
+    if(soundEnabled && soundVolume > 0) { iconSpan.textContent = '🔊'; volumeSpan.textContent = `${soundVolume}%`; }
+    else { iconSpan.textContent = '🔇'; volumeSpan.textContent = 'Mute'; }
+}
+
+function toggleSound() {
+    soundEnabled = !soundEnabled;
+    localStorage.setItem('soundEnabled', soundEnabled);
+    updateSoundIcon();
+    if(soundEnabled) playSound('click');
 }
 
 // Recent apps drag and snap
@@ -1687,13 +1583,115 @@ function initRecentAppsDrag() {
     recentRow.style.transform = 'none';
 }
 
-// Marquee selection
-function initMarquee() {
-    const desktopBg = document.getElementById('desktopBg');
-    desktopBg.addEventListener('mousedown', startMarquee);
-    document.addEventListener('mousemove', updateMarquee);
-    document.addEventListener('mouseup', endMarquee);
+// Widget dragging
+let widgetDragState = null;
+
+function initWidgetDragging() {
+    document.querySelectorAll('.widget').forEach(widget => {
+        let isDragging = false;
+        let startX = 0, startY = 0;
+        let startLeft = 0, startTop = 0;
+        
+        widget.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.widget-title') || widget.contains(e.target)) {
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                const rect = widget.getBoundingClientRect();
+                startLeft = rect.left;
+                startTop = rect.top;
+                widget.style.position = 'absolute';
+                widget.style.left = `${startLeft}px`;
+                widget.style.top = `${startTop}px`;
+                widget.style.margin = '0';
+                widget.classList.add('dragging');
+                e.preventDefault();
+            }
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            let newLeft = startLeft + dx;
+            let newTop = startTop + dy;
+            newLeft = Math.max(5, Math.min(newLeft, window.innerWidth - widget.offsetWidth - 5));
+            newTop = Math.max(5, Math.min(newTop, window.innerHeight - 100));
+            widget.style.left = `${newLeft}px`;
+            widget.style.top = `${newTop}px`;
+        });
+        
+        document.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                widget.classList.remove('dragging');
+                const positions = JSON.parse(localStorage.getItem('widgetPositions') || '{}');
+                positions[widget.id] = { left: parseFloat(widget.style.left), top: parseFloat(widget.style.top) };
+                localStorage.setItem('widgetPositions', JSON.stringify(positions));
+                widget.style.position = '';
+                widget.style.left = '';
+                widget.style.top = '';
+            }
+        });
+    });
+    
+    const savedPositions = JSON.parse(localStorage.getItem('widgetPositions') || '{}');
+    Object.entries(savedPositions).forEach(([id, pos]) => {
+        const widget = document.getElementById(id);
+        if (widget) {
+            widget.style.position = 'absolute';
+            widget.style.left = `${pos.left}px`;
+            widget.style.top = `${pos.top}px`;
+            widget.style.margin = '0';
+        }
+    });
 }
+
+// Login with Supabase
+async function handleLogin() {
+    const username = document.getElementById('loginUsername').value;
+    const password = document.getElementById('loginPassword').value;
+    if(!username || !password) {
+        document.getElementById('loginError').textContent = 'Enter username and password';
+        return;
+    }
+    if(!supabaseClient) {
+        document.getElementById('loginError').textContent = 'Supabase connecting... try again';
+        return;
+    }
+    try {
+        const { data: profile, error: profileError } = await supabaseClient.from('profiles').select('id, email').eq('username', username).single();
+        if(profileError || !profile) { document.getElementById('loginError').textContent = 'User not found'; return; }
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email: profile.email, password: password });
+        if(error) throw error;
+        currentUser = data.user;
+        currentUser.username = username;
+        localStorage.setItem('fanter_currentUser', JSON.stringify(currentUser));
+        document.getElementById('startUserName').textContent = username;
+        document.getElementById('startUserEmail').textContent = profile.email;
+        
+        const loginScreen = document.getElementById('loginScreen');
+        const desktop = document.getElementById('desktop');
+        const fadeOverlay = document.getElementById('fadeOverlay');
+        loginScreen.style.transition = 'opacity 0.5s ease';
+        loginScreen.style.opacity = '0';
+        setTimeout(() => {
+            loginScreen.classList.remove('visible');
+            loginScreen.style.display = 'none';
+            fadeOverlay.classList.add('active');
+            setTimeout(() => {
+                desktop.style.display = 'block';
+                desktop.classList.add('visible');
+                fadeOverlay.classList.remove('active');
+                showToast(`Welcome back, ${username}!`);
+                showAchievement('Welcome Aboard', 3);
+                initDesktop();
+            }, 2000);
+        }, 500);
+    } catch(err) { document.getElementById('loginError').textContent = err.message; }
+}
+
+function showRegister() { window.location.href = 'fantaccount.html'; }
 
 async function initDesktop() {
     await loadGames();
@@ -1703,7 +1701,7 @@ async function initDesktop() {
     updateClock();
     updateSoundIcon();
     initRecentAppsDrag();
-    initMarquee();
+    initWidgetDragging();
     
     document.getElementById('startBtn').onclick = toggleStartMenu;
     document.getElementById('bootSearch').oninput = (e) => updateBootResults(e.target.value);
@@ -1745,48 +1743,46 @@ async function initDesktop() {
         });
     });
     
-    const widgetsDiv = document.getElementById('desktopWidgets');
-    widgetsDiv.classList.add('visible');
-    ['time', 'calendar', 'weather', 'battery'].forEach(w => {
-        const saved = localStorage.getItem(`widget_${w}`);
-        const el = document.getElementById(`${w}Widget`);
-        if(el && saved === 'false') el.style.display = 'none';
-        else if(el && saved === 'true') el.style.display = 'block';
-        else if(el && w === 'weather') el.style.display = 'none';
-        else if(el && w === 'battery') el.style.display = 'none';
-    });
-    
     document.getElementById('ctxRefresh').onclick = () => location.reload();
     document.getElementById('ctxWallpaper').onclick = uploadWallpaper;
     document.getElementById('ctxWidgets').onclick = () => {
+        const widgetsDiv = document.getElementById('desktopWidgets');
         widgetsDiv.classList.toggle('visible');
         showToast('Widgets toggled');
     };
     document.getElementById('ctxShortcuts').onclick = showShortcuts;
-    document.getElementById('desktopBg').oncontextmenu = (e) => {
+    
+    // Right-click on desktop background
+    const desktopBg = document.getElementById('desktopBg');
+    desktopBg.oncontextmenu = (e) => {
         e.preventDefault();
         const menu = document.getElementById('contextMenu');
-        menu.style.left = `${e.clientX}px`; menu.style.top = `${e.clientY}px`;
+        menu.style.left = `${e.clientX}px`;
+        menu.style.top = `${e.clientY}px`;
         menu.classList.add('visible');
         setTimeout(() => document.addEventListener('click', () => menu.classList.remove('visible'), { once: true }), 10);
     };
     
+    // Marquee selection on desktop background
+    desktopBg.addEventListener('mousedown', startMarquee);
+    document.addEventListener('mousemove', updateMarquee);
+    document.addEventListener('mouseup', endMarquee);
+    
+    // Global keyboard shortcuts
     document.addEventListener('keydown', (e) => {
         if(e.key === 'Escape' && activeWindowId) {
             const win = windows.find(w => w.id === activeWindowId);
             if(win?.maximized) toggleMaximize(activeWindowId);
+            else if(bootMenuOpen) toggleBootMenu();
+            else if(startMenuOpen) toggleStartMenu();
         }
         if((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); toggleBootMenu(); }
         if((e.ctrlKey || e.metaKey) && e.key === '/') { e.preventDefault(); showShortcuts(); }
-        if(e.key === 'Escape') { if(bootMenuOpen) toggleBootMenu(); if(startMenuOpen) toggleStartMenu(); }
         if((e.ctrlKey || e.metaKey) && e.key === 'w') { e.preventDefault(); if(activeWindowId) closeWindowWithAnimation(activeWindowId); }
         if((e.ctrlKey || e.metaKey) && e.key === 'm') { e.preventDefault(); if(activeWindowId) toggleMinimize(activeWindowId); }
     });
     
     showToast('🎉 Welcome to fanterOS!');
-    
-    // Only open Game Hub if user explicitly clicks it - NOT on startup
-    // setTimeout(() => { createGameubWindow(); }, 500);  // REMOVED - no auto-open
 }
 
 function initSupabase() {
