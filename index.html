@@ -964,19 +964,43 @@ async function initDesktop() {
   }, 500);
 }
 
-// Initialize Supabase
-window.initSupabase = function() {
-  if (typeof supabase !== 'undefined' && window.supabase) {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Initialize Supabase - SINGLE INSTANCE
+let supabaseClient = null;
+
+function initSupabase() {
+  if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     console.log('✅ Supabase initialized');
     return true;
   } else {
-    setTimeout(window.initSupabase, 100);
+    setTimeout(initSupabase, 100);
     return false;
   }
-};
+}
 
-window.initSupabase();
+initSupabase();
+
+// Use supabaseClient for auth calls
+async function handleLogin() {
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+  if(!email || !password) {
+    document.getElementById('loginError').textContent = 'Enter email and password';
+    return;
+  }
+  try {
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    if(error) throw error;
+    currentUser = data.user;
+    localStorage.setItem('fanter_currentUser', JSON.stringify(currentUser));
+    document.getElementById('startUserName').textContent = currentUser.email?.split('@')[0] || 'User';
+    document.getElementById('startUserEmail').textContent = currentUser.email;
+    showToast(`Welcome back!`);
+    document.getElementById('loginScreen').classList.remove('visible');
+    document.getElementById('desktop').classList.add('visible');
+    showAchievement('Welcome Aboard', 3);
+  } catch(err) { document.getElementById('loginError').textContent = err.message; }
+}
 document.getElementById('loginBtn').onclick = handleLogin;
 document.getElementById('showRegister').onclick = showRegister;
 document.getElementById('loginScreen').classList.add('visible');
