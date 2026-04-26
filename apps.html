@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body>
+<script>
+// ============================================
+// FANTER APPS - All app functions
+// Add new apps here by creating a function and adding to __registerApps
+// ============================================
+
+// Store all app creation functions
+window.__registerApps = function() {
+    const appFunctions = {};
+    let nextWindowId = 1;
+    let windows = [];
+    let activeWindowId = null;
+    
+    // Helper functions for app windows
+    function addWindowToGlobal(win, app) {
+        if (typeof window !== 'undefined' && window.windows) {
+            window.windows.push({ id: nextWindowId, element: win, app: app, minimized: false, maximized: false });
+            window.focusWindow(nextWindowId);
+        }
+        nextWindowId++;
+    }
+    
+    function setupWindowEvents(win, id) {
+        const header = win.querySelector('.window-header');
+        const minBtn = win.querySelector('.window-control.minimize');
+        const maxBtn = win.querySelector('.window-control.maximize');
+        const closeBtn = win.querySelector('.window-control.close');
+        
+        win.addEventListener('mousedown', () => {
+            if (window.focusWindow) window.focusWindow(id);
+        });
+        
+        let drag = null;
+        header.addEventListener('mousedown', (e) => {
+            if(e.target.closest('.window-controls')) return;
+            drag = { x: e.clientX, y: e.clientY, left: parseInt(win.style.left), top: parseInt(win.style.top) };
+            document.addEventListener('mousemove', onDrag);
+            document.addEventListener('mouseup', stopDrag);
+        });
+        
+        function onDrag(e) {
+            if(!drag) return;
+            win.style.left = `${drag.left + (e.clientX - drag.x)}px`;
+            win.style.top = `${drag.top + (e.clientY - drag.y)}px`;
+        }
+        function stopDrag() {
+            drag = null;
+            document.removeEventListener('mousemove', onDrag);
+            document.removeEventListener('mouseup', stopDrag);
+        }
+        
+        minBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (window.toggleMinimize) window.toggleMinimize(id);
+        });
+        maxBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (window.toggleMaximize) window.toggleMaximize(id);
+        });
+        closeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (window.closeWindowWithAnimation) window.closeWindowWithAnimation(id);
+        });
+        header.addEventListener('dblclick', () => {
+            if (window.toggleMaximize) window.toggleMaximize(id);
+        });
+    }
+    
+    function addResizeHandles(win, id) {
+        const handles = ['n','s','w','e','nw','ne','sw','se'];
+        handles.forEach(dir => {
+            const handle = document.createElement('div');
+            handle.className = `resize-handle resize-${dir}`;
+            win.appendChild(handle);
+            handle.addEventListener('mousedown', (e) => {
+                e.stopPropagation();
+                const rect = win.getBoundingClientRect();
+                window.resizeData = { id, dir, startX: e.clientX, startY: e.clientY, startW: rect.width, startH: rect.height, startL: rect.left, startT: rect.top };
+                document.addEventListener('mousemove', onResize);
+                document.addEventListener('mouseup', stopResize);
+            });
+        });
+    }
+    
+    function onResize(e) {
+        if(!window.resizeData) return;
+        const dx = e.clientX - window.resizeData.startX;
+        const dy = e.clientY - window.resizeData.startY;
+        const win = window.windows?.find(w => w.id === window.resizeData.id);
+        if(!win || win.maximized) return;
+        let newW = window.resizeData.startW, newH = window.resizeData.startH, newL = window.resizeData.startL, newT = window.resizeData.startT;
+        if(window.resizeData.dir.includes('e')) newW = Math.max(400, window.resizeData.startW + dx);
+        if(window.resizeData.dir.includes('w')) { newW = Math.max(400, window.resizeData.startW - dx); newL = window.resizeData.startL + dx; }
+        if(window.resizeData.dir.includes('s')) newH = Math.max(300, window.resizeData.startH + dy);
+        if(window.resizeData.dir.includes('n')) { newH = Math.max(300, window.resizeData.startH - dy); newT = window.resizeData.startT + dy; }
+        win.element.style.width = `${newW}px`; win.element.style.height = `${newH}px`; win.element.style.left = `${newL}px`; win.element.style.top = `${newT}px`;
+    }
+    
+    function stopResize() {
+        window.resizeData = null;
+        document.removeEventListener('mousemove', onResize);
+        document.removeEventListener('mouseup', stopResize);
+    }
+    
+    // ========== MINESWEEPER ==========
+    appFunctions.minesweeper = function() {
+        const id = Date.now() + Math.random();
+        const win = document.createElement('div');
+        win.className = 'window';
+        win.style.cssText = `left:150px; top:100px; width:500px; height:550px; z-index:1000;`;
+        win.innerHTML = `
+            <div class="window-header"><div class="window-title"><span>💣</span><span>Minesweeper</span></div><div class="window-controls"><button class="window-control minimize">─</button><button class="window-control maximize">□</button><button class="window-control close">✕</button></div></div>
+            <div class="window-content" style="text-align:center;">
+                <div style="margin-bottom:10px;">💣 Mines left: <span id="minesLeft-${id}">10</span></div>
+                <canvas id="minesweeperCanvas-${id}" width="400" height="400" style="border:2px solid var(--border-glass); border-radius:12px; background:#1a1a2e;"></canvas>
+                <button id="resetMinesweeper-${id}" style="margin-top:12px; padding:8px 20px; background:var(--accent); border:none; border-radius:30px; color:white; cursor:pointer;">New Game</button>
+            </div>
+        `;
+        document.body.appendChild(win);
+        if (window.windows) window.windows.push({ id: id, element: win, app: { id: 'minesweeper', name: 'Minesweeper', icon: '💣' }, minimized: false, maximized: false });
+        if (window.focusWindow) window.focusWindow(id);
+        setupWindowEvents(win, id);
+        addResizeHandles(win, id);
+        if (window.updateTaskbar) window.updateTaskbar();
+        
+        const size = 9;
+        let board = [];
+        let revealed = [];
+        let flagged = [];
+        let gameActive = true;
+        let minesCount = 10;
+        
+        function initBoard() {
+            board = Array(size).fill().map(() => Array(size).fill(0));
+            revealed = Array(size).fill().map(() => Array(size).fill(false));
+            flagged = Array(size).fill().map(() => Array(size).fill(false));
+            gameActive = true;
+            minesCount = 10;
+            document.getElementById(`minesLeft-${id}`).textContent = minesCount;
+            
+            let minesPlaced = 0;
+            while(minesPlaced < 10) {
+                const r = Math.floor(Math.random() * size);
+                const c = Math.floor(Math.random() * size);
+                if(board[r][c] !== -1) {
+                    board[r][c] = -1;
+                    minesPlaced++;
+                    for(let dr = -1; dr <= 1; dr++) {
+                        for(let dc = -1; dc <= 1; dc++) {
+                            if(r+dr >=0 && r+dr < size && c+dc >=0 && c+dc < size && board[r+dr][c+dc] !== -1) {
+                                board[r+dr][c+dc]++;
+                            }
+                        }
+                    }
+                }
+            }
+            draw();
+        }
+        
+        function draw() {
+            const canvas = document.getElementById(`minesweeperCanvas-${id}`);
+            const ctx = canvas.getContext('2d');
+            const cellSize = canvas.width / size;
+            
+            for(let i = 0; i < size; i++) {
+                for(let j = 0; j < size; j++) {
+                    if(revealed[i][j]) {
+                        if(board[i][j] === -1) {
+                            ctx.fillStyle = '#ff4444';
+                            ctx.fillRect(j*cellSize, i*cellSize, cellSize, cellSize);
+                            ctx.fillStyle = 'white';
+                            ctx.font = `${cellSize * 0.6}px Arial`;
+                            ctx.fillText('💣', j*cellSize + cellSize/3, i*cellSize + cellSize*0.7);
+                        } else {
+                            ctx.fillStyle = '#2a2a3a';
+                            ctx.fillRect(j*cellSize, i*cellSize, cellSize, cellSize);
+                            if(board[i][j] > 0) {
+                                ctx.fillStyle = board[i][j] === 1 ? '#4caf50' : board[i][j] === 2 ? '#2196f3' : board[i][j] === 3 ? '#ff9800' : '#f44336';
+                                ctx.font = `bold ${cellSize * 0.5}px Arial`;
+                                ctx.fillText(board[i][j], j*cellSize + cellSize/2.5, i*cellSize + cellSize*0.7);
+                            }
+                        }
+                    } else {
+                        ctx.fillStyle = '#3a3a4a';
+                        ctx.fillRect(j*cellSize, i*cellSize, cellSize, cellSize);
+                        if(flagged[i][j]) {
+                            ctx.fillStyle = '#ffcc00';
+                            ctx.font = `${cellSize * 0.6}px Arial`;
+                            ctx.fillText('🚩', j*cellSize + cellSize/3, i*cellSize + cellSize*0.7);
+                        }
+                    }
+                    ctx.strokeStyle = '#555';
+                    ctx.strokeRect(j*cellSize, i*cellSize, cellSize, cellSize);
+                }
+            }
+        }
+        
+        function revealCell(row, col) {
+            if(!gameActive || revealed[row][col] || flagged[row][col]) return;
+            revealed[row][col] = true;
+            if(board[row][col] === -1) {
+                gameActive = false;
+                for(let i=0;i<size;i++) for(let j=0;j<size;j++) revealed[i][j] = true;
+                draw();
+                if (window.showToast) window.showToast('💥 Game Over! You hit a mine!');
+                if (window.showAchievement) window.showAchievement('Minesweeper Novice', 5);
+                return;
+            }
+            if(board[row][col] === 0) {
+                for(let dr=-1; dr<=1; dr++) {
+                    for(let dc=-1; dc<=1; dc++) {
+                        if(row+dr>=0 && row+dr<size && col+dc>=0 && col+dc<size) revealCell(row+dr, col+dc);
+                    }
+                }
+            }
+            draw();
+            
+            let allRevealed = true;
+            for(let i=0;i<size;i++) for(let j=0;j<size;j++) if(board[i][j] !== -1 && !revealed[i][j]) allRevealed = false;
+            if(allRevealed) {
+                if (window.showToast) window.showToast('🎉 You win! Congratulations!');
+                if (window.showAchievement) window.showAchievement('Minesweeper Master', 15);
+                gameActive = false;
+            }
+        }
+        
+        function flagCell(row, col) {
+            if(!gameActive || revealed[row][col]) return;
+            flagged[row][col] = !flagged[row][col];
+            minesCount += flagged[row][col] ? -1 : 1;
+            document.getElementById(`minesLeft-${id}`).textContent = minesCount;
+            draw();
+        }
+        
+        const canvas = document.getElementById(`minesweeperCanvas-${id}`);
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const cellSize = canvas.width / size;
+            const col = Math.floor((e.clientX - rect.left) / cellSize);
+            const row = Math.floor((e.clientY - rect.top) / cellSize);
+            if(e.ctrlKey) flagCell(row, col);
+            else revealCell(row, col);
+        });
+        
+        document.getElementById(`resetMinesweeper-${id}`).onclick = () => initBoard();
+        initBoard();
+    };
+    
+    // ========== SUDOKU ==========
+    appFunctions.sudoku = function() {
+        const id = Date.now() + Math.random();
+        const win = document.createElement('div');
+        win.className = 'window';
+        win.style.cssText = `left:150px; top:100px; width:550px; height:600px;`;
+        win.innerHTML = `
+            <div class="window-header"><div class="window-title"><span>🔢</span><span>Sudoku</span></div><div class="window-controls"><button class="window-control minimize">─</button><button class="window-control maximize">□</button><button class="window-control close">✕</button></div></div>
+            <div class="window-content" style="text-align:center;">
+                <canvas id="sudokuCanvas-${id}" width="450" height="450" style="border:2px solid var(--border-glass); border-radius:12px; background:#1a1a2e;"></canvas>
+                <div style="margin-top:12px;">
+                    <button id="checkSudoku-${id}" style="padding:6px 12px; background:var(--accent); border:none; border-radius:20px; color:white; cursor:pointer;">Check</button>
+                    <button id="resetSudoku-${id}" style="padding:6px 12px; background:var(--accent); border:none; border-radius:20px; color:white; cursor:pointer;">New Game</button>
+                </div>
+                <div id="sudokuMessage-${id}" style="margin-top:10px;"></div>
+            </div>
+        `;
+        document.body.appendChild(win);
+        if (window.windows) window.windows.push({ id: id, element: win, app: { id: 'sudoku', name: 'Sudoku', icon: '🔢' }, minimized: false, maximized: false });
+        if (window.focusWindow) window.focusWindow(id);
+        setupWindowEvents(win, id);
+        addResizeHandles(win, id);
+        if (window.updateTaskbar) window.updateTaskbar();
+        
+        const board = [
+            [5,3,0,0,7,0,0,0,0],
+            [6,0,0,1,9,5,0,0,0],
+            [0,9,8,0,0,0,0,6,0],
+            [8,0,0,0,6,0,0,0,3],
+            [4,0,0,8,0,3,0,0,1],
+            [7,0,0,0,2,0,0,0,6],
+            [0,6,0,0,0,0,2,8,0],
+            [0,0,0,4,1,9,0,0,5],
+            [0,0,0,0,8,0,0,7,9]
+        ];
+        let userBoard = JSON.parse(JSON.stringify(board));
+        
+        function isValid(board, row, col, num) {
+            for(let i=0;i<9;i++) if(board[row][i] === num || board[i][col] === num) return false;
+            const boxRow = Math.floor(row/3)*3, boxCol = Math.floor(col/3)*3;
+            for(let i=0;i<3;i++) for(let j=0;j<3;j++) if(board[boxRow+i][boxCol+j] === num) return false;
+            return true;
+        }
+        
+        function generateNewPuzzle() {
+            const empty = JSON.parse(JSON.stringify(board));
+            const solved = JSON.parse(JSON.stringify(empty));
+            // Simple solver for demo
+            userBoard = JSON.parse(JSON.stringify(empty));
+            for(let i=0;i<40;i++) {
+                const row = Math.floor(Math.random()*9);
+                const col = Math.floor(Math.random()*9);
+                userBoard[row][col] = 0;
+            }
+            drawSudoku();
+        }
+        
+        function drawSudoku() {
+            const canvas = document.getElementById(`sudokuCanvas-${id}`);
+            const ctx = canvas.getContext('2d');
+            const cellSize = canvas.width / 9;
+            for(let i=0;i<9;i++) {
+                for(let j=0;j<9;j++) {
+                    if(board[i][j] !== 0 && userBoard[i][j] === board[i][j]) ctx.fillStyle = '#2a2a3a';
+                    else ctx.fillStyle = '#1e1e2e';
+                    ctx.fillRect(j*cellSize, i*cellSize, cellSize, cellSize);
+                    if(userBoard[i][j] !== 0) {
+                        ctx.fillStyle = userBoard[i][j] === board[i][j] ? '#4caf50' : '#2196f3';
+                        ctx.font = `bold ${cellSize*0.4}px Arial`;
+                        ctx.fillText(userBoard[i][j], j*cellSize + cellSize/2.5, i*cellSize + cellSize*0.7);
+                    }
+                    if(board[i][j] === 0 && userBoard[i][j] !== 0) {
+                        ctx.fillStyle = '#ff9800';
+                        ctx.font = `${cellSize*0.4}px Arial`;
+                        ctx.fillText(userBoard[i][j], j*cellSize + cellSize/2.5, i*cellSize + cellSize*0.7);
+                    }
+                    ctx.strokeStyle = '#555';
+                    ctx.strokeRect(j*cellSize, i*cellSize, cellSize, cellSize);
+                    if(i%3===2 && i!==8) ctx.strokeRect(0, (i+1)*cellSize-1, canvas.width, 2);
+                    if(j%3===2 && j!==8) ctx.strokeRect((j+1)*cellSize-1, 0, 2, canvas.height);
+                }
+            }
+        }
+        
+        function checkSudoku() {
+            for(let i=0;i<9;i++) {
+                for(let j=0;j<9;j++) {
+                    if(userBoard[i][j] !== 0) {
+                        if(!isValid(userBoard,i,j,userBoard[i][j])) {
+                            document.getElementById(`sudokuMessage-${id}`).innerHTML = '<span style="color:#ff5e5e;">❌ Invalid solution!</span>';
+                            return;
+                        }
+                    }
+                }
+            }
+            let complete = true;
+            for(let i=0;i<9;i++) for(let j=0;j<9;j++) if(userBoard[i][j] === 0) complete = false;
+            if(complete) {
+                document.getElementById(`sudokuMessage-${id}`).innerHTML = '<span style="color:#4caf50;">🎉 Congratulations! You solved it!</span>';
+                if (window.showAchievement) window.showAchievement('Sudoku Master', 15);
+            } else {
+                document.getElementById(`sudokuMessage-${id}`).innerHTML = '<span style="color:#4caf50;">✅ Valid so far! Keep going!</span>';
+            }
+            drawSudoku();
+        }
+        
+        const canvas = document.getElementById(`sudokuCanvas-${id}`);
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const cellSize = canvas.width / 9;
+            const col = Math.floor((e.clientX - rect.left) / cellSize);
+            const row = Math.floor((e.clientY - rect.top) / cellSize);
+            if(board[row][col] !== 0) return;
+            const num = prompt('Enter number (1-9):', userBoard[row][col] || '');
+            if(num >=1 && num <=9) userBoard[row][col] = parseInt(num);
+            else if(num === '') userBoard[row][col] = 0;
+            drawSudoku();
+        });
+        
+        document.getElementById(`resetSudoku-${id}`).onclick = () => generateNewPuzzle();
+        document.getElementById(`checkSudoku-${id}`).onclick = checkSudoku;
+        generateNewPuzzle();
+    };
+    
+    // ========== TETRIS ==========
+    appFunctions.tetris = function() {
+        const id = Date.now() + Math.random();
+        const win = document.createElement('div');
+        win.className = 'window';
+        win.style.cssText = `left:150px; top:100px; width:400px; height:550px;`;
+        win.innerHTML = `
+            <div class="window-header"><div class="window-title"><span>🧩</span><span>Tetris</span></div><div class="window-controls"><button class="window-control minimize">─</button><button class="window-control maximize">□</button><button class="window-control close">✕</button></div></div>
+            <div class="window-content" style="text-align:center;">
+                <canvas id="tetrisCanvas-${id}" width="300" height="600" style="border:2px solid var(--border-glass); border-radius:12px; background:#1a1a2e;"></canvas>
+                <div style="margin-top:12px;">Score: <span id="tetrisScore-${id}">0</span></div>
+                <button id="resetTetris-${id}" style="margin-top:8px; padding:6px 16px; background:var(--accent); border:none; border-radius:20px; color:white; cursor:pointer;">Restart</button>
+            </div>
+        `;
+        document.body.appendChild(win);
+        if (window.windows) window.windows.push({ id: id, element: win, app: { id: 'tetris', name: 'Tetris', icon: '🧩' }, minimized: false, maximized: false });
+        if (window.focusWindow) window.focusWindow(id);
+        setupWindowEvents(win, id);
+        addResizeHandles(win, id);
+        if (window.updateTaskbar) window.updateTaskbar();
+        
+        const canvas = document.getElementById(`tetrisCanvas-${id}`);
+        const ctx = canvas.getContext('2d');
+        const COLS = 10, ROWS = 20;
+        let grid = Array(ROWS).fill().map(() => Array(COLS).fill(0));
+        let score = 0;
+        let gameOver = false;
+        let fallInterval = null;
+        
+        const pieces = [
+            [[1,1,1,1]],
+            [[1,1],[1,1]],
+            [[0,1,0],[1,1,1]],
+            [[1,0,0],[1,1,1]],
+            [[0,0,1],[1,1,1]],
+            [[0,1,1],[1,1,0]],
+            [[1,1,0],[0,1,1]]
+        ];
+        const pieceColors = ['#00e5f0', '#f0e000', '#e0a000', '#a0f000', '#f000a0', '#00a0f0', '#a0f0a0'];
+        
+        let currentPiece, currentX, currentY, currentColor;
+        
+        function spawnNewPiece() {
+            const idx = Math.floor(Math.random() * pieces.length);
+            currentPiece = pieces[idx];
+            currentColor = pieceColors[idx];
+            currentX = Math.floor((COLS - currentPiece[0].length) / 2);
+            currentY = 0;
+            if(collision()) { gameOver = true; if(fallInterval) clearInterval(fallInterval); }
+            draw();
+        }
+        
+        function collision() {
+            for(let y=0; y<currentPiece.length; y++) {
+                for(let x=0; x<currentPiece[y].length; x++) {
+                    if(currentPiece[y][x] && (grid[currentY+y]?.[currentX+x] !== 0 || currentY+y >= ROWS || currentX+x < 0 || currentX+x >= COLS)) return true;
+                }
+            }
+            return false;
+        }
+        
+        function mergePiece() {
+            for(let y=0; y<currentPiece.length; y++) {
+                for(let x=0; x<currentPiece[y].length; x++) {
+                    if(currentPiece[y][x]) {
+                        grid[currentY+y][currentX+x] = currentColor;
+                    }
+                }
+            }
+            clearLines();
+            spawnNewPiece();
+            draw();
+        }
+        
+        function clearLines() {
+            let linesCleared = 0;
+            for(let y=ROWS-1; y>=0; y--) {
+                if(grid[y].every(cell => cell !== 0)) {
+                    grid.splice(y,1);
+                    grid.unshift(Array(COLS).fill(0));
+                    y++;
+                    linesCleared++;
+                }
+            }
+            if(linesCleared > 0) {
+                score += linesCleared * 100;
+                document.getElementById(`tetrisScore-${id}`).textContent = score;
+                if (window.showAchievement && !gameOver && score >= 1000) window.showAchievement('Tetris Enthusiast', 10);
+            }
+        }
+        
+        function draw() {
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0,0,canvas.width,canvas.height);
+            for(let y=0; y<ROWS; y++) {
+                for(let x=0; x<COLS; x++) {
+                    if(grid[y][x]) {
+                        ctx.fillStyle = grid[y][x];
+                        ctx.fillRect(x*30, y*30, 28, 28);
+                    }
+                }
+            }
+            for(let y=0; y<currentPiece.length; y++) {
+                for(let x=0; x<currentPiece[y].length; x++) {
+                    if(currentPiece[y][x]) {
+                        ctx.fillStyle = currentColor;
+                        ctx.fillRect((currentX+x)*30, (currentY+y)*30, 28, 28);
+                    }
+                }
+            }
+            if(gameOver) {
+                ctx.fillStyle = 'rgba(0,0,0,0.7)';
+                ctx.fillRect(0,0,canvas.width,canvas.height);
+                ctx.fillStyle = 'white';
+                ctx.font = '20px Arial';
+                ctx.fillText('GAME OVER', 70, 280);
+            }
+        }
+        
+        function move(dx, dy) {
+            if(gameOver) return;
+            currentX += dx;
+            if(collision()) { currentX -= dx; return false; }
+            if(dy) {
+                currentY += dy;
+                if(collision()) { currentY -= dy; mergePiece(); return false; }
+            }
+            draw();
+            return true;
+        }
+        
+        function rotate() {
+            if(gameOver) return;
+            const rotated = currentPiece[0].map((_, idx) => currentPiece.map(row => row[idx]).reverse());
+            const oldPiece = currentPiece;
+            currentPiece = rotated;
+            if(collision()) currentPiece = oldPiece;
+            draw();
+        }
+        
+        document.addEventListener('keydown', (e) => {
+            if(e.key === 'ArrowLeft') move(-1,0);
+            if(e.key === 'ArrowRight') move(1,0);
+            if(e.key === 'ArrowDown') move(0,1);
+            if(e.key === 'ArrowUp') rotate();
+        });
+        
+        function startGame() {
+            if(fallInterval) clearInterval(fallInterval);
+            grid = Array(ROWS).fill().map(() => Array(COLS).fill(0));
+            score = 0;
+            gameOver = false;
+            document.getElementById(`tetrisScore-${id}`).textContent = score;
+            spawnNewPiece();
+            fallInterval = setInterval(() => { if(!gameOver) move(0,1); }, 500);
+            draw();
+        }
+        
+        document.getElementById(`resetTetris-${id}`).onclick = startGame;
+        startGame();
+    };
+    
+    // ========== TIC TAC TOE ==========
+    appFunctions.tictactoe = function() {
+        const id = Date.now() + Math.random();
+        const win = document.createElement('div');
+        win.className = 'window';
+        win.style.cssText = `left:150px; top:100px; width:450px; height:500px;`;
+        win.innerHTML = `
+            <div class="window-header"><div class="window-title"><span>❌</span><span>Tic Tac Toe</span></div><div class="window-controls"><button class="window-control minimize">─</button><button class="window-control maximize">□</button><button class="window-control close">✕</button></div></div>
+            <div class="window-content" style="text-align:center;">
+                <canvas id="tttCanvas-${id}" width="300" height="300" style="border:2px solid var(--border-glass); border-radius:12px; background:#1a1a2e;"></canvas>
+                <div style="margin-top:12px;">Turn: <span id="tttTurn-${id}">X</span></div>
+                <div id="tttMessage-${id}"></div>
+                <button id="resetTicTac-${id}" style="margin-top:12px; padding:6px 16px; background:var(--accent); border:none; border-radius:20px; color:white; cursor:pointer;">Reset</button>
+            </div>
+        `;
+        document.body.appendChild(win);
+        if (window.windows) window.windows.push({ id: id, element: win, app: { id: 'tictactoe', name: 'Tic Tac Toe', icon: '❌' }, minimized: false, maximized: false });
+        if (window.focusWindow) window.focusWindow(id);
+        setupWindowEvents(win, id);
+        addResizeHandles(win, id);
+        if (window.updateTaskbar) window.updateTaskbar();
+        
+        const canvas = document.getElementById(`tttCanvas-${id}`);
+        const ctx = canvas.getContext('2d');
+        let board = Array(9).fill(null);
+        let turn = 'X';
+        let gameOver = false;
+        
+        function drawBoard() {
+            const size = canvas.width;
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0,0,size,size);
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 2;
+            for(let i=1;i<3;i++) {
+                ctx.beginPath();
+                ctx.moveTo(i*size/3,0);
+                ctx.lineTo(i*size/3,size);
+                ctx.stroke();
+                ctx.moveTo(0,i*size/3);
+                ctx.lineTo(size,i*size/3);
+                ctx.stroke();
+            }
+            for(let i=0;i<9;i++) {
+                if(board[i]) {
+                    const x = (i%3)*size/3 + size/6;
+                    const y = Math.floor(i/3)*size/3 + size/6;
+                    ctx.fillStyle = board[i] === 'X' ? '#4caf50' : '#2196f3';
+                    ctx.font = `bold ${size/3}px Arial`;
+                    ctx.fillText(board[i], x-20, y+15);
+                }
+            }
+        }
+        
+        function checkWin() {
+            const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+            for(let line of lines) {
+                if(board[line[0]] && board[line[0]] === board[line[1]] && board[line[0]] === board[line[2]]) {
+                    gameOver = true;
+                    document.getElementById(`tttMessage-${id}`).innerHTML = `<span style="color:#4caf50;">🎉 ${board[line[0]]} wins!</span>`;
+                    if (window.showAchievement) window.showAchievement(`${board[line[0]]} Master`, 10);
+                    return true;
+                }
+            }
+            if(board.every(cell => cell !== null)) {
+                gameOver = true;
+                document.getElementById(`tttMessage-${id}`).innerHTML = '<span style="color:#ff9800;">It\'s a draw!</span>';
+                return true;
+            }
+            return false;
+        }
+        
+        function makeMove(index) {
+            if(gameOver || board[index]) return false;
+            board[index] = turn;
+            drawBoard();
+            if(checkWin()) return true;
+            turn = turn === 'X' ? 'O' : 'X';
+            document.getElementById(`tttTurn-${id}`).textContent = turn;
+            return true;
+        }
+        
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const size = canvas.width;
+            const x = Math.floor((e.clientX - rect.left) / (size/3));
+            const y = Math.floor((e.clientY - rect.top) / (size/3));
+            const index = y*3 + x;
+            makeMove(index);
+        });
+        
+        function resetGame() {
+            board = Array(9).fill(null);
+            turn = 'X';
+            gameOver = false;
+            document.getElementById(`tttTurn-${id}`).textContent = 'X';
+            document.getElementById(`tttMessage-${id}`).innerHTML = '';
+            drawBoard();
+        }
+        
+        document.getElementById(`resetTicTac-${id}`).onclick = resetGame;
+        resetGame();
+    };
+    
+    // ========== CONNECT FOUR ==========
+    appFunctions.connectfour = function() {
+        const id = Date.now() + Math.random();
+        const win = document.createElement('div');
+        win.className = 'window';
+        win.style.cssText = `left:150px; top:100px; width:500px; height:520px;`;
+        win.innerHTML = `
+            <div class="window-header"><div class="window-title"><span>🔴</span><span>Connect Four</span></div><div class="window-controls"><button class="window-control minimize">─</button><button class="window-control maximize">□</button><button class="window-control close">✕</button></div></div>
+            <div class="window-content" style="text-align:center;">
+                <canvas id="c4Canvas-${id}" width="420" height="360" style="border:2px solid var(--border-glass); border-radius:12px; background:#1a1a2e;"></canvas>
+                <div style="margin-top:12px;">Turn: <span id="c4Turn-${id}">🔴 Red</span></div>
+                <div id="c4Message-${id}"></div>
+                <button id="resetC4-${id}" style="margin-top:12px; padding:6px 16px; background:var(--accent); border:none; border-radius:20px; color:white; cursor:pointer;">Reset</button>
+            </div>
+        `;
+        document.body.appendChild(win);
+        if (window.windows) window.windows.push({ id: id, element: win, app: { id: 'connectfour', name: 'Connect Four', icon: '🔴' }, minimized: false, maximized: false });
+        if (window.focusWindow) window.focusWindow(id);
+        setupWindowEvents(win, id);
+        addResizeHandles(win, id);
+        if (window.updateTaskbar) window.updateTaskbar();
+        
+        const canvas = document.getElementById(`c4Canvas-${id}`);
+        const ctx = canvas.getContext('2d');
+        const ROWS = 6, COLS = 7;
+        let board = Array(ROWS).fill().map(() => Array(COLS).fill(null));
+        let turn = 'red';
+        let gameOver = false;
+        
+        function drawBoard() {
+            const cellW = canvas.width / COLS;
+            const cellH = canvas.height / ROWS;
+            for(let row=0; row<ROWS; row++) {
+                for(let col=0; col<COLS; col++) {
+                    ctx.fillStyle = '#1a1a2e';
+                    ctx.fillRect(col*cellW, row*cellH, cellW, cellH);
+                    ctx.fillStyle = board[row][col] === 'red' ? '#ff4444' : board[row][col] === 'yellow' ? '#ffcc00' : '#333';
+                    ctx.beginPath();
+                    ctx.arc(col*cellW+cellW/2, row*cellH+cellH/2, cellW*0.35, 0, Math.PI*2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#555';
+                    ctx.strokeRect(col*cellW, row*cellH, cellW, cellH);
+                }
+            }
+        }
+        
+        function dropPiece(col) {
+            if(gameOver) return false;
+            for(let row=ROWS-1; row>=0; row--) {
+                if(!board[row][col]) {
+                    board[row][col] = turn;
+                    drawBoard();
+                    if(checkWin(row,col)) {
+                        gameOver = true;
+                        document.getElementById(`c4Message-${id}`).innerHTML = `<span style="color:#4caf50;">🎉 ${turn === 'red' ? '🔴 Red' : '🟡 Yellow'} wins!</span>`;
+                        if (window.showAchievement) window.showAchievement(`${turn === 'red' ? 'Connect Four Red' : 'Connect Four Yellow'} Master`, 10);
+                        return true;
+                    }
+                    turn = turn === 'red' ? 'yellow' : 'red';
+                    document.getElementById(`c4Turn-${id}`).textContent = turn === 'red' ? '🔴 Red' : '🟡 Yellow';
+                    drawBoard();
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        function checkWin(row, col) {
+            const directions = [[1,0],[0,1],[1,1],[1,-1]];
+            for(let [dx,dy] of directions) {
+                let count = 1;
+                for(let step=1; step<=3; step++) {
+                    const nr = row + dx*step, nc = col + dy*step;
+                    if(nr>=0 && nr<ROWS && nc>=0 && nc<COLS && board[nr][nc] === turn) count++;
+                    else break;
+                }
+                for(let step=1; step<=3; step++) {
+                    const nr = row - dx*step, nc = col - dy*step;
+                    if(nr>=0 && nr<ROWS && nc>=0 && nc<COLS && board[nr][nc] === turn) count++;
+                    else break;
+                }
+                if(count >= 4) return true;
+            }
+            return false;
+        }
+        
+        canvas.addEventListener('click', (e) => {
+            if(gameOver) return;
+            const rect = canvas.getBoundingClientRect();
+            const cellW = canvas.width / COLS;
+            const col = Math.floor((e.clientX - rect.left) / cellW);
+            if(col >=0 && col < COLS) dropPiece(col);
+        });
+        
+        function resetGame() {
+            board = Array(ROWS).fill().map(() => Array(COLS).fill(null));
+            turn = 'red';
+            gameOver = false;
+            document.getElementById(`c4Turn-${id}`).textContent = '🔴 Red';
+            document.getElementById(`c4Message-${id}`).innerHTML = '';
+            drawBoard();
+        }
+        
+        document.getElementById(`resetC4-${id}`).onclick = resetGame;
+        resetGame();
+    };
+    
+    // ========== CHECKERS ==========
+    appFunctions.checkers = function() {
+        const id = Date.now() + Math.random();
+        const win = document.createElement('div');
+        win.className = 'window';
+        win.style.cssText = `left:150px; top:100px; width:450px; height:480px;`;
+        win.innerHTML = `
+            <div class="window-header"><div class="window-title"><span>⚫</span><span>Checkers</span></div><div class="window-controls"><button class="window-control minimize">─</button><button class="window-control maximize">□</button><button class="window-control close">✕</button></div></div>
+            <div class="window-content" style="text-align:center;">
+                <canvas id="checkersCanvas-${id}" width="400" height="400" style="border:2px solid var(--border-glass); border-radius:12px; background:#1a1a2e;"></canvas>
+                <div style="margin-top:12px;">Turn: <span id="checkersTurn-${id}">⚫ Black</span></div>
+                <div id="checkersMessage-${id}"></div>
+                <button id="resetCheckers-${id}" style="margin-top:12px; padding:6px 16px; background:var(--accent); border:none; border-radius:20px; color:white; cursor:pointer;">Reset</button>
+            </div>
+        `;
+        document.body.appendChild(win);
+        if (window.windows) window.windows.push({ id: id, element: win, app: { id: 'checkers', name: 'Checkers', icon: '⚫' }, minimized: false, maximized: false });
+        if (window.focusWindow) window.focusWindow(id);
+        setupWindowEvents(win, id);
+        addResizeHandles(win, id);
+        if (window.updateTaskbar) window.updateTaskbar();
+        
+        const canvas = document.getElementById(`checkersCanvas-${id}`);
+        const ctx = canvas.getContext('2d');
+        const SIZE = 8;
+        let board = Array(SIZE).fill().map(() => Array(SIZE).fill(null));
+        let turn = 'black';
+        let selectedRow = null, selectedCol = null;
+        let gameOver = false;
+        
+        function initBoard() {
+            for(let i=0;i<SIZE;i++) {
+                for(let j=0;j<SIZE;j++) {
+                    if((i+j)%2 === 1) {
+                        if(i<3) board[i][j] = { color: 'black', king: false };
+                        else if(i>4) board[i][j] = { color: 'red', king: false };
+                        else board[i][j] = null;
+                    } else board[i][j] = null;
+                }
+            }
+        }
+        
+        function drawBoard() {
+            const cellSize = canvas.width / SIZE;
+            for(let i=0;i<SIZE;i++) {
+                for(let j=0;j<SIZE;j++) {
+                    ctx.fillStyle = (i+j)%2 === 0 ? '#2a2a3a' : '#e8d8b0';
+                    ctx.fillRect(j*cellSize, i*cellSize, cellSize, cellSize);
+                    if(board[i][j]) {
+                        ctx.fillStyle = board[i][j].color === 'black' ? '#333' : '#cc4444';
+                        ctx.beginPath();
+                        ctx.arc(j*cellSize+cellSize/2, i*cellSize+cellSize/2, cellSize*0.35, 0, Math.PI*2);
+                        ctx.fill();
+                        if(board[i][j].king) {
+                            ctx.fillStyle = '#ffcc00';
+                            ctx.font = `bold ${cellSize*0.3}px Arial`;
+                            ctx.fillText('👑', j*cellSize+cellSize/2.5, i*cellSize+cellSize/1.8);
+                        }
+                    }
+                    if(selectedRow === i && selectedCol === j) {
+                        ctx.strokeStyle = '#7c5cff';
+                        ctx.lineWidth = 3;
+                        ctx.strokeRect(j*cellSize+2, i*cellSize+2, cellSize-4, cellSize-4);
+                    }
+                }
+            }
+        }
+        
+        function isValidMove(fromRow, fromCol, toRow, toCol) {
+            const piece = board[fromRow][fromCol];
+            if(!piece || piece.color !== turn) return false;
+            const dy = toRow - fromRow;
+            const dx = toCol - fromCol;
+            if(Math.abs(dx) !== 1 || Math.abs(dy) !== 1) {
+                if(Math.abs(dx) === 2 && Math.abs(dy) === 2) {
+                    const midRow = (fromRow + toRow)/2;
+                    const midCol = (fromCol + toCol)/2;
+                    const target = board[midRow][midCol];
+                    if(target && target.color !== turn) return true;
+                }
+                return false;
+            }
+            const dir = turn === 'black' ? 1 : -1;
+            if(!piece.king && dy !== dir) return false;
+            if(board[toRow][toCol]) return false;
+            return true;
+        }
+        
+        function movePiece(fromRow, fromCol, toRow, toCol) {
+            const piece = board[fromRow][fromCol];
+            if(Math.abs(toCol - fromCol) === 2) {
+                const midRow = (fromRow + toRow)/2;
+                const midCol = (fromCol + toCol)/2;
+                board[midRow][midCol] = null;
+            }
+            board[toRow][toCol] = piece;
+            board[fromRow][fromCol] = null;
+            if((turn === 'black' && toRow === SIZE-1) || (turn === 'red' && toRow === 0)) piece.king = true;
+            turn = turn === 'black' ? 'red' : 'black';
+            document.getElementById(`checkersTurn-${id}`).textContent = turn === 'black' ? '⚫ Black' : '🔴 Red';
+            selectedRow = null;
+            selectedCol = null;
+            drawBoard();
+            checkWin();
+        }
+        
+        function checkWin() {
+            let blackCount = 0, redCount = 0;
+            for(let i=0;i<SIZE;i++) {
+                for(let j=0;j<SIZE;j++) {
+                    if(board[i][j]?.color === 'black') blackCount++;
+                    if(board[i][j]?.color === 'red') redCount++;
+                }
+            }
+            if(blackCount === 0 || redCount === 0) {
+                gameOver = true;
+                const winner = blackCount === 0 ? 'Red' : 'Black';
+                document.getElementById(`checkersMessage-${id}`).innerHTML = `<span style="color:#4caf50;">🎉 ${winner} wins!</span>`;
+                if (window.showAchievement) window.showAchievement('Checkers Champion', 15);
+            }
+        }
+        
+        canvas.addEventListener('click', (e) => {
+            if(gameOver) return;
+            const rect = canvas.getBoundingClientRect();
+            const cellSize = canvas.width / SIZE;
+            const col = Math.floor((e.clientX - rect.left) / cellSize);
+            const row = Math.floor((e.clientY - rect.top) / cellSize);
+            if(selectedRow !== null && isValidMove(selectedRow, selectedCol, row, col)) {
+                movePiece(selectedRow, selectedCol, row, col);
+            } else if(board[row][col] && board[row][col].color === turn) {
+                selectedRow = row;
+                selectedCol = col;
+                drawBoard();
+            } else {
+                selectedRow = null;
+                selectedCol = null;
+                drawBoard();
+            }
+        });
+        
+        function resetGame() {
+            board = Array(SIZE).fill().map(() => Array(SIZE).fill(null));
+            initBoard();
+            turn = 'black';
+            selectedRow = null;
+            selectedCol = null;
+            gameOver = false;
+            document.getElementById(`checkersTurn-${id}`).textContent = '⚫ Black';
+            document.getElementById(`checkersMessage-${id}`).innerHTML = '';
+            drawBoard();
+        }
+        
+        document.getElementById(`resetCheckers-${id}`).onclick = resetGame;
+        resetGame();
+    };
+    
+    // ========== ROCK PAPER SCISSORS ==========
+    appFunctions.rockpaperscissors = function() {
+        const id = Date.now() + Math.random();
+        const win = document.createElement('div');
+        win.className = 'window';
+        win.style.cssText = `left:150px; top:100px; width:450px; height:450px;`;
+        win.innerHTML = `
+            <div class="window-header"><div class="window-title"><span>✊</span><span>Rock Paper Scissors</span></div><div class="window-controls"><button class="window-control minimize">─</button><button class="window-control maximize">□</button><button class="window-control close">✕</button></div></div>
+            <div class="window-content" style="text-align:center; display:flex; flex-direction:column; justify-content:center; gap:16px;">
+                <div style="font-size:20px;">Choose your move:</div>
+                <div style="display:flex; gap:20px; justify-content:center;">
+                    <button id="rockBtn-${id}" style="font-size:40px; padding:15px; background:rgba(255,255,255,0.1); border:none; border-radius:20px; cursor:pointer;">✊</button>
+                    <button id="paperBtn-${id}" style="font-size:40px; padding:15px; background:rgba(255,255,255,0.1); border:none; border-radius:20px; cursor:pointer;">📄</button>
+                    <button id="scissorsBtn-${id}" style="font-size:40px; padding:15px; background:rgba(255,255,255,0.1); border:none; border-radius:20px; cursor:pointer;">✂️</button>
+                </div>
+                <div id="rpsResult-${id}" style="background:rgba(0,0,0,0.3); padding:20px; border-radius:16px; min-height:100px;"></div>
+                <div>Score: You <span id="playerScore-${id}">0</span> - <span id="computerScore-${id}">0</span> Computer</div>
+                <button id="resetRps-${id}" style="padding:8px 20px; background:var(--accent); border:none; border-radius:30px; color:white; cursor:pointer;">Reset Score</button>
+            </div>
+        `;
+        document.body.appendChild(win);
+        if (window.windows) window.windows.push({ id: id, element: win, app: { id: 'rockpaperscissors', name: 'Rock Paper Scissors', icon: '✊' }, minimized: false, maximized: false });
+        if (window.focusWindow) window.focusWindow(id);
+        setupWindowEvents(win, id);
+        addResizeHandles(win, id);
+        if (window.updateTaskbar) window.updateTaskbar();
+        
+        let playerScore = 0, computerScore = 0;
+        const moves = { '✊': 'Rock', '📄': 'Paper', '✂️': 'Scissors' };
+        const emojiMap = { 'Rock': '✊', 'Paper': '📄', 'Scissors': '✂️' };
+        
+        function play(playerChoice) {
+            const choices = ['Rock', 'Paper', 'Scissors'];
+            const computerChoice = choices[Math.floor(Math.random() * 3)];
+            let result = '';
+            if(playerChoice === computerChoice) result = "It's a tie!";
+            else if((playerChoice === 'Rock' && computerChoice === 'Scissors') ||
+                    (playerChoice === 'Paper' && computerChoice === 'Rock') ||
+                    (playerChoice === 'Scissors' && computerChoice === 'Paper')) {
+                result = "You win!";
+                playerScore++;
+            } else {
+                result = "Computer wins!";
+                computerScore++;
+            }
+            document.getElementById(`rpsResult-${id}`).innerHTML = `
+                <div style="font-size:18px;">You chose ${emojiMap[playerChoice]} ${playerChoice}</div>
+                <div style="font-size:18px;">Computer chose ${emojiMap[computerChoice]} ${computerChoice}</div>
+                <div style="font-size:24px; margin-top:10px; color:${result === 'You win!' ? '#4caf50' : result === 'Computer wins!' ? '#ff5e5e' : '#ffcc00'};">${result}</div>
+            `;
+            document.getElementById(`playerScore-${id}`).textContent = playerScore;
+            document.getElementById(`computerScore-${id}`).textContent = computerScore;
+            if(playerScore >= 5) {
+                document.getElementById(`rpsResult-${id}`).innerHTML += '<div style="margin-top:10px; color:#4caf50;">🎉 You won the match!</div>';
+                if (window.showAchievement) window.showAchievement('RPS Champion', 10);
+                playerScore = 0; computerScore = 0;
+                document.getElementById(`playerScore-${id}`).textContent = 0;
+                document.getElementById(`computerScore-${id}`).textContent = 0;
+            } else if(computerScore >= 5) {
+                document.getElementById(`rpsResult-${id}`).innerHTML += '<div style="margin-top:10px; color:#ff5e5e;">😔 Computer won the match!</div>';
+                playerScore = 0; computerScore = 0;
+                document.getElementById(`playerScore-${id}`).textContent = 0;
+                document.getElementById(`computerScore-${id}`).textContent = 0;
+            }
+        }
+        
+        document.getElementById(`rockBtn-${id}`).onclick = () => play('Rock');
+        document.getElementById(`paperBtn-${id}`).onclick = () => play('Paper');
+        document.getElementById(`scissorsBtn-${id}`).onclick = () => play('Scissors');
+        document.getElementById(`resetRps-${id}`).onclick = () => { playerScore = 0; computerScore = 0; document.getElementById(`playerScore-${id}`).textContent = 0; document.getElementById(`computerScore-${id}`).textContent = 0; document.getElementById(`rpsResult-${id}`).innerHTML = '<div>Game reset!</div>'; };
+    };
+    
+    return appFunctions;
+};
+</script>
+</body>
+</html>
