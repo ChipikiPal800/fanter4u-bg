@@ -1,0 +1,156 @@
+{
+  "apps": [
+    {
+      "id": "gamehub",
+      "name": "Game Hub",
+      "icon": "🎮",
+      "iconUrl": "https://png.pngtree.com/png-clipart/20200224/original/pngtree-game-control-line-icon-vector-png-image_5209084.jpg",
+      "description": "Browse and play all your games in one place. Search, filter by category, and track your playtime.",
+      "creator": "abcatlmfao",
+      "category": "games",
+      "preinstalled": true
+    },
+    {
+      "id": "minesweeper",
+      "name": "Minesweeper",
+      "icon": "💣",
+      "iconUrl": "https://p1.hiclipart.com/preview/249/974/567/red-circle-minesweeper-minesweeper-deluxe-minesweeper-adfree-video-games-land-mine-naval-mine-android-png-clipart.jpg",
+      "description": "Classic grid-based puzzle game. Click cells to reveal numbers, flag mines, and clear the board without exploding!",
+      "creator": "abcatlmfao",
+      "category": "games",
+      "preinstalled": false
+    },
+    {
+      "id": "sudoku",
+      "name": "Sudoku",
+      "icon": "🔢",
+      "iconUrl": "https://t3.ftcdn.net/jpg/02/23/28/28/360_F_223282851_HP22kLC9EjTtN9dwNgQrrwrF5cL5xSF5.jpg",
+      "description": "Number puzzle game. Fill the 9x9 grid so that each column, row, and 3x3 box contains all digits from 1 to 9.",
+      "creator": "abcatlmfao",
+      "category": "games",
+      "preinstalled": false
+    },
+    {
+      "id": "solitaire",
+      "name": "Solitaire",
+      "icon": "🃏",
+      "iconUrl": "https://play-lh.googleusercontent.com/1ywLh7-1RvXuE40IcxXL3vU4LhdkcopUOxJrrZjRlyZX-b_4zgXd2Hc5EyyWwmfruns",
+      "description": "Classic card game. Build stacks of cards in descending order and alternating colors to win.",
+      "creator": "abcatlmfao",
+      "category": "games",
+      "preinstalled": false
+    },
+    {
+      "id": "tetris",
+      "name": "Tetris",
+      "icon": "🧩",
+      "iconUrl": "https://tetris.wiki/images/thumb/5/52/Tetris_%28N3TWORK%29_icon.png/220px-Tetris_%28N3TWORK%29_icon.png",
+      "description": "Classic falling blocks puzzle game. Arrange shapes to complete lines and clear the board.",
+      "creator": "abcatlmfao",
+      "category": "games",
+      "preinstalled": false
+    },
+    {
+      "id": "tictactoe",
+      "name": "Tic Tac Toe",
+      "icon": "❌",
+      "iconUrl": "https://as1.ftcdn.net/jpg/02/48/63/22/1000_F_248632274_5dA0OuezqyhpG5rTFp0g1taCRqAmtdSo.jpg",
+      "description": "Simple two-player game. Get three in a row to win!",
+      "creator": "abcatlmfao",
+      "category": "games",
+      "preinstalled": false
+    },
+    {
+      "id": "connectfour",
+      "name": "Connect Four",
+      "icon": "🔴",
+      "iconUrl": "https://m.media-amazon.com/images/I/71WIAdYrTiL.png",
+      "description": "Classic disc-dropping game. Connect four of your discs in a row horizontally, vertically, or diagonally.",
+      "creator": "abcatlmfao",
+      "category": "games",
+      "preinstalled": false
+    },
+    {
+      "id": "checkers",
+      "name": "Checkers",
+      "icon": "⚫",
+      "iconUrl": "https://p7.hiclipart.com/preview/327/19/604/formula-one-racing-flags-drapeau-xe0-damier-auto-racing-checkered-flag-icon.jpg",
+      "description": "Classic board game. Capture all of your opponent's pieces by jumping over them.",
+      "creator": "abcatlmfao",
+      "category": "games",
+      "preinstalled": false
+    },
+    {
+      "id": "rockpaperscissors",
+      "name": "Rock Paper Scissors",
+      "icon": "✊",
+      "iconUrl": "https://cdn-icons-png.flaticon.com/512/6793/6793733.png",
+      "description": "Classic hand game. Play against the computer and try to win!",
+      "creator": "abcatlmfao",
+      "category": "games",
+      "preinstalled": false
+    },
+    {
+      "id": "thefactory",
+      "name": "The Factory",
+      "icon": "🏭",
+      "iconUrl": "",
+      "description": "All-in-one generator for jokes, quotes, facts, poetry, random numbers, and URL encoding.",
+      "creator": "abcatlmfao",
+      "category": "tools",
+      "preinstalled": true
+    },
+    {
+      "id": "thestudio",
+      "name": "The Studio",
+      "icon": "🎨",
+      "iconUrl": "",
+      "description": "Creative suite with pixel art editor, photo editor (brightness/contrast), and color palette generator.",
+      "creator": "abcatlmfao",
+      "category": "creative",
+      "preinstalled": true
+    },
+    {
+      "id": "calculator",
+      "name": "Calculator",
+      "icon": "🧮",
+      "iconUrl": "https://png.pngtree.com/png-vector/20190115/ourmid/pngtree-vector-calculator-icon-png-image_319747.jpg",
+      "description": "Basic and scientific calculator. Switch between modes for different math operations.",
+      "creator": "abcatlmfao",
+      "category": "tools",
+      "preinstalled": true
+    },
+    {
+      "id": "weather",
+      "name": "Weather",
+      "icon": "🌤️",
+      "iconUrl": "",
+      "description": "Check current weather for any city. Uses real-time API data.",
+      "creator": "abcatlmfao",
+      "category": "tools",
+      "preinstalled": true
+    },
+    {
+      "id": "settings",
+      "name": "Settings",
+      "icon": "⚙️",
+      "iconUrl": "",
+      "description": "Customize your OS appearance and behavior.",
+      "creator": "abcatlmfao",
+      "category": "system",
+      "url": "settings.html",
+      "preinstalled": true
+    },
+    {
+      "id": "fanterstudios",
+      "name": "Fanter Studios",
+      "icon": "🎬",
+      "iconUrl": "",
+      "description": "Create your own games and apps with this visual editor.",
+      "creator": "abcatlmfao",
+      "category": "creative",
+      "url": "https://chipikipal800.github.io/fanter-studios/",
+      "preinstalled": false
+    }
+  ]
+}
