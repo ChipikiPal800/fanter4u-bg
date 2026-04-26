@@ -306,39 +306,47 @@ let currentUser = null;
 let achievements = JSON.parse(localStorage.getItem('fanter_achievements') || '{}');
 let resizeData = null;
 
-// All apps
 const APPS = [
+  // GAMES
   { id: 'gamehub', name: 'Game Hub', icon: '🎮', iconUrl: 'https://png.pngtree.com/png-clipart/20200224/original/pngtree-game-control-line-icon-vector-png-image_5209084.jpg', isBuiltin: true },
-  { id: 'emulators', name: 'Emulators', icon: '🕹️', iconUrl: '', isEmulator: true },
-  { id: 'flappybird', name: 'Flappy Bird', icon: '🐦', iconUrl: '', url: 'https://chipikipal800.github.io/flappy-bird-unblocked/', external: true },
-  { id: 'game2048', name: '2048', icon: '🔢', iconUrl: '', url: 'https://chipikipal800.github.io/2048/', external: true },
-  { id: 'memorymatch', name: 'Memory Match', icon: '🃏', url: 'https://chipikipal800.github.io/Memory-Game-fend/', external: true },
-  { id: 'wordle', name: 'Wordle', icon: '📝', url: 'https://chipikipal800.github.io/wordle-unlimited/', external: true },
-  { id: 'tramrush', name: 'Tram Rush', icon: '🐍', url: 'https://chipikipal800.github.io/Google_Snake_Game/', external: true },
-  { id: 'fanterstudios', name: 'Fanter Studios', icon: '🎬', url: 'https://chipikipal800.github.io/fanter-studios/', external: true },
-  { id: 'thefactory', name: 'The Factory', icon: '🏭', appType: 'factory' },
-  { id: 'thestudio', name: 'The Studio', icon: '🎨', appType: 'studio' },
-  { id: 'netspeed', name: 'Net Speed Test', icon: '📡', appType: 'netspeed' },
-  { id: 'iplookup', name: 'IP Lookup', icon: '🌐', appType: 'iplookup' },
-  { id: 'charCounter', name: 'Char Counter', icon: '🔤', appType: 'charCounter' },
-  { id: 'converter', name: 'Unit+Time Converter', icon: '➗', appType: 'converter' },
-  { id: 'chess', name: 'Chess', icon: '♟️', appType: 'chess' },
-  { id: 'battleship', name: 'Battleship', icon: '⛴️', appType: 'battleship' },
-  { id: 'hangman', name: 'Hangman', icon: '🪢', appType: 'hangman' },
-  { id: 'weather', name: 'Weather', icon: '🌤️', appType: 'weather' },
-  { id: 'calculator', name: 'Calculator', icon: '🧮', appType: 'calculator' },
-  { id: 'notes', name: 'Notes', icon: '📋', appType: 'notes' },
-  { id: 'timer', name: 'Timer', icon: '⏱️', appType: 'timer' },
-  { id: 'tasks', name: 'Tasks', icon: '✅', appType: 'tasks' },
-  { id: 'fortuneteller', name: 'Fortune Teller', icon: '🔮', appType: 'fortuneteller' },
-  { id: 'eightball', name: '8-Ball', icon: '🎱', appType: 'eightball' },
-  { id: 'whiteboard', name: 'Whiteboard', icon: '✏️', appType: 'whiteboard' },
-  { id: 'browser', name: 'Browser', icon: '🌐', appType: 'browser' },
-  { id: 'shop', name: 'Shop', icon: '🛒', url: 'shop.html' },
-  { id: 'settings', name: 'Settings', icon: '⚙️', url: 'settings.html' },
-  { id: 'fantarena', name: 'Fantarena', icon: '🏟️', url: 'fantarena.html' },
-  { id: 'account', name: 'Account', icon: '👤', url: 'fantaccount.html' },
-  { id: 'fanterclicker', name: 'Fanter Clicker', icon: '🍪', url: 'https://chipikipal800.github.io/Fanter-Clicker/', external: true }
+  { id: 'emulators', name: 'Emulators', icon: '🕹️', iconUrl: 'https://p7.hiclipart.com/preview/350/141/104/matsu-psx-emulator-multi-emu-playstation-super-nintendo-entertainment-system-game-boy-advance-emu.jpg', isEmulator: true },
+  { id: 'flappybird', name: 'Flappy Bird', icon: '🐦', iconUrl: 'https://somegadgetguy.com/wp-content/uploads/2014/02/flappy-bird-icon.jpg', url: 'https://chipikipal800.github.io/flappy-bird-unblocked/', external: true },
+  { id: 'game2048', name: '2048', icon: '🔢', iconUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4A1I1YQjuhK0X_ACucsDPgejmtgBCaLA1IQ&s', url: 'https://chipikipal800.github.io/2048/', external: true },
+  { id: 'memorymatch', name: 'Memory Match', icon: '🃏', iconUrl: '', url: 'https://chipikipal800.github.io/Memory-Game-fend/', external: true },
+  { id: 'wordle', name: 'Wordle', icon: '📝', iconUrl: 'https://static01.nyt.com/images/2022/03/02/crosswords/alpha-wordle-icon-new/alpha-wordle-icon-new-smallSquare252-v3.png', url: 'https://chipikipal800.github.io/wordle-unlimited/', external: true },
+  { id: 'tramrush', name: 'Tram Rush', icon: '🐍', iconUrl: 'https://www.usatoday.com/gcdn/presto/2019/04/01/USAT/9b5c7996-d594-4e96-9138-95a69b64a585-Google_Maps_Snake.png', url: 'https://chipikipal800.github.io/Google_Snake_Game/', external: true },
+  { id: 'chess', name: 'Chess', icon: '♟️', iconUrl: '', appType: 'chess' },
+  { id: 'battleship', name: 'Battleship', icon: '⛴️', iconUrl: '', appType: 'battleship' },
+  { id: 'hangman', name: 'Hangman', icon: '🪢', iconUrl: '', appType: 'hangman' },
+  
+  // CREATIVE
+  { id: 'thefactory', name: 'The Factory', icon: '🏭', iconUrl: '', appType: 'factory' },
+  { id: 'thestudio', name: 'The Studio', icon: '🎨', iconUrl: '', appType: 'studio' },
+  { id: 'whiteboard', name: 'Whiteboard', icon: '✏️', iconUrl: '', appType: 'whiteboard' },
+  
+  // TOOLS
+  { id: 'calculator', name: 'Calculator', icon: '🧮', iconUrl: 'https://png.pngtree.com/png-vector/20190115/ourmid/pngtree-vector-calculator-icon-png-image_319747.jpg', appType: 'calculator' },
+  { id: 'notes', name: 'Notes', icon: '📋', iconUrl: '', appType: 'notes' },
+  { id: 'timer', name: 'Timer', icon: '⏱️', iconUrl: '', appType: 'timer' },
+  { id: 'tasks', name: 'Tasks', icon: '✅', iconUrl: '', appType: 'tasks' },
+  { id: 'converter', name: 'Unit+Time Converter', icon: '➗', iconUrl: '', appType: 'converter' },
+  { id: 'netspeed', name: 'Net Speed Test', icon: '📡', iconUrl: '', appType: 'netspeed' },
+  { id: 'iplookup', name: 'IP Lookup', icon: '🌐', iconUrl: '', appType: 'iplookup' },
+  { id: 'charCounter', name: 'Char Counter', icon: '🔤', iconUrl: '', appType: 'charCounter' },
+  { id: 'weather', name: 'Weather', icon: '🌤️', iconUrl: '', appType: 'weather' },
+  { id: 'browser', name: 'Browser', icon: '🌐', iconUrl: '', appType: 'browser' },
+  
+  // FUN
+  { id: 'fortuneteller', name: 'Fortune Teller', icon: '🔮', iconUrl: '', appType: 'fortuneteller' },
+  { id: 'eightball', name: '8-Ball', icon: '🎱', iconUrl: '', appType: 'eightball' },
+  
+  // EXTERNAL LINKS
+  { id: 'fanterstudios', name: 'Fanter Studios', icon: '🎬', iconUrl: '', url: 'https://chipikipal800.github.io/fanter-studios/', external: true },
+  { id: 'fanterclicker', name: 'Fanter Clicker', icon: '🍪', iconUrl: '', url: 'https://chipikipal800.github.io/Fanter-Clicker/', external: true },
+  { id: 'shop', name: 'Shop', icon: '🛒', iconUrl: '', url: 'shop.html' },
+  { id: 'settings', name: 'Settings', icon: '⚙️', iconUrl: '', url: 'settings.html' },
+  { id: 'fantarena', name: 'Fantarena', icon: '🏟️', iconUrl: '', url: 'fantarena.html' },
+  { id: 'account', name: 'Account', icon: '👤', iconUrl: '', url: 'fantaccount.html' }
 ];
 
 const EMULATORS = [
@@ -360,7 +368,9 @@ const DESKTOP_ICONS_LEFT = [
 const DESKTOP_ICONS_RIGHT = [
   { id: 'gamehub', icon: '🎮', label: 'Game Hub' },
   { id: 'tramrush', icon: '🐍', label: 'Tram Rush' },
-  { id: 'wordle', icon: '📝', label: 'Wordle' }
+  { id: 'wordle', icon: '📝', label: 'Wordle' },
+  { id: 'chess', icon: '♟️', label: 'Chess' },
+  { id: 'calculator', icon: '🧮', label: 'Calc' }
 ];
 
 function showToast(msg) {
