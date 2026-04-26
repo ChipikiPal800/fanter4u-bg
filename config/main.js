@@ -1670,28 +1670,34 @@ applyStealth();
     }
 
     function launchApp(app) {
-        const existing = window.windows.find(w => w.app?.id === app.id);
-        if (existing) {
-            if (existing.minimized) toggleMinimize(existing.id);
-            focusWindow(existing.id);
-            return;
-        }
-        updateRecentApps(app.id, app.name, app.icon, app.id);
-        if (app.id === 'gamehub') createGameHubWindow();
-        else if (app.id === 'emulators') createEmulatorsWindow();
-        else if (app.id === 'appstore') createAppStoreWindow();
-        else if (app.id === 'calculator') createCalculatorWindow();
-        else if (app.id === 'thefactory') createFactoryWindow();
-        else if (app.id === 'thestudio') createStudioWindow();
-        else if (app.id === 'weather') createWeatherWindow();
-        else if (app.id === 'notes') createNotesWindow();
-        else if (app.id === 'timer') createTimerWindow();
-        else if (app.id === 'tasks') createTasksWindow();
-        else if (app.id === 'whiteboard') createWhiteboardWindow();
-        else if (app.url) createExternalWindow(app);
-        else showToast(`${app.name} coming soon!`);
-        playSound('click');
+    
+    if (app.id === 'stealth') {
+        createStealthWindow();
+        return;
     }
+    
+    const existing = window.windows.find(w => w.app?.id === app.id);
+    if (existing) {
+        if (existing.minimized) toggleMinimize(existing.id);
+        focusWindow(existing.id);
+        return;
+    }
+    updateRecentApps(app.id, app.name, app.icon, app.id);
+    if (app.id === 'gamehub') createGameHubWindow();
+    else if (app.id === 'emulators') createEmulatorsWindow();
+    else if (app.id === 'appstore') createAppStoreWindow();
+    else if (app.id === 'calculator') createCalculatorWindow();
+    else if (app.id === 'thefactory') createFactoryWindow();
+    else if (app.id === 'thestudio') createStudioWindow();
+    else if (app.id === 'weather') createWeatherWindow();
+    else if (app.id === 'notes') createNotesWindow();
+    else if (app.id === 'timer') createTimerWindow();
+    else if (app.id === 'tasks') createTasksWindow();
+    else if (app.id === 'whiteboard') createWhiteboardWindow();
+    else if (app.url) createExternalWindow(app);
+    else showToast(`${app.name} coming soon!`);
+    playSound('click');
+}
 
     // ===== START MENU =====
     function renderStartApps() {
