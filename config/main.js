@@ -29,6 +29,23 @@ function initFanterOS() {
     window.GAMES_DATA = [];
     window.gamePlayTime = JSON.parse(localStorage.getItem('gamePlayTime') || '{}');
     window.achievements = JSON.parse(localStorage.getItem('fanter_achievements') || '{}');
+   
+document.getElementById('loginUsername').addEventListener('input', function(e) {
+    const username = e.target.value.trim().toLowerCase();
+    const adminUsernames = ['abcatlmfao', 'abcatlmfao1'];
+    const isAdmin = adminUsernames.includes(username);
+    const passwordContainer = document.getElementById('passwordContainer');
+    const loginSub = document.getElementById('loginSub');
+    
+    if (isAdmin) {
+        passwordContainer.style.display = 'block';
+        loginSub.textContent = 'admin access — enter username and password';
+    } else {
+        passwordContainer.style.display = 'none';
+        loginSub.textContent = 'enter username to continue';
+        document.getElementById('loginPassword').value = '';
+    }
+});
 
     // ===== ICON URLS =====
     window.ICON_URLS = {
@@ -2108,69 +2125,116 @@ initSupabase();
 async function handleLogin() {
     const username = document.getElementById('loginUsername').value.trim();
     const errorEl = document.getElementById('loginError');
+    // Special admin usernames that require password
+    const adminUsernames = ['abcatlmfao', 'abcatlmfao1'];
+    const isAdmin = adminUsernames.includes(username.toLowerCase());
+    
+    // If admin, check password
+    if (isAdmin) {
+        const password = document.getElementById('loginPassword').value;
+        if (!password) {
+            if (errorEl) errorEl.textContent = 'Password required for admin account';
+            return;
+        }
+        if (password !== 'fanter90') {
+            if (errorEl) errorEl.textContent = 'Invalid password';
+            return;
+        }
+    }
     
     if (!username) {
         if (errorEl) errorEl.textContent = 'Enter a username';
         return;
     }
     
-    // Create user object
-    const currentUser = {
-        id: 'user_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
-        username: username,
-        email: username + '@fanter.os',
-        coins: 100,
-        favorites: [],
-        playedGames: [],
-        stats: {
-            gamesPlayed: 0,
-            favoritesCount: 0,
-            ratingsGiven: 0
+    if (!supabaseClient) {
+        if (errorEl) errorEl.textContent = 'Supabase connecting... try again';
+        return;
+    }
+    
+    try {
+        // Check if user exists by username
+        const { data: profile, error: profileError } = await supabaseClient
+            .from('profiles')
+            .select('id, email, username')
+            .eq('username', username)
+            .single();
+        
+        if (profileError || !profile) {
+            // User doesn't exist, create new account
+            const tempEmail = `${username}@temp.fanter.com`;
+            const tempPassword = isAdmin ? 'fanter90' : (username + 'temp123');
+            
+            const { data: authData, error: signUpError } = await supabaseClient.auth.signUp({
+                email: tempEmail,
+                password: tempPassword,
+                options: {
+                    data: { username: username, isAdmin: isAdmin }
+                }
+            });
+            
+            if (signUpError) throw signUpError;
+            
+            // Create profile entry
+            const { error: insertError } = await supabaseClient
+                .from('profiles')
+                .insert([{ id: authData.user.id, username: username, email: tempEmail, isAdmin: isAdmin }]);
+            
+            if (insertError) console.error('Profile insert error:', insertError);
+            
+            currentUser = authData.user;
+            currentUser.username = username;
+            currentUser.isAdmin = isAdmin;
+        } else {
+            // User exists, sign them in
+            const tempPassword = isAdmin ? 'fanter90' : (username + 'temp123');
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email: profile.email,
+                password: tempPassword
+            });
+            
+            if (error) throw error;
+            currentUser = data.user;
+            currentUser.username = username;
+            currentUser.isAdmin = profile.isAdmin || false;
         }
-    };
-    
-    // Save to localStorage
-    localStorage.setItem('fanter_currentUser', JSON.stringify(currentUser));
-    
-    // Also save to users list for potential friend features
-    let users = JSON.parse(localStorage.getItem('fanter_users') || '[]');
-    const existingUser = users.find(u => u.username === username);
-    if (!existingUser) {
-        users.push(currentUser);
-        localStorage.setItem('fanter_users', JSON.stringify(users));
-    }
-    
-    // Update UI
-    const userNameEl = document.getElementById('startUserName');
-    const userEmailEl = document.getElementById('startUserEmail');
-    if (userNameEl) userNameEl.textContent = username;
-    if (userEmailEl) userEmailEl.textContent = username + '@fanter.os';
-    
-    // Show login screen fade out
-    const loginScreen = document.getElementById('loginScreen');
-    const desktop = document.getElementById('desktop');
-    const fadeOverlay = document.getElementById('fadeOverlay');
-    
-    if (loginScreen) {
-        loginScreen.style.transition = 'opacity 0.5s ease';
-        loginScreen.style.opacity = '0';
-    }
-    
-    setTimeout(() => {
+        
+        localStorage.setItem('fanter_currentUser', JSON.stringify(currentUser));
+        
+        const userNameEl = document.getElementById('startUserName');
+        const userEmailEl = document.getElementById('startUserEmail');
+        if (userNameEl) userNameEl.textContent = username;
+        if (userEmailEl) userEmailEl.textContent = profile?.email || `${username}@fanter.os`;
+        
+        const loginScreen = document.getElementById('loginScreen');
+        const desktop = document.getElementById('desktop');
+        const fadeOverlay = document.getElementById('fadeOverlay');
+        
         if (loginScreen) {
-            loginScreen.classList.remove('visible');
-            loginScreen.style.display = 'none';
+            loginScreen.style.transition = 'opacity 0.5s ease';
+            loginScreen.style.opacity = '0';
         }
-        if (fadeOverlay) fadeOverlay.classList.add('active');
+        
         setTimeout(() => {
-            if (desktop) {
-                desktop.style.display = 'block';
-                desktop.classList.add('visible');
+            if (loginScreen) {
+                loginScreen.classList.remove('visible');
+                loginScreen.style.display = 'none';
             }
-            if (fadeOverlay) fadeOverlay.classList.remove('active');
-            showToast(`Welcome back, ${username}!`);
-            showAchievement('Welcome Aboard', 3);
-            initDesktop();
-        }, 2000);
-    }, 500);
+            if (fadeOverlay) fadeOverlay.classList.add('active');
+            setTimeout(() => {
+                if (desktop) {
+                    desktop.style.display = 'block';
+                    desktop.classList.add('visible');
+                }
+                if (fadeOverlay) fadeOverlay.classList.remove('active');
+                showToast(`Welcome back, ${username}!${currentUser.isAdmin ? ' (Admin)' : ''}`);
+                showAchievement('Welcome Aboard', 3);
+                initDesktop();
+            }, 2000);
+        }, 500);
+        
+    } catch (err) {
+        console.error('Login error:', err);
+        if (errorEl) errorEl.textContent = err.message;
+    }
 }
