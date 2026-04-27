@@ -12,6 +12,20 @@ const io = socketIO(server, {
     }
 });
 
+// ===== ROOT AND HEALTH ENDPOINTS =====
+app.get('/', (req, res) => {
+    res.json({ 
+        status: 'online',
+        service: 'fanterOS Netplay Server',
+        endpoints: ['/health', '/socket.io']
+    });
+});
+
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok', timestamp: Date.now() });
+});
+// ===== END ENDPOINTS =====
+
 // Store active rooms
 const rooms = new Map();
 
@@ -63,7 +77,7 @@ io.on('connection', (socket) => {
         console.log(`👤 ${playerName} joined room ${roomId}`);
     });
     
-    // WebRTC signaling (for video strem and controller inputs)
+    // WebRTC signaling (for video stream and controller inputs)
     socket.on('signal', ({ roomId, signal, to }) => {
         if (to) {
             io.to(to).emit('signal', { signal, from: socket.id });
@@ -140,7 +154,12 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(` 67
-   
+    console.log(`
+    ╔═══════════════════════════════════════╗
+    ║   🎮 FANTER NETPLAY SERVER 🎮        ║
+    ║                                       ║
+    ║   Running on port: ${PORT}            ║
+    ║   Ready for multiplayer retro gaming! ║
+    ╚═══════════════════════════════════════╝
     `);
 });
