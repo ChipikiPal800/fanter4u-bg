@@ -469,20 +469,6 @@ body {
   gap: 10px;
 }
 
-.taskbar-datetime {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  padding: 2px 6px;
-  cursor: pointer;
-  border-radius: 6px;
-  transition: var(--transition-fast);
-}
-
-.taskbar-datetime:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
 .taskbar-time {
   font-size: 11px;
   font-weight: 500;
@@ -493,7 +479,7 @@ body {
   color: var(--text-muted);
 }
 
-/* ===== RECENT APPS ROW ===== */
+
 .recent-apps-row {
   position: fixed;
   bottom: 52px;
@@ -1759,39 +1745,29 @@ input:checked + .slider:before {
     transform: translateY(-1px);
 }
 
-/* Bottom Right Clock */
-.bottom-clock {
-    position: fixed;
-    bottom: 12px;
-    right: 12px;
-    background: rgba(15, 15, 25, 0.85);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 12px;
-    padding: 6px 12px;
-    text-align: center;
+/* KEEP THIS - taskbar clock */
+.taskbar-clock {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
     font-family: 'Inter', monospace;
-    z-index: 100;
     cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
     transition: all 0.2s ease;
 }
 
-.bottom-clock:hover {
-    background: rgba(124, 92, 255, 0.2);
-    border-color: var(--accent);
-    transform: scale(1.02);
+.taskbar-clock:hover {
+    background: rgba(255, 255, 255, 0.1);
 }
 
-.bottom-clock #bottomClockTime {
-    font-size: 14px;
-    font-weight: 600;
+.taskbar-clock #taskbarTime {
+    font-size: 12px;
+    font-weight: 500;
     color: var(--text-primary);
-    display: block;
 }
 
-.bottom-clock #bottomClockDate {
+.taskbar-clock #taskbarDate {
     font-size: 9px;
     color: var(--text-muted);
-    display: block;
-    margin-top: 2px;
 }
