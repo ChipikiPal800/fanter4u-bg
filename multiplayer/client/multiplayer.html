@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplayer Arcade | fanterOS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="multiplayer.css">
+</head>
+<body>
+    <div class="multiplayer-container">
+        <div class="header">
+            <h1>🎮 MULTIPLAYER ARCADE 🎮</h1>
+            <p>Play retro games with friends online</p>
+        </div>
+        
+        <div class="main-content">
+            <!-- Active Games Section -->
+            <div class="active-games">
+                <h2>🟢 ACTIVE GAMES</h2>
+                <div id="roomsList" class="rooms-list">
+                    <div class="loading">Loading active games...</div>
+                </div>
+            </div>
+            
+            <!-- Host Game Section -->
+            <div class="host-game">
+                <h2>🎲 HOST A GAME</h2>
+                <select id="gameSelect" class="game-select">
+                    <option value="">Select a game...</option>
+                    <option value="Mario Party 3|n64|rom_mp3">🎲 Mario Party 3</option>
+                    <option value="Mario Kart 64|n64|rom_mk64">🏎️ Mario Kart 64</option>
+                    <option value="Super Smash Bros|n64|rom_ssb">👊 Super Smash Bros</option>
+                    <option value="Pokémon Stadium|n64|rom_ps">⚡ Pokémon Stadium</option>
+                    <option value="Diddy Kong Racing|n64|rom_dkr">🏁 Diddy Kong Racing</option>
+                </select>
+                <button id="hostGameBtn" class="host-btn">🚀 HOST GAME</button>
+            </div>
+        </div>
+        
+        <!-- Join Game Modal -->
+        <div id="joinModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>🔗 JOIN GAME</h2>
+                <input type="text" id="roomCodeInput" placeholder="Enter room code (e.g., ABC123)">
+                <button id="confirmJoinBtn" class="join-btn">JOIN</button>
+            </div>
+        </div>
+        
+        <!-- Status -->
+        <div id="status" class="status"></div>
+    </div>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="multiplayer.js"></script>
+</body>
+</html>
