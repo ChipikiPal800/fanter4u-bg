@@ -30,22 +30,7 @@ function initFanterOS() {
     window.gamePlayTime = JSON.parse(localStorage.getItem('gamePlayTime') || '{}');
     window.achievements = JSON.parse(localStorage.getItem('fanter_achievements') || '{}');
    
-document.getElementById('loginUsername').addEventListener('input', function(e) {
-    const username = e.target.value.trim().toLowerCase();
-    const adminUsernames = ['abcatlmfao', 'abcatlmfao1'];
-    const isAdmin = adminUsernames.includes(username);
-    const passwordContainer = document.getElementById('passwordContainer');
-    const loginSub = document.getElementById('loginSub');
-    
-    if (isAdmin) {
-        passwordContainer.style.display = 'block';
-        loginSub.textContent = 'admin access — enter username and password';
-    } else {
-        passwordContainer.style.display = 'none';
-        loginSub.textContent = 'enter username to continue';
-        document.getElementById('loginPassword').value = '';
-    }
-});
+
 
     // ===== ICON URLS =====
     window.ICON_URLS = {
@@ -108,6 +93,8 @@ document.getElementById('loginUsername').addEventListener('input', function(e) {
     ];
 
     window.installedApps = JSON.parse(localStorage.getItem('installedApps') || '[]');
+
+    
 
     // ===== HELPER FUNCTIONS =====
     function showToast(msg) {
@@ -1547,7 +1534,7 @@ document.addEventListener('visibilitychange', () => {
 
 // Initialize stealth on page load
 saveOriginalIdentity();
-applyStealth();
+
 
     function createWhiteboardWindow() {
         const id = window.nextWindowId++;
@@ -1924,6 +1911,30 @@ applyStealth();
             });
         });
     }
+
+    
+const loginUsername = document.getElementById('loginUsername');
+if (loginUsername) {
+    loginUsername.addEventListener('input', function(e) {
+        const username = e.target.value.trim().toLowerCase();
+        const adminUsernames = ['abcatlmfao', 'abcatlmfao1'];
+        const isAdmin = adminUsernames.includes(username);
+        const passwordContainer = document.getElementById('passwordContainer');
+        const loginSub = document.getElementById('loginSub');
+        
+        if (passwordContainer) {
+            if (isAdmin) {
+                passwordContainer.style.display = 'block';
+                if (loginSub) loginSub.textContent = 'admin access — enter username and password';
+            } else {
+                passwordContainer.style.display = 'none';
+                if (loginSub) loginSub.textContent = 'enter username to continue';
+                const loginPassword = document.getElementById('loginPassword');
+                if (loginPassword) loginPassword.value = '';
+            }
+        }
+    });
+}
 
     // ===== INITIALIZE DESKTOP =====
     async function initDesktop() {
