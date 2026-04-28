@@ -17,9 +17,10 @@
             align-items: center;
             min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
         }
         .emulator-container {
-            width: 90vw;
+            width: 100%;
             max-width: 900px;
             background: #1a1a2e;
             border-radius: 16px;
@@ -32,10 +33,12 @@
             color: #ffcc66;
         }
         #gameCanvas {
-            width: 100%;
+            width: 100% !important;
+            height: auto !important;
             background: #000;
             border-radius: 8px;
             aspect-ratio: 4/3;
+            display: block !important;
         }
         .status {
             text-align: center;
@@ -49,6 +52,11 @@
             color: #888;
             font-size: 11px;
         }
+        /* Force EmulatorJS menu to be visible */
+        .ejs_menu_bar, .ejs_control_bar, [class*="ejs_"] {
+            display: block !important;
+            visibility: visible !important;
+        }
     </style>
 </head>
 <body>
@@ -56,7 +64,7 @@
         <div class="emulator-header">
             <h2>🎮 Aladdin (GBA)</h2>
         </div>
-        <canvas id="gameCanvas"></canvas>
+        <canvas id="gameCanvas" width="800" height="600" style="width:800px;height:600px;"></canvas>
         <div class="status" id="status">Loading emulator...</div>
         <div class="controls-info">
             Controls: Arrow Keys | Z = A | X = B | A = L | S = R | Enter = Start
@@ -64,16 +72,14 @@
     </div>
 
     <script>
-        // Your ROM URL
         const ROM_URL = 'https://chipikipal800.github.io/MKGBA2.0/Binaries/aladdin.gba';
         
-        // Clean up any existing emulator
+        // Clean up
         if (window.EJS_emulator) {
             try { window.EJS_emulator.destroy(); } catch(e) {}
             window.EJS_emulator = null;
         }
         
-        // Remove any existing EmulatorJS scripts
         const existingScripts = document.querySelectorAll('script[src*="emulatorjs"]');
         existingScripts.forEach(script => script.remove());
         
@@ -84,14 +90,19 @@
         window.EJS_gameUrl = ROM_URL;
         window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
         
-        // Critical fixes for black screen and menu
+        // Critical fixes
         window.EJS_DEBUG_XX = true;
         window.EJS_ignoreGamepad = true;
         window.EJS_WebGL2 = false;
         window.EJS_recanvas = true;
         window.EJS_video = 'webgl1';
+        window.EJS_software = false;
         
-        // Keep all controls visible
+        // Audio settings
+        window.EJS_audio_sampling_rate = 44100;
+        window.EJS_audio_latency = 256;
+        
+        // Force menu visibility
         window.EJS_buttons = {
             playPause: true,
             restart: true,
@@ -104,23 +115,27 @@
         
         window.EJS_startOnLoaded = true;
         
-        // Load EmulatorJS
+        // Force canvas size
+        window.EJS_canvas_size = [800, 600];
+        
         const script = document.createElement('script');
         script.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
         script.onload = () => {
             const statusEl = document.getElementById('status');
-            statusEl.textContent = 'Emulator loaded! Game should start...';
+            statusEl.textContent = '✅ Emulator loaded! Game should be visible.';
             statusEl.style.color = '#4cd964';
             
-            // Check if menu appeared
+            // Force canvas redraw after 2 seconds
             setTimeout(() => {
-                const menuBar = document.querySelector('.ejs_menu_bar, .ejs_control_bar, [class*="menu"]');
-                if (menuBar) {
-                    statusEl.textContent = '✅ Game running! Menu should be visible at bottom.';
-                } else {
-                    statusEl.textContent = '⚠️ Game running but menu may be hidden. Try clicking on the canvas.';
+                const canvas = document.getElementById('gameCanvas');
+                if (canvas) {
+                    const ctx = canvas.getContext('2d');
+                    if (ctx) {
+                        ctx.fillStyle = '#000';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    }
                 }
-            }, 3000);
+            }, 2000);
         };
         script.onerror = () => {
             const statusEl = document.getElementById('status');
@@ -129,7 +144,7 @@
         };
         document.body.appendChild(script);
         
-        // Also try to load styles manually
+        // Load CSS
         const link = document.createElement('link');
         link.rel = 'stylesheet';
         link.href = 'https://cdn.emulatorjs.org/stable/data/emulator.min.css';
