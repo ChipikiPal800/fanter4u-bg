@@ -2,110 +2,61 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Emulator Test - Working</title>
+    <title>Emulator Test - Aladdin GBA</title>
     <style>
         body { background: #0a0a0f; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: monospace; color: white; }
         .container { text-align: center; }
         canvas { border: 2px solid #7c5cff; border-radius: 12px; background: #000; width: 640px; height: 480px; }
         .status { margin-top: 10px; color: #4cd964; }
         .error { color: #ff5e5e; }
-        button { background: #7c5cff; border: none; padding: 10px 20px; color: white; margin-top: 20px; cursor: pointer; border-radius: 8px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>EmulatorJS Test (Working ROM)</h2>
+        <h2>Testing Aladdin GBA</h2>
         <canvas id="gameCanvas"></canvas>
-        <div class="status" id="status">Initializing...</div>
-        <button onclick="loadROM()">Load ROM</button>
+        <div class="status" id="status">Loading emulator...</div>
     </div>
 
     <script>
-        // Working ROM URL (direct download from a known good source)
-        // This is a small GBA ROM that definitely works
-        const TEST_ROM_URL = 'https://chipikipal800.github.io/MKGBA2.0/Binaries/aladdin.gba';
+        // Your working ROM URL
+        const ROM_URL = 'https://chipikipal800.github.io/MKGBA2.0/Binaries/aladdin.gba';
         
-        // Fallback ROM if the above doesn't work
-        const FALLBACK_ROM = 'https://raw.githubusercontent.com/libretro/libretro-test-roms/master/gba/SonicAdvance.gba';
-        
+        // Configure EmulatorJS - Set startOnLoaded to true so it auto-starts
         window.EJS_player = '#gameCanvas';
         window.EJS_core = 'gba';
-        window.EJS_gameName = 'Test Game';
-        window.EJS_gameUrl = TEST_ROM_URL;
+        window.EJS_gameName = 'Aladdin';
+        window.EJS_gameUrl = ROM_URL;
         window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
         window.EJS_DEBUG_XX = true;
         window.EJS_ignoreGamepad = true;
         window.EJS_WebGL2 = false;
         window.EJS_recanvas = true;
         window.EJS_video = 'webgl1';
-        window.EJS_startOnLoaded = false;  // Don't auto-start
+        window.EJS_startOnLoaded = true;  // CRITICAL: Auto-start the game
         window.EJS_defaultOptions = { 'virtual-gamepad': true };
         
-        let romLoaded = false;
+        // Remove any existing script and load fresh
+        const oldScript = document.querySelector('script[src*="emulatorjs"]');
+        if (oldScript) oldScript.remove();
         
-        function loadROM() {
-            const statusEl = document.getElementById('status');
-            statusEl.textContent = 'Loading ROM...';
-            
-            // Try the main ROM first
-            fetch(TEST_ROM_URL)
-                .then(response => {
-                    if (!response.ok) throw new Error('Main ROM failed, trying fallback');
-                    return response.blob();
-                })
-                .then(blob => {
-                    const url = URL.createObjectURL(blob);
-                    if (window.EJS_emulator && window.EJS_emulator.gameManager) {
-                        // Use setROM instead of loadROM if available
-                        if (window.EJS_emulator.gameManager.setROM) {
-                            window.EJS_emulator.gameManager.setROM(url);
-                        } else if (window.EJS_emulator.gameManager.loadROM) {
-                            window.EJS_emulator.gameManager.loadROM(url);
-                        } else {
-                            // Fallback: recreate emulator with new URL
-                            window.EJS_gameUrl = url;
-                            location.reload();
-                            return;
-                        }
-                        
-                        setTimeout(() => {
-                            if (window.EJS_emulator.gameManager.start) {
-                                window.EJS_emulator.gameManager.start();
-                            }
-                            statusEl.textContent = '✅ Game loaded! Should be running.';
-                            statusEl.className = 'status';
-                            romLoaded = true;
-                        }, 1000);
-                    } else {
-                        statusEl.textContent = 'Emulator not ready yet!';
-                        statusEl.className = 'error';
-                    }
-                })
-                .catch(err => {
-                    console.error('ROM fetch error:', err);
-                    statusEl.textContent = 'ROM fetch failed: ' + err.message;
-                    statusEl.className = 'error';
-                });
-        }
-        
-        // Load EmulatorJS
         const script = document.createElement('script');
         script.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
         script.onload = () => {
             const statusEl = document.getElementById('status');
-            statusEl.textContent = 'Emulator loaded, waiting...';
+            statusEl.textContent = 'Emulator loaded, starting game...';
             
+            // Check if emulator is ready
             let attempts = 0;
             const checkInterval = setInterval(() => {
                 attempts++;
                 if (window.EJS_emulator && window.EJS_emulator.gameManager) {
                     clearInterval(checkInterval);
-                    statusEl.textContent = '✅ Emulator ready! Click "Load ROM"';
-                    statusEl.className = 'status';
-                    console.log('Emulator ready, gameManager methods:', Object.keys(window.EJS_emulator.gameManager));
+                    statusEl.textContent = '✅ Game should be running!';
+                    console.log('Emulator ready, game should start automatically');
                 } else if (attempts > 60) {
                     clearInterval(checkInterval);
-                    statusEl.textContent = '❌ Emulator not ready - try refreshing';
+                    statusEl.textContent = '⚠️ Emulator loaded but game not starting - check console';
                     statusEl.className = 'error';
                 }
             }, 500);
