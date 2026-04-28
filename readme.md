@@ -86,13 +86,13 @@ definitely others, im sorry i forgot your username. also, im pretty sure all of 
 
 if you use fanteros, please star the repo. it actually helps a lot.
 
-=============================================================================
+============================================================================
 
 license
 
 fanteros is open source under the mit license. you can fork it, modify it, host your own copy, whatever you want. just don't sell it.
 
-=============================================================================
+============================================================================
 
 you can probably tell i like equal signs :)
 
