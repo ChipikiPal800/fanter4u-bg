@@ -1,5 +1,5 @@
 // multiplayer/client/multiplayer.js
-const NETPLAY_SERVER = 'https://fanter-netplay.containers.snapdeploy.dev';
+const NETPLAY_SERVER = 'https://fanter-netplay.onrender.com/';
 
 let socket = null;
 let currentUser = JSON.parse(localStorage.getItem('fanter_currentUser') || '{"username":"Guest"}');
