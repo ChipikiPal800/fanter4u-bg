@@ -5,7 +5,6 @@ let socket = null;
 let currentUser = JSON.parse(localStorage.getItem('fanter_currentUser') || '{"username":"Guest"}');
 let currentRoomId = null;
 
-// Initialize socket connection
 function initSocket() {
     socket = io(NETPLAY_SERVER, {
         transports: ['websocket', 'polling']
@@ -28,7 +27,6 @@ function initSocket() {
         showStatus(`🎮 Room created! Code: ${roomId}`, '#ffcc66');
         currentRoomId = roomId;
         
-        // Get selected game info
         const gameSelect = document.getElementById('gameSelect');
         const selectedValue = gameSelect.value;
         
@@ -39,7 +37,6 @@ function initSocket() {
         
         const [gameName, gameCore, romUrl] = selectedValue.split('|');
         
-        // Open game window as HOST
         const gameWindow = window.open(`play.html?host=true&room=${roomId}&game=${encodeURIComponent(gameName)}&core=${gameCore}&rom=${encodeURIComponent(romUrl)}`, '_blank');
         
         if (!gameWindow) {
@@ -51,7 +48,6 @@ function initSocket() {
         showStatus(`✅ Joined ${gameName} hosted by ${hostName}`, '#4cd964');
         currentRoomId = roomId;
         
-        // Open game window as GUEST
         const gameWindow = window.open(`play.html?host=false&room=${roomId}&game=${encodeURIComponent(gameName)}&core=${gameCore}&rom=${encodeURIComponent(romId)}`, '_blank');
         
         if (!gameWindow) {
@@ -89,7 +85,6 @@ function initSocket() {
     });
 }
 
-// Display active rooms
 function displayRooms(rooms) {
     const container = document.getElementById('roomsList');
     
@@ -107,7 +102,6 @@ function displayRooms(rooms) {
     `).join('');
 }
 
-// Host a game
 function hostGame() {
     const gameSelect = document.getElementById('gameSelect');
     const selection = gameSelect.value;
@@ -132,7 +126,6 @@ function hostGame() {
     });
 }
 
-// Join a room by ID
 function joinRoom(roomId) {
     if (!socket || !socket.connected) {
         showStatus('❌ Not connected to server', '#ff5e5e');
@@ -145,13 +138,11 @@ function joinRoom(roomId) {
     });
 }
 
-// Show join modal
 function showJoinModal() {
     document.getElementById('joinModal').classList.add('show');
     document.getElementById('roomCodeInput').focus();
 }
 
-// Confirm join from modal
 function confirmJoin() {
     const roomCode = document.getElementById('roomCodeInput').value.trim().toUpperCase();
     if (roomCode) {
@@ -162,14 +153,11 @@ function confirmJoin() {
     }
 }
 
-// Share room code
 function shareRoomCode() {
     if (!currentRoomId) {
         showStatus('❌ No active room to share', '#ff5e5e');
         return;
     }
-    
-    const shareText = `🎮 Join my game on fanterOS!\nRoom Code: ${currentRoomId}\n${window.location.href}`;
     
     if (navigator.share) {
         navigator.share({
@@ -184,7 +172,6 @@ function shareRoomCode() {
     }
 }
 
-// Show status message
 function showStatus(message, color = '#a0a0c0') {
     const statusEl = document.getElementById('status');
     statusEl.innerHTML = message;
@@ -196,14 +183,12 @@ function showStatus(message, color = '#a0a0c0') {
     }, 4000);
 }
 
-// Refresh rooms list
 function refreshRooms() {
     if (socket && socket.connected) {
         socket.emit('get-rooms');
     }
 }
 
-// Escape HTML
 function escapeHtml(str) {
     if (!str) return '';
     return str.replace(/[&<>]/g, function(m) {
@@ -214,17 +199,13 @@ function escapeHtml(str) {
     });
 }
 
-// ===== GAME LIST - Updated with test GB ROM =====
+// ===== GAME LIST - Public ROMs for testing =====
 const gameList = [
-    { display: "🎮 Test Game Boy ROM", core: "gb", rom: "https://drive.usercontent.google.com/download?id=1Fz8tHIKaf0MCPEQQbZ2SFdhyU3cIfgRp&export=download" },
+    { display: "🎮 Test Game Boy (Public ROM)", core: "gb", rom: "https://raw.githubusercontent.com/ianatha/bgb-test-roms/master/tetris.gb" },
     { display: "🎲 Mario Party 3", core: "n64", rom: "https://drive.usercontent.google.com/download?id=YOUR_MP3_FILE_ID&export=download" },
     { display: "🏎️ Mario Kart 64", core: "n64", rom: "https://drive.usercontent.google.com/download?id=YOUR_MK64_FILE_ID&export=download" },
     { display: "👊 Super Smash Bros", core: "n64", rom: "https://drive.usercontent.google.com/download?id=YOUR_SSB_FILE_ID&export=download" },
-    { display: "⚡ Pokémon Stadium", core: "n64", rom: "https://drive.usercontent.google.com/download?id=YOUR_PS_FILE_ID&export=download" },
-    { display: "🏁 Diddy Kong Racing", core: "n64", rom: "https://drive.usercontent.google.com/download?id=YOUR_DKR_FILE_ID&export=download" },
-    { display: "⭐ Super Mario 64", core: "n64", rom: "https://drive.usercontent.google.com/download?id=YOUR_SM64_FILE_ID&export=download" },
-    { display: "🗡️ Zelda Ocarina of Time", core: "n64", rom: "https://drive.usercontent.google.com/download?id=YOUR_ZELDA_FILE_ID&export=download" },
-    { display: "🦊 Star Fox 64", core: "n64", rom: "https://drive.usercontent.google.com/download?id=YOUR_STARFOX_FILE_ID&export=download" }
+    { display: "⭐ Super Mario 64", core: "n64", rom: "https://drive.usercontent.google.com/download?id=YOUR_SM64_FILE_ID&export=download" }
 ];
 
 function populateGameSelect() {
@@ -241,11 +222,10 @@ function populateGameSelect() {
     });
 }
 
-// ===== EVENT LISTENERS =====
+// Event listeners
 document.getElementById('hostGameBtn').addEventListener('click', hostGame);
 document.getElementById('confirmJoinBtn').addEventListener('click', confirmJoin);
 
-// Close modal
 const closeBtn = document.querySelector('.close');
 if (closeBtn) {
     closeBtn.addEventListener('click', () => {
@@ -253,23 +233,19 @@ if (closeBtn) {
     });
 }
 
-// Click outside modal to close
 document.getElementById('joinModal').addEventListener('click', (e) => {
     if (e.target === document.getElementById('joinModal')) {
         document.getElementById('joinModal').classList.remove('show');
     }
 });
 
-// Enter key in room code input
 document.getElementById('roomCodeInput').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
         confirmJoin();
     }
 });
 
-// Auto-refresh rooms every 5 seconds
 setInterval(refreshRooms, 5000);
 
-// Initialize
 populateGameSelect();
 initSocket();
