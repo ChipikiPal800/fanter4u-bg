@@ -220,7 +220,7 @@ const gameList = [
     { display: "🎲 Mario Party 3", core: "n64", rom: "https://example.com/mario-party-3.n64" },
     { display: "🏎️ Mario Kart 64", core: "n64", rom: "https://chipikipal800.github.io/MarioKart64-1/" },
     { display: "👊 Super Smash Bros", core: "n64", rom: "https://example.com/smash-bros.n64" },
-    { display: "⚡ Pokémon Stadium", core: "n64", rom: "https://example.com/pokemon-stadium.n64" },
+    { display: "⚡ Pokémon Stadium", core: "n64", rom: "drive.usercontent.google.com/download?id=1TuKmXD8qWW9xQ2R3Tl-eaAHHUw2a9ox_&export=download" },
     { display: "🏁 Diddy Kong Racing", core: "n64", rom: "https://example.com/diddy-kong-racing.n64" },
     { display: "⭐ Super Mario 64", core: "n64", rom: "https://example.com/sm64.n64" },
     { display: "🗡️ Zelda Ocarina of Time", core: "n64", rom: "https://example.com/zelda-oot.n64" },
