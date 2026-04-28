@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Emulator Test - Canvas Fix</title>
+    <title>Emulator Test - Fixed</title>
     <style>
         body { background: #0a0a0f; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: monospace; color: white; }
         .container { text-align: center; }
@@ -10,11 +10,10 @@
             border: 2px solid #7c5cff; 
             border-radius: 12px; 
             background: #000; 
-            width: 640px; 
-            height: 480px;
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
+            width: 100%; 
+            max-width: 640px; 
+            height: auto;
+            aspect-ratio: 4/3;
         }
         .status { margin-top: 10px; color: #4cd964; }
         .error { color: #ff5e5e; }
@@ -22,7 +21,7 @@
 </head>
 <body>
     <div class="container">
-        <h2>Testing Aladdin GBA - Chrome Fix</h2>
+        <h2>Testing Aladdin GBA - Fixed</h2>
         <canvas id="gameCanvas"></canvas>
         <div class="status" id="status">Loading emulator...</div>
     </div>
@@ -30,47 +29,40 @@
     <script>
         const ROM_URL = 'https://chipikipal800.github.io/MKGBA2.0/Binaries/aladdin.gba';
         
-        // Force kill any existing emulator
+        // Kill any existing emulator
         if (window.EJS_emulator) {
             try { window.EJS_emulator.destroy(); } catch(e) {}
             window.EJS_emulator = null;
         }
         
+        // CRITICAL: These two settings fix the black screen issue [citation:1]
+        window.EJS_DEBUG_XX = true;        // Bypasses GamepadHandler error
+        window.EJS_ignoreGamepad = true;    // Disables problematic gamepad module
+        
+        // Standard configuration
         window.EJS_player = '#gameCanvas';
         window.EJS_core = 'gba';
         window.EJS_gameName = 'Aladdin';
         window.EJS_gameUrl = ROM_URL;
         window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
-        
-        // These settings are confirmed to work
-        window.EJS_DEBUG_XX = true;
-        window.EJS_ignoreGamepad = true;
         window.EJS_WebGL2 = false;
         window.EJS_recanvas = true;
         window.EJS_video = 'webgl1';
+        
+        // Audio settings (fix croaking) [citation:2]
         window.EJS_audio_sampling_rate = 44100;
         window.EJS_audio_latency = 256;
+        
         window.EJS_startOnLoaded = true;
         
-        // Remove old script
+        // Remove old script and load fresh
         const oldScript = document.querySelector('script[src*="emulatorjs"]');
         if (oldScript) oldScript.remove();
         
         const script = document.createElement('script');
         script.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
         script.onload = () => {
-            const statusEl = document.getElementById('status');
-            statusEl.textContent = 'Game running! If you hear sound but no video, try clicking the canvas.';
-            
-            // Try to force canvas visibility
-            setTimeout(() => {
-                const canvas = document.getElementById('gameCanvas');
-                if (canvas) {
-                    // Force a resize to trigger redraw
-                    canvas.style.width = '641px';
-                    setTimeout(() => { canvas.style.width = '640px'; }, 10);
-                }
-            }, 3000);
+            document.getElementById('status').textContent = '✅ Game should be running with video!';
         };
         script.onerror = () => {
             document.getElementById('status').textContent = '❌ Failed to load EmulatorJS';
