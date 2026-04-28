@@ -56,6 +56,10 @@ setInterval(() => {
 // ===== SOCKET.IO CONNECTION HANDLING =====
 io.on('connection', (socket) => {
     console.log('🎮 Player connected:', socket.id);
+
+    socket.on('ping', () => {
+        socket.emit('pong');
+        
     
     // Create a new game room
     socket.on('create-room', ({ gameName, playerName, gameCore, romId }) => {
