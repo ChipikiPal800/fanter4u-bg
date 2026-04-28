@@ -4,7 +4,7 @@ const http = require('http');
 const socketIO = require('socket.io');
 const path = require('path');
 
-// ===== CRITICAL: Use PORT from environment (SnapDeploy sets this) =====
+// ===== USE PORT FROM ENVIRONMENT (Render sets this) =====
 const PORT = process.env.PORT || 3000;
 
 const app = express();
@@ -45,7 +45,6 @@ const rooms = new Map();
 setInterval(() => {
     const now = Date.now();
     for (const [roomId, room] of rooms.entries()) {
-        // Delete rooms older than 1 hour
         if (now - room.createdAt > 3600000) {
             rooms.delete(roomId);
             console.log(`🧹 Cleaned up old room: ${roomId}`);
@@ -57,10 +56,11 @@ setInterval(() => {
 io.on('connection', (socket) => {
     console.log('🎮 Player connected:', socket.id);
 
+    // Ping/pong to keep connection alive
     socket.on('ping', () => {
         socket.emit('pong');
-        
-    
+    });
+
     // Create a new game room
     socket.on('create-room', ({ gameName, playerName, gameCore, romId }) => {
         try {
@@ -101,10 +101,8 @@ io.on('connection', (socket) => {
             room.players.push({ id: socket.id, name: playerName || 'Guest', isHost: false });
             rooms.set(roomId, room);
             
-            // Notify host that someone joined
             io.to(room.host).emit('player-joined', { playerName: playerName || 'Guest', playerId: socket.id });
             
-            // Send room info to joining player
             socket.emit('room-joined', { 
                 roomId, 
                 gameName: room.gameName,
@@ -115,7 +113,6 @@ io.on('connection', (socket) => {
                 isHost: false
             });
             
-            // Notify all players in room about player count update
             io.to(roomId).emit('room-update', { playerCount: room.players.length });
             
             console.log(`👤 ${playerName || 'Guest'} joined room ${roomId} (${room.players.length}/4 players)`);
@@ -164,7 +161,6 @@ io.on('connection', (socket) => {
                     io.to(roomId).emit('room-closed', { reason: wasHost ? 'Host left' : 'All players left' });
                 } else {
                     if (wasHost && room.players.length > 0) {
-                        // Transfer host to next player
                         const newHost = room.players[0];
                         room.host = newHost.id;
                         room.hostName = newHost.name;
@@ -204,7 +200,6 @@ io.on('connection', (socket) => {
     // Handle disconnect
     socket.on('disconnect', () => {
         console.log('🔌 Player disconnected:', socket.id);
-        // Clean up rooms where this socket was a player
         for (const [roomId, room] of rooms.entries()) {
             if (room.players.some(p => p.id === socket.id)) {
                 const wasHost = room.host === socket.id;
@@ -216,7 +211,6 @@ io.on('connection', (socket) => {
                     io.to(roomId).emit('room-closed', { reason: wasHost ? 'Host disconnected' : 'All players left' });
                 } else {
                     if (wasHost && room.players.length > 0) {
-                        // Transfer host to next player
                         const newHost = room.players[0];
                         room.host = newHost.id;
                         room.hostName = newHost.name;
@@ -238,7 +232,7 @@ server.listen(PORT, '0.0.0.0', () => {
     ║   🎮 FANTER NETPLAY SERVER 🎮        ║
     ║                                       ║
     ║   Running on port: ${PORT}            ║
-    ║   Ready for multiplyer retro gaming!  ║
+    ║   Ready for multiplayer retro gaming! ║
     ╚═══════════════════════════════════════╝
     `);
 });
