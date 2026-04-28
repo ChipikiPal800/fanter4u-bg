@@ -2,73 +2,138 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Emulator Test - Fixed</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>GBA Emulator - Aladdin</title>
     <style>
-        body { background: #0a0a0f; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: monospace; color: white; }
-        .container { text-align: center; }
-        canvas { 
-            border: 2px solid #7c5cff; 
-            border-radius: 12px; 
-            background: #000; 
-            width: 100%; 
-            max-width: 640px; 
-            height: auto;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0a0a0f;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .emulator-container {
+            width: 90vw;
+            max-width: 900px;
+            background: #1a1a2e;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .emulator-header {
+            text-align: center;
+            margin-bottom: 16px;
+            color: #ffcc66;
+        }
+        #gameCanvas {
+            width: 100%;
+            background: #000;
+            border-radius: 8px;
             aspect-ratio: 4/3;
         }
-        .status { margin-top: 10px; color: #4cd964; }
-        .error { color: #ff5e5e; }
+        .status {
+            text-align: center;
+            margin-top: 12px;
+            color: #4cd964;
+            font-size: 14px;
+        }
+        .controls-info {
+            text-align: center;
+            margin-top: 12px;
+            color: #888;
+            font-size: 11px;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Testing Aladdin GBA - Fixed</h2>
+    <div class="emulator-container">
+        <div class="emulator-header">
+            <h2>🎮 Aladdin (GBA)</h2>
+        </div>
         <canvas id="gameCanvas"></canvas>
         <div class="status" id="status">Loading emulator...</div>
+        <div class="controls-info">
+            Controls: Arrow Keys | Z = A | X = B | A = L | S = R | Enter = Start
+        </div>
     </div>
 
     <script>
+        // Your ROM URL
         const ROM_URL = 'https://chipikipal800.github.io/MKGBA2.0/Binaries/aladdin.gba';
         
-        // Kill any existing emulator
+        // Clean up any existing emulator
         if (window.EJS_emulator) {
             try { window.EJS_emulator.destroy(); } catch(e) {}
             window.EJS_emulator = null;
         }
         
-        // CRITICAL: These two settings fix the black screen issue [citation:1]
-        window.EJS_DEBUG_XX = true;        // Bypasses GamepadHandler error
-        window.EJS_ignoreGamepad = true;    // Disables problematic gamepad module
+        // Remove any existing EmulatorJS scripts
+        const existingScripts = document.querySelectorAll('script[src*="emulatorjs"]');
+        existingScripts.forEach(script => script.remove());
         
-        // Standard configuration
+        // Configure EmulatorJS
         window.EJS_player = '#gameCanvas';
         window.EJS_core = 'gba';
         window.EJS_gameName = 'Aladdin';
         window.EJS_gameUrl = ROM_URL;
         window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
+        
+        // Critical fixes for black screen and menu
+        window.EJS_DEBUG_XX = true;
+        window.EJS_ignoreGamepad = true;
         window.EJS_WebGL2 = false;
         window.EJS_recanvas = true;
         window.EJS_video = 'webgl1';
         
-        // Audio settings (fix croaking) [citation:2]
-        window.EJS_audio_sampling_rate = 44100;
-        window.EJS_audio_latency = 256;
+        // Keep all controls visible
+        window.EJS_buttons = {
+            playPause: true,
+            restart: true,
+            mute: true,
+            settings: true,
+            fullscreen: true,
+            saveState: true,
+            loadState: true
+        };
         
         window.EJS_startOnLoaded = true;
         
-        // Remove old script and load fresh
-        const oldScript = document.querySelector('script[src*="emulatorjs"]');
-        if (oldScript) oldScript.remove();
-        
+        // Load EmulatorJS
         const script = document.createElement('script');
         script.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
         script.onload = () => {
-            document.getElementById('status').textContent = '✅ Game should be running with video!';
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = 'Emulator loaded! Game should start...';
+            statusEl.style.color = '#4cd964';
+            
+            // Check if menu appeared
+            setTimeout(() => {
+                const menuBar = document.querySelector('.ejs_menu_bar, .ejs_control_bar, [class*="menu"]');
+                if (menuBar) {
+                    statusEl.textContent = '✅ Game running! Menu should be visible at bottom.';
+                } else {
+                    statusEl.textContent = '⚠️ Game running but menu may be hidden. Try clicking on the canvas.';
+                }
+            }, 3000);
         };
         script.onerror = () => {
-            document.getElementById('status').textContent = '❌ Failed to load EmulatorJS';
-            document.getElementById('status').className = 'error';
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = '❌ Failed to load EmulatorJS';
+            statusEl.style.color = '#ff5e5e';
         };
         document.body.appendChild(script);
+        
+        // Also try to load styles manually
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://cdn.emulatorjs.org/stable/data/emulator.min.css';
+        document.head.appendChild(link);
     </script>
 </body>
 </html>
