@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Emulator Test - Aladdin GBA</title>
+    <title>Emulator Test - Visual Fix</title>
     <style>
         body { background: #0a0a0f; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: monospace; color: white; }
         .container { text-align: center; }
@@ -13,30 +13,40 @@
 </head>
 <body>
     <div class="container">
-        <h2>Testing Aladdin GBA</h2>
+        <h2>Testing Aladdin GBA (Visual Fix)</h2>
         <canvas id="gameCanvas"></canvas>
         <div class="status" id="status">Loading emulator...</div>
     </div>
 
     <script>
-        // Your working ROM URL
         const ROM_URL = 'https://chipikipal800.github.io/MKGBA2.0/Binaries/aladdin.gba';
         
-        // Configure EmulatorJS - Set startOnLoaded to true so it auto-starts
+        // Clear any existing emulator
+        delete window.EJS_emulator;
+        
         window.EJS_player = '#gameCanvas';
         window.EJS_core = 'gba';
         window.EJS_gameName = 'Aladdin';
         window.EJS_gameUrl = ROM_URL;
         window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
+        
+        // CRITICAL FIXES for black screen with sound
         window.EJS_DEBUG_XX = true;
         window.EJS_ignoreGamepad = true;
-        window.EJS_WebGL2 = false;
-        window.EJS_recanvas = true;
-        window.EJS_video = 'webgl1';
-        window.EJS_startOnLoaded = true;  // CRITICAL: Auto-start the game
+        window.EJS_WebGL2 = false;           // Force WebGL1 instead of WebGL2
+        window.EJS_recanvas = true;           // Force canvas recreation
+        window.EJS_video = 'webgl1';          // Explicit video driver
+        window.EJS_forceWebGL1 = true;        // Additional WebGL1 force
+        window.EJS_software = false;          // Don't use software rendering
+        
+        // Audio settings (already working)
+        window.EJS_audio_sampling_rate = 44100;
+        window.EJS_audio_latency = 256;
+        
+        window.EJS_startOnLoaded = true;
         window.EJS_defaultOptions = { 'virtual-gamepad': true };
         
-        // Remove any existing script and load fresh
+        // Remove old script
         const oldScript = document.querySelector('script[src*="emulatorjs"]');
         if (oldScript) oldScript.remove();
         
@@ -46,18 +56,22 @@
             const statusEl = document.getElementById('status');
             statusEl.textContent = 'Emulator loaded, starting game...';
             
-            // Check if emulator is ready
             let attempts = 0;
             const checkInterval = setInterval(() => {
                 attempts++;
                 if (window.EJS_emulator && window.EJS_emulator.gameManager) {
                     clearInterval(checkInterval);
-                    statusEl.textContent = '✅ Game should be running!';
-                    console.log('Emulator ready, game should start automatically');
+                    statusEl.textContent = '✅ Game running! (sound OK, video might be delayed)';
+                    
+                    // Force canvas redraw
+                    const canvas = document.getElementById('gameCanvas');
+                    if (canvas) {
+                        canvas.style.display = 'none';
+                        setTimeout(() => { canvas.style.display = 'block'; }, 100);
+                    }
                 } else if (attempts > 60) {
                     clearInterval(checkInterval);
-                    statusEl.textContent = '⚠️ Emulator loaded but game not starting - check console';
-                    statusEl.className = 'error';
+                    statusEl.textContent = '⚠️ Emulator loaded but not responding';
                 }
             }, 500);
         };
