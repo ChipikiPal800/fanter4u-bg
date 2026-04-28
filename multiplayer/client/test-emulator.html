@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Emulator Test</title>
+    <style>
+        body { background: #0a0a0f; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: monospace; color: white; }
+        .container { text-align: center; }
+        canvas { border: 2px solid #7c5cff; border-radius: 12px; background: #000; width: 640px; height: 480px; }
+        button { background: #7c5cff; border: none; padding: 10px 20px; color: white; margin-top: 20px; cursor: pointer; border-radius: 8px; }
+        .status { margin-top: 10px; color: #4cd964; }
+        .error { color: #ff5e5e; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>EmulatorJS Test</h2>
+        <canvas id="gameCanvas"></canvas>
+        <div class="status" id="status">Initializing...</div>
+        <button onclick="loadROM()">Load ROM</button>
+    </div>
+
+    <script>
+        // Public test ROM that definitely works
+        const TEST_ROM_URL = 'https://raw.githubusercontent.com/ianatha/bgb-test-roms/master/tetris.gb';
+        
+        window.EJS_player = '#gameCanvas';
+        window.EJS_core = 'gb';
+        window.EJS_gameName = 'Tetris';
+        window.EJS_gameUrl = TEST_ROM_URL;
+        window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
+        window.EJS_DEBUG_XX = true;
+        window.EJS_ignoreGamepad = true;
+        window.EJS_WebGL2 = false;
+        window.EJS_recanvas = true;
+        window.EJS_video = 'webgl1';
+        window.EJS_startOnLoaded = true;
+        
+        let emulatorReady = false;
+        
+        function loadROM() {
+            if (emulatorReady && window.EJS_emulator && window.EJS_emulator.gameManager) {
+                document.getElementById('status').textContent = 'Loading ROM...';
+                if (window.EJS_emulator.gameManager.loadROM) {
+                    window.EJS_emulator.gameManager.loadROM(TEST_ROM_URL);
+                }
+                setTimeout(() => {
+                    if (window.EJS_emulator.gameManager.start) {
+                        window.EJS_emulator.gameManager.start();
+                    }
+                }, 1000);
+            } else {
+                document.getElementById('status').textContent = 'Emulator not ready yet! Wait a few seconds.';
+            }
+        }
+        
+        const script = document.createElement('script');
+        script.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
+        script.onload = () => {
+            document.getElementById('status').textContent = 'Emulator loaded, waiting for ready...';
+            let attempts = 0;
+            const checkInterval = setInterval(() => {
+                attempts++;
+                if (window.EJS_emulator && window.EJS_emulator.gameManager) {
+                    clearInterval(checkInterval);
+                    emulatorReady = true;
+                    document.getElementById('status').textContent = '✅ Emulator ready! Click "Load ROM"';
+                    document.getElementById('status').className = 'status';
+                } else if (attempts > 40) {
+                    clearInterval(checkInterval);
+                    document.getElementById('status').textContent = '❌ Emulator failed to initialize';
+                    document.getElementById('status').className = 'error';
+                }
+            }, 500);
+        };
+        script.onerror = () => {
+            document.getElementById('status').textContent = '❌ Failed to load EmulatorJS';
+            document.getElementById('status').className = 'error';
+        };
+        document.body.appendChild(script);
+    </script>
+</body>
+</html>
