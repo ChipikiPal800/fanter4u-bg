@@ -77,6 +77,12 @@
       <div class="battery-status" id="batteryStatus">--</div>
     </div>
   </div>
+  
+  
+  <div id="nobodyCaresBtn" style="position: fixed; bottom: 55px; right: 12px; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); border-radius: 40px; padding: 6px 14px; cursor: pointer; z-index: 9999; font-family: monospace; border: 1px solid rgba(255,100,100,0.3); transition: 0.05s linear;">
+    <span style="font-size: 12px; color: #ff8888;">click me</span>
+    <span id="nobodyCaresCount" style="background: #ff4444; color: white; border-radius: 20px; padding: 2px 8px; margin-left: 8px; font-size: 12px; font-weight: bold;">0</span>
+  </div>
 </div>
 
 <!-- Widgets Panel -->
@@ -244,6 +250,45 @@
 
 <!-- External JS - from /config folder -->
 <script src="config/main.js"></script>
+
+<!-- Nobody Cares Button Script -->
+<script>
+  (function() {
+    // Wait for DOM to be ready
+    function initNobodyCares() {
+      const btn = document.getElementById('nobodyCaresBtn');
+      const counterSpan = document.getElementById('nobodyCaresCount');
+      
+      if (!btn || !counterSpan) {
+        // Retry if elements not found
+        setTimeout(initNobodyCares, 100);
+        return;
+      }
+      
+      let count = localStorage.getItem('fanter_nobody_cares');
+      if (count === null) count = 0;
+      else count = parseInt(count, 10);
+      
+      counterSpan.innerText = count;
+      
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        count++;
+        counterSpan.innerText = count;
+        localStorage.setItem('fanter_nobody_cares', count);
+        
+        btn.style.transform = 'scale(0.95)';
+        setTimeout(() => { btn.style.transform = ''; }, 100);
+      });
+    }
+    
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initNobodyCares);
+    } else {
+      initNobodyCares();
+    }
+  })();
+</script>
 
 </body>
 </html>
