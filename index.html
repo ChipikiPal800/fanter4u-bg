@@ -290,5 +290,294 @@
   })();
 </script>
 
+  <!-- LUCID MODE - Desktop Dreams -->
+<script>
+(function() {
+  // Lucid Mode Configuration
+  let idleTime = 0;
+  let lucidActive = false;
+  let dreamCount = parseInt(localStorage.getItem('fanter_dream_count') || '0');
+  let dreamLog = JSON.parse(localStorage.getItem('fanter_dream_log') || '[]');
+  let idleTimer = null;
+  let lucidInterval = null;
+  let originalWallpaper = '';
+  let dreamWallpaperInterval = null;
+  
+  const IDLE_THRESHOLD = 300000; // 5 minutes in milliseconds
+  const DREAM_DURATION = 30000; // Dreams last 30 seconds
+  
+  // Get elements
+  const desktop = document.getElementById('desktop');
+  const desktopBg = document.getElementById('desktopBg');
+  const widgets = document.querySelectorAll('.widget');
+  const icons = document.querySelectorAll('.desktop-icons-left, .desktop-icons-right');
+  
+  // Save original wallpaper
+  function saveOriginalWallpaper() {
+    if (desktopBg) {
+      originalWallpaper = desktopBg.style.backgroundImage || '';
+    }
+  }
+  
+  // Enter Lucid Mode (The Dream)
+  function enterLucidMode() {
+    if (lucidActive) return;
+    lucidActive = true;
+    
+    // Log the dream
+    dreamCount++;
+    dreamLog.unshift({
+      timestamp: Date.now(),
+      date: new Date().toLocaleString()
+    });
+    if (dreamLog.length > 50) dreamLog.pop();
+    localStorage.setItem('fanter_dream_count', dreamCount);
+    localStorage.setItem('fanter_dream_log', JSON.stringify(dreamLog));
+    
+    // Show dream notification (subtle)
+    showDreamToast('💭 Lucid Mode...');
+    
+    // Apply dream effects
+    if (desktop) {
+      desktop.classList.add('lucid-mode');
+    }
+    
+    // Slow breathing color shift on wallpaper
+    if (desktopBg) {
+      let hue = 0;
+      dreamWallpaperInterval = setInterval(() => {
+        if (!lucidActive) return;
+        hue = (hue + 2) % 360;
+        desktopBg.style.filter = `hue-rotate(${hue}deg) brightness(1.1) saturate(0.9)`;
+      }, 200);
+    }
+    
+    // Float icons (add CSS animation)
+    const style = document.createElement('style');
+    style.id = 'lucidModeStyle';
+    style.textContent = `
+      .lucid-mode .desktop-icons-left i, 
+      .lucid-mode .desktop-icons-right i,
+      .lucid-mode .desktop-icon {
+        animation: floatIcon ${2 + Math.random() * 2}s infinite ease-in-out;
+      }
+      @keyframes floatIcon {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-8px); }
+      }
+      .lucid-mode .widget {
+        animation: widgetPulse 3s infinite ease-in-out;
+      }
+      @keyframes widgetPulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.8; transform: scale(1.02); }
+      }
+      .lucid-mode .taskbar {
+        animation: taskbarGlitch 4s infinite;
+      }
+      @keyframes taskbarGlitch {
+        0%, 90%, 100% { filter: none; }
+        92% { filter: hue-rotate(10deg) brightness(1.2); transform: skewX(-2deg); }
+        95% { filter: hue-rotate(-10deg) brightness(0.9); transform: skewX(2deg); }
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // Random glitch effects on widgets
+    lucidInterval = setInterval(() => {
+      if (!lucidActive) return;
+      
+      // Random widget glitch
+      if (widgets.length > 0 && Math.random() > 0.7) {
+        const randomWidget = widgets[Math.floor(Math.random() * widgets.length)];
+        randomWidget.style.transform = `translate(${Math.random() * 4 - 2}px, ${Math.random() * 4 - 2}px)`;
+        randomWidget.style.opacity = '0.9';
+        setTimeout(() => {
+          if (randomWidget) {
+            randomWidget.style.transform = '';
+            randomWidget.style.opacity = '';
+          }
+        }, 100);
+      }
+      
+      // Time widget shows random numbers briefly
+      const widgetTime = document.getElementById('widgetTime');
+      if (widgetTime && Math.random() > 0.9) {
+        const originalTime = widgetTime.innerText;
+        widgetTime.innerText = Math.floor(Math.random() * 24) + ':' + Math.floor(Math.random() * 60);
+        setTimeout(() => {
+          if (widgetTime) widgetTime.innerText = originalTime;
+        }, 500);
+      }
+    }, 3000);
+    
+    // End dream after DREAM_DURATION
+    setTimeout(() => {
+      exitLucidMode();
+    }, DREAM_DURATION);
+  }
+  
+  // Exit Lucid Mode
+  function exitLucidMode() {
+    if (!lucidActive) return;
+    lucidActive = false;
+    
+    // Remove effects
+    if (desktop) {
+      desktop.classList.remove('lucid-mode');
+    }
+    
+    if (dreamWallpaperInterval) {
+      clearInterval(dreamWallpaperInterval);
+      dreamWallpaperInterval = null;
+    }
+    
+    if (lucidInterval) {
+      clearInterval(lucidInterval);
+      lucidInterval = null;
+    }
+    
+    // Reset wallpaper
+    if (desktopBg) {
+      desktopBg.style.filter = '';
+      desktopBg.style.backgroundImage = originalWallpaper;
+    }
+    
+    // Remove glitch styles
+    const style = document.getElementById('lucidModeStyle');
+    if (style) style.remove();
+    
+    // Reset all elements
+    widgets.forEach(w => {
+      w.style.transform = '';
+      w.style.opacity = '';
+    });
+    
+    icons.forEach(icon => {
+      if (icon.children) {
+        Array.from(icon.children).forEach(child => {
+          if (child.style) child.style.transform = '';
+        });
+      }
+    });
+    
+    showDreamToast('✨ You awake...');
+    
+    // Check for dream unlocks
+    checkDreamUnlocks();
+  }
+  
+  // Dream counter and unlocks
+  function checkDreamUnlocks() {
+    if (dreamCount === 10 && !localStorage.getItem('dream_wallpaper_unlocked')) {
+      localStorage.setItem('dream_wallpaper_unlocked', 'true');
+      showDreamToast('🏆 Unlocked: The Dreamer Wallpaper!', 5000);
+    }
+    
+    if (dreamCount === 50 && !localStorage.getItem('dream_counter_unlocked')) {
+      localStorage.setItem('dream_counter_unlocked', 'true');
+      showDreamToast('🌙 Unlocked: Dream Counter Widget!', 5000);
+      // Add dream counter to widgets if you have a widget system
+      addDreamCounterWidget();
+    }
+  }
+  
+  function addDreamCounterWidget() {
+    const widgetsContainer = document.getElementById('desktopWidgets');
+    if (widgetsContainer && !document.getElementById('dreamCounterWidget')) {
+      const dreamWidget = document.createElement('div');
+      dreamWidget.id = 'dreamCounterWidget';
+      dreamWidget.className = 'widget';
+      dreamWidget.innerHTML = `
+        <div class="widget-title">💭 DREAMS</div>
+        <div style="font-size: 24px; font-weight: bold;">${dreamCount}</div>
+        <div style="font-size: 10px;">lucid moments</div>
+      `;
+      widgetsContainer.appendChild(dreamWidget);
+    }
+  }
+  
+  function showDreamToast(message, duration = 2000) {
+    let toast = document.getElementById('dreamToast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'dreamToast';
+      toast.style.cssText = `
+        position: fixed;
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.8);
+        backdrop-filter: blur(10px);
+        color: #b0e0ff;
+        padding: 8px 20px;
+        border-radius: 40px;
+        font-family: monospace;
+        font-size: 14px;
+        z-index: 10000;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s;
+        border: 1px solid rgba(100,150,200,0.3);
+      `;
+      document.body.appendChild(toast);
+    }
+    
+    toast.innerText = message;
+    toast.style.opacity = '1';
+    setTimeout(() => {
+      toast.style.opacity = '0';
+    }, duration);
+  }
+  
+  // Idle detection
+  function resetIdleTimer() {
+    if (lucidActive) return;
+    idleTime = 0;
+    if (idleTimer) {
+      clearTimeout(idleTimer);
+    }
+    idleTimer = setTimeout(() => {
+      if (!lucidActive && idleTime === 0) {
+        idleTime = 1;
+        enterLucidMode();
+      }
+    }, IDLE_THRESHOLD);
+  }
+  
+  // Track user activity
+  const events = ['mousemove', 'click', 'keydown', 'scroll', 'touchstart'];
+  events.forEach(event => {
+    document.addEventListener(event, resetIdleTimer);
+  });
+  
+  // Initialize
+  saveOriginalWallpaper();
+  resetIdleTimer();
+  
+  // If dream counter already unlocked, add it on load
+  if (localStorage.getItem('dream_counter_unlocked') === 'true') {
+    setTimeout(addDreamCounterWidget, 1000);
+  }
+  
+  // Manual trigger for testing (press D three times)
+  let dPressCount = 0;
+  let dPressTimer;
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'd' || e.key === 'D') {
+      dPressCount++;
+      if (dPressTimer) clearTimeout(dPressTimer);
+      dPressTimer = setTimeout(() => { dPressCount = 0; }, 1000);
+      
+      if (dPressCount === 3) {
+        dPressCount = 0;
+        enterLucidMode();
+        showDreamToast('🔮 Manual Lucid Mode');
+      }
+    }
+  });
+})();
+</script>
+  
 </body>
 </html>
