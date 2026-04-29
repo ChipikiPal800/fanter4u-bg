@@ -1771,3 +1771,19 @@ input:checked + .slider:before {
     font-size: 9px;
     color: var(--text-muted);
 }
+
+/* Smooth transitions for Lucid Mode */
+.desktop-bg,
+.widget,
+.desktop-icons-left i,
+.desktop-icons-right i,
+.taskbar {
+  transition: all 0.3s ease-out;
+}
+
+/* Dream counter widget styling */
+#dreamCounterWidget {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  border: 1px solid #4a6fa5;
+  box-shadow: 0 0 10px rgba(100,150,200,0.3);
+}
